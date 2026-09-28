@@ -1,0 +1,99 @@
+/*
+ * Tokens de diseño de Patio. TODO color, radio, sombra y fuente de la web sale de aquí.
+ * Concepto: patio sevillano a mediodía (cal, azulejo cobalto, luz del agua). Ver DESIGN.md.
+ * IA: un solo acento (--azulejo). --agua solo se usa en la luz cáustica del fondo, nunca en UI.
+ * Contrastes medidos (WCAG AA ≥ 4.5), peor caso entre cal y cal-hondo, día y noche:
+ * tinta ≥ 13.5 · pizarra ≥ 5.7 · azulejo ≥ 6.5 · error ≥ 5.3 · texto de botón sobre azulejo ≥ 7.7.
+ * Si cambias un color, vuelve a medir (scripts/contrast.py).
+ */
+:root {
+  color-scheme: light dark;
+
+  /* Paleta: día */
+  --cal: #f2f4f6;
+  --cal-hondo: #e4e9ef;
+  --tinta: #13202c;
+  --pizarra: #4b5b6b;
+  --azulejo: #2447b5;
+  --azulejo-hover: #1c3a99;
+  --sobre-azulejo: #ffffff;
+  --agua: #8ccbe0;
+  --error: #b42318;
+
+  /* Luz cáustica del fondo (Caustics.astro) */
+  --caustic-light: #ffffff;
+  --caustic-strength: 0.9;
+
+  /* Bloques de código / terminal: siempre oscuros */
+  --code-bg: #13202c;
+  --code-fg: #e7edf3;
+
+  /* Cristal (aproximación web de liquid glass; no existe implementación oficial para web) */
+  --glass-bg: rgb(255 255 255 / 0.55);
+  --glass-bg-strong: rgb(255 255 255 / 0.72);
+  --glass-border: rgb(255 255 255 / 0.75);
+  --glass-edge: rgb(19 32 44 / 0.08);
+  --glass-highlight: rgb(255 255 255 / 0.9);
+  --glass-blur: 18px;
+  --shadow-glass: 0 1px 2px rgb(19 40 80 / 0.06), 0 12px 40px -12px rgb(19 40 80 / 0.22);
+  --shadow-lift: 0 2px 4px rgb(19 40 80 / 0.08), 0 20px 50px -16px rgb(19 40 80 / 0.3);
+
+  /* Tipografía (autoalojada con @fontsource, ver src/layouts/Base.astro) */
+  --font-display: "Bricolage Grotesque Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-body: "Geist Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Geist Mono Variable", ui-monospace, "SFMono-Regular", monospace;
+
+  --step--1: clamp(0.84rem, 0.82rem + 0.1vw, 0.9rem);
+  --step-0: clamp(1rem, 0.97rem + 0.15vw, 1.08rem);
+  --step-1: clamp(1.2rem, 1.12rem + 0.4vw, 1.4rem);
+  --step-2: clamp(1.5rem, 1.3rem + 0.9vw, 2rem);
+  --step-3: clamp(2rem, 1.6rem + 1.8vw, 3rem);
+  --step-4: clamp(2.4rem, 1.8rem + 2.9vw, 4.1rem);
+
+  /* Radios: una sola regla (DESIGN.md) */
+  --r-panel: 28px;
+  --r-card: 18px;
+  --r-input: 12px;
+  --r-pill: 999px;
+
+  /* Espaciado y layout */
+  --gutter: clamp(1rem, 0.6rem + 2vw, 2rem);
+  --section: clamp(4.5rem, 3rem + 6vw, 8rem);
+  --max: 1200px;
+
+  /* Movimiento */
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --dur: 600ms;
+
+  /* Capas (única escala de z-index del proyecto) */
+  --z-bg: -1;
+  --z-nav: 40;
+  --z-menu: 50;
+}
+
+/* Paleta: noche (el mismo patio de noche). Se activa con la preferencia del sistema. */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --cal: #0d1620;
+    --cal-hondo: #16222e;
+    --tinta: #e7edf3;
+    --pizarra: #9dacbb;
+    --azulejo: #8aa6ff;
+    --azulejo-hover: #a9beff;
+    --sobre-azulejo: #0b1530;
+    --agua: #2c6f8c;
+    --error: #ff8a80;
+    --caustic-light: #2c6f8c;
+    --caustic-strength: 0.5;
+    --code-bg: #070d13;
+    --code-fg: #cfd9e3;
+
+    --glass-bg: rgb(22 36 50 / 0.55);
+    --glass-bg-strong: rgb(22 36 50 / 0.78);
+    --glass-border: rgb(255 255 255 / 0.12);
+    --glass-edge: rgb(0 0 0 / 0.3);
+    --glass-highlight: rgb(255 255 255 / 0.16);
+    --shadow-glass: 0 1px 2px rgb(0 0 0 / 0.3), 0 16px 40px -12px rgb(0 0 0 / 0.55);
+    --shadow-lift: 0 2px 4px rgb(0 0 0 / 0.35), 0 24px 56px -16px rgb(0 0 0 / 0.65);
+  }
+}

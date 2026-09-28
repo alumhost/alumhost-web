@@ -1,0 +1,5 @@
+# Copia a .dev.vars para desarrollo local (npm run preview). Nunca subas .dev.vars.
+# Claves de PRUEBA oficiales de Turnstile (siempre pasan):
+TURNSTILE_SECRET=1x0000000000000000000000000000000AA
+# Sin binding de email, en local se acepta el envío y solo se registra en consola:
+ALLOW_LOG_ONLY=1

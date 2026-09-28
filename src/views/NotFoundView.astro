@@ -1,0 +1,24 @@
+---
+import Base from "../layouts/Base.astro";
+import { path, useDict, type Lang } from "../i18n";
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = useDict(lang);
+---
+<Base lang={lang} page="notFound">
+  <section class="container nf">
+    <div class="glass box">
+      <p class="code mono">404</p>
+      <h1>{t.notFound.title}</h1>
+      <p class="muted">{t.notFound.body}</p>
+      <a class="btn btn--primary" href={path("home", lang)}>{t.notFound.back}</a>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .nf { min-height: 80dvh; display: grid; place-items: center; padding-top: 7rem; }
+  .box { padding: clamp(2rem, 5vw, 3.5rem); max-width: 560px; display: grid; gap: 1rem; justify-items: start; }
+  .code { color: var(--azulejo); }
+  h1 { font-size: var(--step-3); }
+</style>

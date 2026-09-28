@@ -1,0 +1,70 @@
+---
+/**
+ * Contacto: canales directos (izq.) + formulario (der.). El abuso tiene canal propio y plazo público (plan §4.3).
+ */
+import Base from "../layouts/Base.astro";
+import Icon from "../components/Icon.astro";
+import ContactForm from "../components/ContactForm.astro";
+import { site } from "../config/site";
+import { useDict, type Lang } from "../i18n";
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = useDict(lang);
+const c = t.contact;
+---
+<Base lang={lang} page="contact">
+  <div class="container contact">
+    <div class="intro">
+      <h1 class="rise" style="--i:0">{c.header.title}</h1>
+      <p class="lead rise" style="--i:1">{c.header.sub}</p>
+      <ul class="channels rise" style="--i:2">
+        <li>
+          <Icon name="envelope-simple" size="1.4rem" class="ch-icon" />
+          <div>
+            <p class="ch-label">{c.channels.emailLabel}</p>
+            <a class="mono" href={`mailto:${site.email.hello}`}>{site.email.hello}</a>
+          </div>
+        </li>
+        <li>
+          <Icon name="warning-octagon" size="1.4rem" class="ch-icon" />
+          <div>
+            <p class="ch-label">{c.channels.abuseLabel}</p>
+            <a class="mono" href={`mailto:${site.email.abuse}`}>{site.email.abuse}</a>
+            <p class="muted note">{c.channels.abuseNote}</p>
+          </div>
+        </li>
+      </ul>
+    </div>
+    <div class="form-col rise" style="--i:2">
+      <ContactForm lang={lang} />
+    </div>
+  </div>
+</Base>
+
+<style>
+  .contact {
+    display: grid;
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+    gap: clamp(2rem, 5vw, 4.5rem);
+    align-items: start;
+    padding-top: 9rem;
+  }
+  .intro { position: sticky; top: 8rem; }
+  .intro .lead { margin-top: 1.2rem; }
+  .channels { list-style: none; padding: 0; margin-top: 2.5rem; display: grid; gap: 1.6rem; }
+  .channels li { display: grid; grid-template-columns: auto 1fr; gap: 0.9rem; }
+  :global(.ch-icon) { color: var(--azulejo); margin-top: 0.1rem; }
+  .ch-label { font-weight: 560; }
+  .channels a { font-size: 0.95rem; overflow-wrap: anywhere; }
+  .note { font-size: var(--step--1); margin-top: 0.2rem; }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .rise { animation: rise 900ms var(--ease) both; animation-delay: calc(100ms + var(--i, 0) * 90ms); }
+    @keyframes rise { from { opacity: 0; transform: translateY(20px); } }
+  }
+  @media (max-width: 919px) {
+    .contact { grid-template-columns: 1fr; padding-top: 8rem; }
+    .intro { position: static; }
+  }
+</style>
