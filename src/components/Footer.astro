@@ -1,0 +1,74 @@
+---
+/**
+ * Pie. Los enlaces externos (estado, devlog, repo) solo aparecen si están definidos en site.links.
+ * TODO(legal): antes de cobrar, añadir enlaces a Términos, Privacidad (RGPD) y DPA (plan §4.3).
+ *              No añadas los enlaces hasta que existan las páginas (nada de enlaces muertos).
+ */
+import Mark from "./Mark.astro";
+import { site } from "../config/site";
+import { fill, path, useDict, type Lang } from "../i18n";
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = useDict(lang);
+const external = [
+  { href: site.links.status, label: t.footer.status },
+  { href: site.links.devlog, label: t.footer.devlog },
+  { href: site.links.repo, label: t.footer.repo },
+].filter((l): l is { href: string; label: string } => Boolean(l.href));
+---
+<footer class="footer">
+  <div class="container grid">
+    <div class="brand">
+      <p class="name"><Mark size={22} /> {site.name}</p>
+      <p class="muted">{t.footer.tagline}</p>
+    </div>
+    <div>
+      <ul>
+        <li><a href={path("plans", lang)}>{t.nav.plans}</a></li>
+        <li><a href={path("contact", lang)}>{t.nav.contact}</a></li>
+        {external.map((l) => <li><a href={l.href} rel="noopener">{l.label}</a></li>)}
+      </ul>
+    </div>
+    <ul class="mail">
+      <li><a href={`mailto:${site.email.hello}`}>{site.email.hello}</a></li>
+      <li><span class="muted">{t.contact.channels.abuseLabel}:</span> <a href={`mailto:${site.email.abuse}`}>{site.email.abuse}</a></li>
+    </ul>
+  </div>
+  <div class="container legal muted">
+    <p>{fill(t.footer.rights, { year: new Date().getFullYear(), name: site.name })}</p>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    margin-top: var(--section);
+    border-top: 1px solid var(--glass-border);
+    background: color-mix(in srgb, var(--cal) 80%, transparent);
+    padding-block: 3rem 2rem;
+    font-size: var(--step--1);
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr 1.2fr;
+    gap: 2rem;
+  }
+  .name {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--font-display);
+    font-stretch: var(--display-width);
+    font-weight: 800;
+    font-size: 1.1rem;
+    margin-bottom: 0.4rem;
+  }
+  ul { list-style: none; padding: 0; display: grid; gap: 0.5rem; }
+  a { color: var(--tinta); text-decoration: none; }
+  a:hover { color: var(--azulejo); text-decoration: underline; }
+  .mail a { font-family: var(--font-mono); font-size: 0.9em; }
+  .legal { margin-top: 2.5rem; }
+  @media (max-width: 767px) {
+    .grid { grid-template-columns: 1fr; }
+  }
+</style>
