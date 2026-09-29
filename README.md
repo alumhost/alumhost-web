@@ -1,6 +1,6 @@
-# Patio · web
+# AlumHost · web
 
-Web de la beta de Patio (hosting boutique para estudiantes): Home, Planes y Contacto, en español e inglés.
+Web de la beta de AlumHost (alumhost.dev, hosting boutique para estudiantes): Home, Planes, Contacto y Privacidad, en español e inglés.
 Astro estático + Cloudflare Workers (Static Assets). Nombre, dominio y precios son **provisionales**.
 
 ## Arrancar

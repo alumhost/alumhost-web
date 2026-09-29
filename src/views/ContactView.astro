@@ -1,6 +1,6 @@
 ---
 /**
- * Contacto: titular y canales directos (izq.) + formulario (der.). El abuso tiene canal propio y plazo público (plan §4.3).
+ * Contacto sobre velo: titular y canales directos (izq.) + formulario (der.). Abuso con canal propio (plan §4.3).
  */
 import Base from "../layouts/Base.astro";
 import ContactForm from "../components/ContactForm.astro";
@@ -13,6 +13,7 @@ const t = useDict(lang);
 const c = t.contact;
 ---
 <Base lang={lang} page="contact">
+  <div class="veil">
   <div class="container contact">
     <div class="intro">
       <h1 class="rise" style="--i:0">{c.header.title}</h1>
@@ -21,6 +22,10 @@ const c = t.contact;
         <div>
           <dt>{c.channels.emailLabel}</dt>
           <dd><a class="mono" href={`mailto:${site.email.hello}`}>{site.email.hello}</a></dd>
+        </div>
+        <div>
+          <dt>{c.channels.supportLabel}</dt>
+          <dd><a class="mono" href={`mailto:${site.email.support}`}>{site.email.support}</a></dd>
         </div>
         <div>
           <dt>{c.channels.abuseLabel}</dt>
@@ -34,6 +39,7 @@ const c = t.contact;
     <div class="form-col rise" style="--i:2">
       <ContactForm lang={lang} />
     </div>
+  </div>
   </div>
 </Base>
 

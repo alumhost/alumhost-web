@@ -13,13 +13,16 @@
 export type SalesMode = "waitlist" | "deposit" | "checkout";
 
 export const site = {
-  name: "Patio", // TODO(marca): nombre provisional
-  domain: "patio.example", // TODO(dominio)
+  name: "AlumHost",
+  domain: "alumhost.dev",
   salesMode: "waitlist" as SalesMode,
 
   email: {
-    hello: "hola@patio.example", // TODO(dominio)
-    abuse: "abuse@patio.example", // TODO(dominio). Obligatorio publicarlo (plan §1.4 y §4.3)
+    // Buzones con Email Routing de Cloudflare hacia Gmail (TODO: activarlo antes de producción).
+    hello: "hola@alumhost.dev",
+    support: "soporte@alumhost.dev",
+    abuse: "abuse@alumhost.dev", // obligatorio publicarlo (plan §1.4 y §4.3)
+    privacy: "privacidad@alumhost.dev",
   },
 
   /**
@@ -36,5 +39,10 @@ export const site = {
    * Cloudflare Turnstile (antibot del formulario). La sitekey es pública; el secret va en `wrangler secret`.
    * Este valor es la sitekey de PRUEBA oficial (siempre pasa). TODO: cambiar por la real antes de producción.
    */
+  /** Responsable del tratamiento que sale en /privacidad. TODO(legal): nombre legal y NIF cuando haya alta. */
+  legal: {
+    controller: "AlumHost, proyecto de Blas y Alonso",
+  },
+
   turnstileSiteKey: "1x00000000000000000000AA",
 } as const;

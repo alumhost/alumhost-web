@@ -1,9 +1,8 @@
 ---
 /**
  * Selector de plan del hero. Componente real (no maqueta): cambia de plan sin JS usando :has().
- * Es el ÚNICO elemento de cristal de la web: flota sobre el agua del hero. Está pensado para vivir dentro de
- * una banda .band-anil (hereda color, --muted, --btn-*).
- * Muestra precio anual con IVA prorrateado por mes. Enlaza a la fila del plan en /planes.
+ * Cristal: flota sobre el agua. Muestra el precio anual (redondo, IVA incluido) y el ahorro frente al mensual.
+ * Enlaza a la fila del plan en /planes. Si añades un plan en plans.ts, añade su selector :has() abajo.
  */
 import { plans } from "../config/plans";
 import { priceView, specLines } from "../lib/planText";
@@ -36,8 +35,8 @@ const def = plans.find((p) => p.featured)?.id ?? plans[0].id;
             {specLines(p, lang).slice(0, 3).map((line) => <li>{line}</li>)}
           </ul>
           <p class="price">
-            <span class="amount">{price.monthly}</span>
-            <span class="per">{t.common.perMonth}</span>
+            <span class="amount">{price.amount}</span>
+            <span class="per">{price.per}</span>
           </p>
           <p class="note">{price.note}</p>
           <a class="more textlink" href={`${path("plans", lang)}#${p.id}`}>{pk.details}</a>
@@ -48,35 +47,38 @@ const def = plans.find((p) => p.featured)?.id ?? plans[0].id;
 </fieldset>
 
 <style>
-  .picker {
-    padding: clamp(1.2rem, 2.5vw, 1.8rem);
-    min-width: 0;
+  .picker { padding: clamp(1.1rem, 2.4vw, 1.7rem); min-width: 0; }
+  .legend { float: left; width: 100%; font-weight: 600; margin-bottom: 0.8rem; }
+  .options {
+    clear: both;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border: 2px solid var(--text);
   }
-  .legend {
-    float: left; /* saca el legend del borde del fieldset */
-    width: 100%;
-    font-weight: 600;
-    margin-bottom: 0.9rem;
-  }
-  .options { clear: both; display: grid; }
-  .opt { position: relative; border-top: 1px solid rgb(255 255 255 / 0.3); }
-  .opt:last-child { border-bottom: 1px solid rgb(255 255 255 / 0.3); }
+  .opt { position: relative; }
+  .opt:nth-child(even) { border-left: 2px solid var(--text); }
+  .opt:nth-child(n + 3) { border-top: 2px solid var(--text); }
   .opt input { position: absolute; inset: 0; opacity: 0; margin: 0; cursor: pointer; }
   .opt span {
     display: flex;
     align-items: center;
+    justify-content: center;
+    text-align: center;
     min-height: 48px;
-    padding: 0.4rem 0.9rem;
+    padding: 0.3rem 0.5rem;
+    font-size: 0.92rem;
     font-weight: 600;
+    line-height: 1.2;
     transition: background-color 160ms var(--ease), color 160ms var(--ease);
   }
-  .opt:hover span { background: rgb(255 255 255 / 0.1); }
-  .opt input:checked + span { background: var(--albero); color: var(--ink); }
-  .opt input:focus-visible + span { outline: 3px solid var(--white); outline-offset: -3px; }
+  .opt:hover span { background: color-mix(in srgb, var(--text) 8%, transparent); }
+  .opt input:checked + span { background: var(--text); color: var(--paper); }
+  .opt input:focus-visible + span { outline: 3px solid var(--focus); outline-offset: -3px; }
 
-  .panels { margin-top: 1.3rem; }
+  .panels { margin-top: 1.2rem; }
   .panel { display: none; }
   .picker:has(input[value="publish"]:checked) .panel[data-plan="publish"],
+  .picker:has(input[value="mini"]:checked) .panel[data-plan="mini"],
   .picker:has(input[value="developer"]:checked) .panel[data-plan="developer"],
   .picker:has(input[value="pro"]:checked) .panel[data-plan="pro"] {
     display: block;
@@ -86,31 +88,29 @@ const def = plans.find((p) => p.featured)?.id ?? plans[0].id;
   @supports not selector(:has(*)) {
     .panel[data-plan="developer"] { display: block; }
   }
-  @keyframes swap {
-    from { opacity: 0; transform: translateY(5px); }
-  }
+  @keyframes swap { from { opacity: 0; transform: translateY(5px); } }
 
   .name { font-weight: 600; color: var(--muted); }
   .specs {
     list-style: none;
     padding: 0;
-    margin-top: 0.3rem;
+    margin-top: 0.2rem;
     display: flex;
     flex-wrap: wrap;
     gap: 0.2rem 1rem;
     font-size: 0.82rem;
     color: var(--muted);
   }
-  .price { margin-top: 0.9rem; display: flex; align-items: baseline; gap: 0.3rem; }
+  .price { margin-top: 0.8rem; display: flex; align-items: baseline; gap: 0.3rem; }
   .amount {
     font-family: var(--font-display);
     font-stretch: 68%;
     font-weight: 800;
-    font-size: var(--step-3);
+    font-size: clamp(3rem, 2rem + 3vw, 4.6rem);
     line-height: 0.9;
     font-variant-numeric: tabular-nums;
   }
-  .per { color: var(--muted); }
-  .note { font-size: var(--step--1); margin-top: 0.4rem; color: var(--muted); }
-  .more { display: inline-flex; align-items: center; margin-top: 0.7rem; min-height: 44px; }
+  .per { color: var(--muted); font-weight: 600; }
+  .note { font-size: var(--step--1); margin-top: 0.4rem; color: var(--muted); max-width: 36ch; }
+  .more { display: inline-flex; align-items: center; margin-top: 0.6rem; min-height: 44px; }
 </style>

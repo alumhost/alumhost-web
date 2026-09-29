@@ -1,7 +1,7 @@
 ---
 /**
- * Navegación: barra plana pegada arriba con una regla gruesa debajo (como el zócalo de un azulejo).
- * En móvil (<820px) los enlaces pasan a un panel desplegable. El CTA sale de primaryCta() (depende de site.salesMode).
+ * Navegación: barra de cristal flotante sobre el agua (esquinas de 16 px, nunca cápsula), con el reflejo que sigue
+ * al puntero. En móvil (<820px) los enlaces pasan a un panel desplegable. El CTA sale de primaryCta().
  * El cambio de idioma lleva a la misma página.
  */
 import Mark from "./Mark.astro";
@@ -25,9 +25,9 @@ const links: { key: RouteKey; label: string }[] = [
 ];
 ---
 <header class="nav-wrap">
-  <nav class="nav container" aria-label={t.nav.menu} data-nav>
+  <nav class="nav glass" aria-label={t.nav.menu} data-nav>
     <a class="brand" href={path("home", lang)} aria-label={`${site.name}, ${t.nav.home}`}>
-      <Mark size={30} />
+      <Mark size={28} />
       <span>{site.name}</span>
     </a>
 
@@ -61,68 +61,63 @@ const links: { key: RouteKey; label: string }[] = [
 <style>
   .nav-wrap {
     position: sticky;
-    top: 0;
+    top: 0.8rem;
     z-index: var(--z-nav);
-    background: var(--cal);
-    border-bottom: var(--rule);
+    padding-inline: var(--gutter);
+    margin-top: 0.8rem;
   }
   .nav {
+    max-width: calc(var(--max) - 2 * var(--gutter));
+    margin-inline: auto;
     display: flex;
     align-items: center;
-    gap: 1.5rem;
+    gap: 1rem;
     min-height: var(--nav-h);
+    padding: 0.45rem 0.5rem 0.45rem 1rem;
   }
   .brand {
     display: inline-flex;
     align-items: center;
-    gap: 0.7rem;
-    color: var(--tinta);
+    gap: 0.6rem;
+    color: var(--text);
     text-decoration: none;
     font-family: var(--font-display);
-    font-stretch: 75%;
+    font-stretch: 78%;
     font-weight: 800;
-    font-size: 1.7rem;
+    font-size: 1.5rem;
     line-height: 1;
-    letter-spacing: 0.01em;
-    text-transform: uppercase;
   }
   .nav-panel { margin-left: auto; }
-  .links {
-    display: flex;
-    align-items: center;
-    gap: 0.25rem;
-    list-style: none;
-    padding: 0;
-  }
+  .links { display: flex; align-items: center; gap: 0.2rem; list-style: none; padding: 0; }
   .links a {
     display: inline-flex;
     align-items: center;
     min-height: 44px;
     padding: 0 0.9rem;
-    color: var(--tinta);
+    color: var(--text);
     text-decoration: none;
     font-weight: 600;
   }
-  .links a:hover { text-decoration: underline; text-decoration-thickness: 0.14em; text-underline-offset: 0.3em; }
-  .links a[aria-current="page"] { text-decoration: underline; text-decoration-thickness: 0.2em; text-underline-offset: 0.3em; }
-  .links .lang { font-weight: 400; border: var(--rule); min-width: 44px; justify-content: center; padding: 0 0.6rem; margin-left: 0.5rem; }
+  .links a:hover,
+  .links a[aria-current="page"] { text-decoration: underline; text-decoration-thickness: 0.16em; text-underline-offset: 0.35em; }
+  .links .lang { font-weight: 400; }
   .actions { display: flex; align-items: center; gap: 0.4rem; }
-  .btn--sm { min-height: 44px; padding: 0 1.2rem; }
+  .btn--sm { min-height: 44px; padding: 0 1.1rem; }
 
   .menu-btn {
     display: none;
     width: 44px;
     height: 44px;
-    border: var(--rule);
+    border: 0;
     background: transparent;
-    color: var(--tinta);
+    color: var(--text);
     align-items: center;
     justify-content: center;
   }
   .icon-close { display: none; }
 
   @media (max-width: 819px) {
-    .nav { flex-wrap: wrap; gap: 0.5rem; padding-block: 0.6rem; }
+    .nav { flex-wrap: wrap; gap: 0.5rem; }
     .actions { margin-left: auto; order: 2; }
     .menu-btn { display: inline-flex; }
     .nav-panel {
@@ -137,9 +132,8 @@ const links: { key: RouteKey; label: string }[] = [
     .nav-panel > .links { overflow: hidden; min-height: 0; visibility: hidden; transition: visibility 0s 320ms; }
     [data-nav].is-open .nav-panel > .links { visibility: visible; transition-delay: 0s; }
     .links { flex-direction: column; align-items: stretch; gap: 0; }
-    .links li + li { border-top: 1px solid color-mix(in srgb, var(--tinta) 25%, transparent); }
-    .links a { min-height: 52px; font-size: 1.15rem; padding: 0; }
-    .links .lang { border: 0; margin: 0; justify-content: flex-start; }
+    .links li + li { border-top: 1px solid var(--glass-border); }
+    .links a { min-height: 52px; font-size: 1.15rem; padding: 0 0.3rem; }
     [data-nav].is-open .nav-panel { grid-template-rows: 1fr; }
     [data-nav].is-open .icon-open { display: none; }
     [data-nav].is-open .icon-close { display: inline; }

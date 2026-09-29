@@ -1,6 +1,6 @@
 ---
 /**
- * Layout común: <head> (SEO, hreflang), navegación y pie. Sin scripts globales: cada componente lleva el suyo.
+ * Layout común: <head> (SEO, hreflang), agua de fondo, navegación, pie y el reflejo del cristal que sigue al puntero.
  * Cada página pasa `lang` y `page`; los textos de <title>/<meta> salen de i18n (meta.*).
  */
 import "@fontsource-variable/archivo/wdth.css";
@@ -8,9 +8,11 @@ import "@fontsource/ibm-plex-sans/400.css";
 import "@fontsource/ibm-plex-sans/600.css";
 import "@fontsource/ibm-plex-mono/400.css";
 import "../styles/global.css";
+import Caustics from "../components/Caustics.astro";
 import Nav from "../components/Nav.astro";
 import Footer from "../components/Footer.astro";
-import { langs, path, useDict, type Lang, type RouteKey } from "../i18n";
+import { fill, langs, path, useDict, type Lang, type RouteKey } from "../i18n";
+import { site as siteConfig } from "../config/site";
 
 interface Props {
   lang: Lang;
@@ -18,8 +20,11 @@ interface Props {
 }
 const { lang, page } = Astro.props;
 const t = useDict(lang);
-const meta = t.meta[page];
-const site = Astro.site ?? new URL("https://patio.example");
+const meta = {
+  title: fill(t.meta[page].title, { name: siteConfig.name }),
+  description: t.meta[page].description,
+};
+const site = Astro.site ?? new URL("https://alumhost.dev");
 const canonical = page === "notFound" ? null : new URL(path(page, lang), site).href;
 ---
 <!doctype html>
@@ -30,8 +35,8 @@ const canonical = page === "notFound" ? null : new URL(path(page, lang), site).h
     <title>{meta.title}</title>
     <meta name="description" content={meta.description} />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <meta name="theme-color" content="#eff1ee" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#0a1030" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#c9d9ee" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0b1447" media="(prefers-color-scheme: dark)" />
     {canonical && <link rel="canonical" href={canonical} />}
     {page !== "notFound" &&
       langs.map((l) => <link rel="alternate" hreflang={l} href={new URL(path(page, l), site).href} />)}
@@ -46,10 +51,40 @@ const canonical = page === "notFound" ? null : new URL(path(page, lang), site).h
   </head>
   <body>
     <a class="skip-link" href="#main">{t.nav.skip}</a>
+    <Caustics />
     <Nav lang={lang} page={page} />
     <main id="main" tabindex="-1">
       <slot />
     </main>
     <Footer lang={lang} />
+
+    <script>
+      // Reflejo del cristal siguiendo al puntero (solo ratón y si se acepta movimiento). Un rAF por frame como máximo.
+      const fine = window.matchMedia("(hover: hover) and (pointer: fine)");
+      const calm = window.matchMedia("(prefers-reduced-motion: reduce)");
+      if (fine.matches && !calm.matches) {
+        let pending: { el: HTMLElement; x: number; y: number } | null = null;
+        document.addEventListener(
+          "pointermove",
+          (ev) => {
+            const el = (ev.target as Element | null)?.closest<HTMLElement>(".glass");
+            if (!el) return;
+            const r = el.getBoundingClientRect();
+            const first = pending === null;
+            pending = { el, x: ev.clientX - r.left, y: ev.clientY - r.top };
+            if (first) {
+              requestAnimationFrame(() => {
+                if (pending) {
+                  pending.el.style.setProperty("--mx", `${pending.x}px`);
+                  pending.el.style.setProperty("--my", `${pending.y}px`);
+                }
+                pending = null;
+              });
+            }
+          },
+          { passive: true },
+        );
+      }
+    </script>
   </body>
 </html>

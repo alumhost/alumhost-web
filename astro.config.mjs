@@ -5,7 +5,7 @@ import { defineConfig } from "astro/config";
 // Las rutas localizadas se gestionan a mano en src/i18n/index.ts (los slugs cambian por idioma).
 export default defineConfig({
   // TODO(dominio): pon aquí el dominio definitivo; se usa para canonical, hreflang y sitemap.
-  site: "https://patio.example",
+  site: "https://alumhost.dev",
   trailingSlash: "ignore",
   build: { format: "directory", inlineStylesheets: "auto" },
   devToolbar: { enabled: false },

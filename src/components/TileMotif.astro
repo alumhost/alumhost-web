@@ -1,0 +1,21 @@
+---
+/**
+ * TileMotif: textura modular (cuartos de círculo llenos y en línea) a baja opacidad dentro de una banda opaca.
+ * Se coloca como primer hijo de un contenedor con position:relative y overflow:hidden. Decorativo (aria-hidden).
+ */
+interface Props { id: string; opacity?: number }
+const { id, opacity = 0.09 } = Astro.props;
+---
+<svg class="motif" style={`opacity:${opacity}`} aria-hidden="true" focusable="false">
+  <defs>
+    <pattern id={id} width="96" height="96" patternUnits="userSpaceOnUse">
+      <path d="M0 0h48a48 48 0 0 1-48 48zM96 96H48a48 48 0 0 1 48-48z" fill="currentColor" />
+      <path d="M96 0v48a48 48 0 0 1-48-48zM0 96V48a48 48 0 0 1 48 48z" fill="none" stroke="currentColor" stroke-width="3" />
+    </pattern>
+  </defs>
+  <rect width="100%" height="100%" fill={`url(#${id})`} />
+</svg>
+
+<style>
+  .motif { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+</style>

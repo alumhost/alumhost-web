@@ -1,7 +1,8 @@
 /*
- * Base global: reset, tipografía, contenedor, bandas de color, botones. Los componentes llevan su <style> con ámbito.
- * IA: las "bandas" (.band-anil, .band-albero) redefinen variables (--btn-*, --link, --focus, --muted, --rule) para que
- *     cualquier botón, enlace o regla que haya dentro funcione sin estilos especiales. Reutilízalas.
+ * Base global: reset, tipografía, contenedor, velo, bandas, cristal, botones. Los componentes llevan su <style>.
+ * IA: las bandas (.band-indigo, .band-sand) son baldosas OPACAS sobre el agua y redefinen --btn-*, --link, --focus,
+ *     --muted y --rule-color, así que cualquier botón, enlace o regla dentro funciona sin estilos especiales.
+ *     .veil es el velo translúcido de las secciones de lectura. .glass solo en lo que flota (nav, selector, plan destacado).
  */
 @import "./tokens.css";
 
@@ -15,13 +16,13 @@ html {
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
   scroll-behavior: smooth;
-  scroll-padding-top: calc(var(--nav-h) + 1rem);
+  scroll-padding-top: calc(var(--nav-h) + 2rem);
 }
 
 body {
   min-height: 100dvh;
-  background: var(--cal);
-  color: var(--tinta);
+  background: var(--pool-base);
+  color: var(--text);
   font-family: var(--font-body);
   font-size: var(--step-0);
   line-height: 1.6;
@@ -39,35 +40,28 @@ h1, h2, h3 {
   font-stretch: var(--display-width);
   font-weight: 800;
   line-height: 0.92;
-  letter-spacing: -0.005em;
+  letter-spacing: 0;
   text-wrap: balance;
 }
 h1 { font-size: var(--step-5); }
 h2 { font-size: var(--step-3); }
-h3 { font-size: var(--step-1); line-height: 1.1; font-stretch: 85%; font-weight: 700; letter-spacing: 0; }
+h3 { font-size: var(--step-1); line-height: 1.1; font-stretch: 85%; font-weight: 700; }
 p { text-wrap: pretty; }
 
 a { color: var(--link); text-decoration-thickness: 0.09em; text-underline-offset: 0.22em; }
 a:hover { text-decoration-thickness: 0.18em; }
 
-:focus-visible {
-  outline: 3px solid var(--focus);
-  outline-offset: 3px;
-}
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
 
-::selection { background: var(--albero); color: var(--ink); }
+::selection { background: var(--sand); color: var(--ink); }
 
 /* ---------- Layout ---------- */
-.container {
-  width: 100%;
-  max-width: var(--max);
-  margin-inline: auto;
-  padding-inline: var(--gutter);
-}
+.container { width: 100%; max-width: var(--max); margin-inline: auto; padding-inline: var(--gutter); }
 .section { padding-block: var(--section); }
 .muted { color: var(--muted); }
 .mono { font-family: var(--font-mono); font-size: 0.9em; }
 .lead { font-size: var(--step-1); line-height: 1.45; color: var(--muted); max-width: 40ch; }
+main { position: relative; }
 
 .sr-only {
   position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
@@ -76,53 +70,72 @@ a:hover { text-decoration-thickness: 0.18em; }
 
 .skip-link {
   position: fixed; left: 1rem; top: -4rem; z-index: var(--z-menu);
-  padding: 0.7rem 1.1rem; background: var(--albero); color: var(--ink); font-weight: 600;
+  padding: 0.7rem 1.1rem; background: var(--sand); color: var(--ink); font-weight: 600;
   transition: top 200ms var(--ease);
 }
 .skip-link:focus { top: 1rem; }
 
-/* ---------- Bandas de color (baldosas a sangre) ---------- */
-.band-anil {
-  background: var(--anil);
+/* ---------- Velo: secciones de lectura sobre el agua ---------- */
+.veil { background: var(--veil); }
+
+/* ---------- Bandas: baldosas opacas a sangre ---------- */
+.band-indigo {
+  background: var(--indigo);
   color: var(--white);
-  --btn-bg: var(--albero);
+  --btn-bg: var(--sand);
   --btn-fg: var(--ink);
-  --link: var(--albero);
-  --focus: var(--albero);
-  --muted: rgb(255 255 255 / 0.82);
-  --rule: 2px solid currentColor;
+  --link: var(--sand);
+  --focus: var(--sand);
+  --muted: rgb(255 255 255 / 0.84);
+  --rule-color: rgb(255 255 255 / 0.9);
 }
-.band-albero {
-  background: var(--albero);
+.band-sand {
+  background: var(--sand);
   color: var(--ink);
   --btn-bg: var(--ink);
   --btn-fg: var(--white);
   --link: var(--ink);
   --focus: var(--ink);
-  --muted: rgb(14 23 64 / 0.84);
-  --rule: 2px solid currentColor;
+  --muted: rgb(13 22 64 / 0.86);
+  --rule-color: var(--ink);
 }
 
-/* ---------- Cristal: solo el selector del hero, sobre el agua ---------- */
+/* ---------- Cristal (solo lo que flota) ----------
+ * Desenfoque + saturación del agua de detrás, borde de luz, brillo superior y reflejo que sigue al puntero
+ * (--mx/--my, script en Base.astro). Sin backdrop-filter o con menos transparencia: superficie sólida.
+ */
 .glass {
+  position: relative;
+  isolation: isolate;
   background: var(--glass-bg);
   border: 1px solid var(--glass-border);
-  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(140%);
-  backdrop-filter: blur(var(--glass-blur)) saturate(140%);
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.35);
+  border-radius: var(--r-glass);
+  box-shadow: inset 0 1px 0 var(--glass-hi), var(--glass-shadow);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(160%);
+  backdrop-filter: blur(var(--glass-blur)) saturate(160%);
 }
+.glass::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(380px circle at var(--mx, 20%) var(--my, -20%), var(--glass-hi), transparent 60%);
+  opacity: 0.55;
+  transition: opacity 400ms var(--ease);
+}
+.glass:hover::before { opacity: 1; }
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  .glass { background: var(--anil); }
+  .glass { background: var(--paper-2); }
 }
 @media (prefers-reduced-transparency: reduce) {
-  .glass {
-    background: var(--anil);
-    -webkit-backdrop-filter: none;
-    backdrop-filter: none;
-  }
+  .glass { background: var(--paper-2); -webkit-backdrop-filter: none; backdrop-filter: none; }
+  .glass::before { display: none; }
+  .veil { background: var(--paper); }
 }
 
-/* ---------- Botón: rectangular, se invierte al pasar el ratón ---------- */
+/* ---------- Botón: baldosa rectangular que se invierte al pasar el ratón ---------- */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -141,8 +154,10 @@ a:hover { text-decoration-thickness: 0.18em; }
 }
 .btn:hover { background: transparent; color: var(--btn-bg); }
 .btn:active { translate: 0 2px; }
+.btn--outline { background: transparent; color: var(--text); border-color: var(--rule-color); }
+.btn--outline:hover { background: var(--rule-color); color: var(--paper); }
 
-/* Enlace secundario: texto subrayado grueso, sin botón */
+/* Enlace secundario: texto subrayado grueso */
 .textlink {
   color: inherit;
   font-weight: 600;
@@ -152,7 +167,7 @@ a:hover { text-decoration-thickness: 0.18em; }
 }
 .textlink:hover { text-decoration-thickness: 0.28em; }
 
-/* Entrada de la portada: se anima el titular, no todo. */
+/* Entrada de titulares (solo cabeceras; nunca el mismo efecto en todos los bloques) */
 @media (prefers-reduced-motion: no-preference) {
   .rise {
     animation: rise 900ms var(--ease) both;

@@ -6,19 +6,23 @@ import type { Dict } from "./es";
 const en: Dict = {
   meta: {
     home: {
-      title: "Patio · VPS and websites for students, with human support",
+      title: "{name} · VPS and websites for students, with human support",
       description:
         "Boutique hosting for students and developers: static sites and SSH-ready VPS, VAT included, with a 1:1 onboarding call.",
     },
     plans: {
-      title: "Plans and pricing · Patio",
-      description: "Publish, VPS Developer and VPS Pro. Clear prices with VAT included, billed yearly by default.",
+      title: "Plans and pricing · {name}",
+      description: "Publish, VPS Mini, VPS Developer and VPS Pro. Round prices with VAT included and 2 months free when paying yearly.",
     },
     contact: {
-      title: "Contact · Patio",
+      title: "Contact · {name}",
       description: "Reserve a spot in the private beta or ask us anything. A real person replies.",
     },
-    notFound: { title: "Page not found · Patio", description: "This page does not exist." },
+    privacy: {
+      title: "Privacy · {name}",
+      description: "What data the contact form collects, why, and how to exercise your rights.",
+    },
+    notFound: { title: "Page not found · {name}", description: "This page does not exist." },
   },
 
   nav: {
@@ -36,24 +40,26 @@ const en: Dict = {
   common: {
     vatIncluded: "VAT included",
     perMonth: "/mo",
-    yearlyTotal: "{total} per year, VAT included",
-    monthlyTotal: "Billed monthly, VAT included",
+    perYear: "/yr",
+    yearlySaving: "You save {amount} compared with paying {monthly} a month. VAT included.",
+    monthlyNote: "Billed monthly, VAT included.",
     from: "from {price}/mo",
   },
 
   home: {
     hero: {
       eyebrow: "Private beta open",
-      titleA: "VPS and websites for students, with support from",
-      titleEm: "real people.",
-      sub: "For your thesis, your coursework or your first project. We do your first setup with you, 1:1.",
+      titleA: "Your server, set up",
+      titleEm: "with you.",
+      sub: "VPS and static sites for students and developers. We do your first setup together, 1:1.",
       ctaSecondary: "See plans",
       picker: {
         legend: "What are you shipping?",
         options: {
           publish: "A static website",
-          developer: "A server (VPS)",
-          pro: "Something heavier",
+          mini: "A small VPS",
+          developer: "A VPS",
+          pro: "A bigger VPS",
         },
         details: "See the full plan",
       },
@@ -93,7 +99,10 @@ const en: Dict = {
         { title: "An SLA.", body: "This is a best-effort service, and we say so before you pay." },
         { title: "The lowest price.", body: "Big clouds win on specs. We compete on help and being close by." },
         { title: "Backups you did not order.", body: "Without the backup add-on, the data on your VPS is your responsibility." },
-        { title: "Outbound email.", body: "Port 25 stays closed so nobody burns the IP we all share." },
+        {
+          title: "Outbound email.",
+          body: "Port 25 is closed. So are 465 and 587, unless you ask us to open them for your project.",
+        },
       ],
     },
     closing: {
@@ -105,13 +114,14 @@ const en: Dict = {
   plans: {
     header: {
       title: "Clear plans, VAT included.",
-      sub: "Beta prices, provisional until we measure real capacity. Yearly billing is cheaper, for you and for us.",
+      sub: "Beta prices, provisional until we measure real capacity. Pay yearly and the VPS plans come with 2 months free.",
     },
     billing: { label: "Billing period", yearly: "Yearly", monthly: "Monthly" },
     recommended: "Recommended to start",
     specs: {
       vcpu: "{n} vCPU",
-      ram: "{n} GB RAM",
+      ramGb: "{n} GB RAM",
+      ramMb: "{n} MB RAM",
       disk: "~{n} GB NVMe",
       ssh: "SSH with public key",
     },
@@ -121,10 +131,15 @@ const en: Dict = {
         tagline: "For your portfolio or a project website.",
         features: ["Deploy with git push", "Automatic HTTPS", "Subdomain or your own domain", "No SSH access"],
       },
+      mini: {
+        name: "VPS Mini",
+        tagline: "For a bot, a small API or learning Linux.",
+        features: ["Shared IPv4 for web (80/443)"],
+      },
       developer: {
         name: "VPS Developer",
         tagline: "For your thesis, an API or systems coursework.",
-        features: ["Your own IPv6", "Shared IPv4 for web (80/443)"],
+        features: ["Shared IPv4 for web (80/443)"],
       },
       pro: {
         name: "VPS Pro",
@@ -132,12 +147,17 @@ const en: Dict = {
         features: ["More CPU and disk (set during the beta)", "Optional dedicated IPv4 for any port"],
       },
     },
+    custom: {
+      title: "Need something else?",
+      body: "More RAM, several services or something these plans do not cover. Tell us and we will email you a quote.",
+      cta: "Ask for a quote",
+    },
     addons: {
       title: "Add-ons",
       backup: {
         title: "Daily backup",
         line: "{plan}: {price}/mo, kept for {days} days.",
-        note: "We test real restores, not just backups.",
+        note: "An automatic copy of your VPS every day.",
       },
       ipv4: {
         title: "Dedicated IPv4",
@@ -150,7 +170,7 @@ const en: Dict = {
         { q: "Is VAT included?", a: "Yes. Every price on this page includes 21% Spanish VAT." },
         {
           q: "Why is yearly cheaper?",
-          a: "Every card payment carries a fixed fee. Charging once a year makes it almost vanish, and we pass that on.",
+          a: "Every card payment carries a fixed fee. Charging once a year makes it almost vanish, and we pass that on: 2 months free on the VPS plans.",
         },
         {
           q: "Do I get backups?",
@@ -158,7 +178,11 @@ const en: Dict = {
         },
         {
           q: "What is not allowed?",
-          a: "Sending mail over port 25, crypto mining, network scanning or hosting phishing.",
+          a: "Crypto mining, network scanning, hosting phishing or sending spam. Outbound mail (25, 465 and 587) is closed by default.",
+        },
+        {
+          q: "Do I get IPv6?",
+          a: "Not yet. VPS plans ship with shared IPv4 for web (80/443). IPv6 comes once its isolation is tested.",
         },
         {
           q: "Is uptime guaranteed?",
@@ -179,8 +203,9 @@ const en: Dict = {
     },
     channels: {
       emailLabel: "Email",
+      supportLabel: "Support",
       abuseLabel: "Report abuse",
-      abuseNote: "We reply within 24-48 business hours.",
+      abuseNote: "We check it every day.",
     },
     form: {
       title: "Write to us",
@@ -191,6 +216,7 @@ const en: Dict = {
       reasons: {
         beta: "Reserve a beta spot",
         plans: "Question about plans",
+        custom: "I need something custom",
         support: "Help with my service",
         other: "Something else",
       },
@@ -199,6 +225,7 @@ const en: Dict = {
       message: "Message",
       messageHelp: "Tell us what you want to build. At least 10 characters.",
       privacy: "We only use your details to reply to you.",
+      privacyLink: "Privacy policy",
       submit: "Send",
       sending: "Sending",
       success: "Got it. We will write to {email} soon.",
@@ -213,11 +240,47 @@ const en: Dict = {
     },
   },
 
+  privacy: {
+    title: "Privacy.",
+    updated: "Last updated: 29 September 2026.",
+    sections: [
+      {
+        h: "Who handles your data",
+        p: "{controller}. For anything about your data, write to {email}.",
+      },
+      {
+        h: "What we collect",
+        p: "What you type into the contact form: name, email, reason, plan and message. Your IP address is also processed for security, only to stop spam and rate-limit messages.",
+      },
+      {
+        h: "Why",
+        p: "To reply to you and, if you ask, to manage your beta spot. The legal basis is your consent when you send the form and, if you are about to sign up, steps taken before a contract.",
+      },
+      {
+        h: "Who we share it with",
+        p: "With the providers that run the site: Cloudflare (hosting, anti-spam check and email forwarding) and Google (our inbox). They may process it outside the European Economic Area under the safeguards the GDPR requires. We never sell your data or use it for advertising.",
+      },
+      {
+        h: "How long",
+        p: "Until your question is solved and for twelve months at most. If you become a customer, as long as the law requires.",
+      },
+      {
+        h: "Your rights",
+        p: "You can ask for access, correction, deletion, objection, restriction and portability by writing to {email}. If you think we got it wrong, you can complain to the Spanish Data Protection Agency (aepd.es).",
+      },
+      {
+        h: "Cookies",
+        p: "We use no analytics or advertising cookies.",
+      },
+    ],
+  },
+
   footer: {
     tagline: "Boutique hosting for students and developers.",
     status: "Service status",
     devlog: "Devlog",
     repo: "Open source",
+    privacy: "Privacy",
     rights: "© {year} {name}",
   },
 

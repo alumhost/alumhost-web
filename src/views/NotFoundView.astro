@@ -6,6 +6,7 @@ const { lang } = Astro.props;
 const t = useDict(lang);
 ---
 <Base lang={lang} page="notFound">
+  <div class="veil">
   <section class="container nf">
     <p class="code" aria-hidden="true">404</p>
     <div>
@@ -14,6 +15,7 @@ const t = useDict(lang);
       <a class="btn" href={path("home", lang)}>{t.notFound.back}</a>
     </div>
   </section>
+  </div>
 </Base>
 
 <style>

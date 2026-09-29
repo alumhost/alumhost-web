@@ -1,11 +1,10 @@
 ---
 /**
- * Pie sobre banda añil, rematado arriba por la cenefa. Los enlaces externos (estado, devlog, repo) solo aparecen
- * si están definidos en site.links.
- * TODO(legal): antes de cobrar, añadir enlaces a Términos, Privacidad (RGPD) y DPA (plan §4.3).
- *              No añadas los enlaces hasta que existan las páginas (nada de enlaces muertos).
+ * Pie: baldosa índigo opaca rematada arriba por la cinta de módulos. Los enlaces externos (estado, devlog, repo)
+ * solo aparecen si están definidos en site.links.
+ * TODO(legal): añadir Términos y DPA cuando existan las páginas (nada de enlaces muertos). Privacidad ya existe.
  */
-import Cenefa from "./Cenefa.astro";
+import TileStrip from "./TileStrip.astro";
 import { site } from "../config/site";
 import { fill, path, useDict, type Lang } from "../i18n";
 
@@ -18,8 +17,8 @@ const external = [
   { href: site.links.repo, label: t.footer.repo },
 ].filter((l): l is { href: string; label: string } => Boolean(l.href));
 ---
-<Cenefa flip />
-<footer class="footer band-anil">
+<TileStrip id="strip-footer" />
+<footer class="footer band-indigo">
   <div class="container top">
     <div>
       <p class="word">{site.name}</p>
@@ -29,10 +28,12 @@ const external = [
       <ul>
         <li><a href={path("plans", lang)}>{t.nav.plans}</a></li>
         <li><a href={path("contact", lang)}>{t.nav.contact}</a></li>
+        <li><a href={path("privacy", lang)}>{t.footer.privacy}</a></li>
         {external.map((l) => <li><a href={l.href} rel="noopener">{l.label}</a></li>)}
       </ul>
       <ul class="mail">
         <li><a href={`mailto:${site.email.hello}`}>{site.email.hello}</a></li>
+        <li><span class="label">{t.contact.channels.supportLabel}</span><a href={`mailto:${site.email.support}`}>{site.email.support}</a></li>
         <li><span class="label">{t.contact.channels.abuseLabel}</span><a href={`mailto:${site.email.abuse}`}>{site.email.abuse}</a></li>
       </ul>
     </nav>
@@ -44,19 +45,13 @@ const external = [
 
 <style>
   .footer { padding-block: clamp(3rem, 6vw, 5rem) 2rem; font-size: var(--step--1); }
-  .top {
-    display: grid;
-    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
-    gap: 3rem;
-    align-items: end;
-  }
+  .top { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 3rem; align-items: end; }
   .word {
     font-family: var(--font-display);
     font-stretch: 68%;
     font-weight: 800;
     font-size: var(--step-4);
     line-height: 0.85;
-    text-transform: uppercase;
   }
   .tagline { margin-top: 1rem; color: var(--muted); max-width: 32ch; font-size: var(--step-0); }
   .cols { display: grid; grid-template-columns: 1fr 1.5fr; gap: 2rem; }

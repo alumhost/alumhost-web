@@ -1,5 +1,5 @@
 /**
- * Worker de Patio. Static Assets sirve la web; este código solo recibe /api/* (ver run_worker_first en wrangler.jsonc).
+ * Worker de AlumHost. Static Assets sirve la web; este código solo recibe /api/* (ver run_worker_first en wrangler.jsonc).
  *
  * Endpoints:
  *   POST /api/contact  formulario de contacto / reserva de beta
@@ -21,8 +21,8 @@ export interface Env {
   ALLOW_LOG_ONLY?: string; // "1" solo en local (.dev.vars): acepta sin enviar, registra en consola
 }
 
-const REASONS = ["beta", "plans", "support", "other"] as const;
-const PLANS = ["", "publish", "developer", "pro"] as const;
+const REASONS = ["beta", "plans", "custom", "support", "other"] as const;
+const PLANS = ["", "publish", "mini", "developer", "pro"] as const;
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
 interface ContactInput {

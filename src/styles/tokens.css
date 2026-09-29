@@ -1,92 +1,99 @@
 /*
- * Tokens de diseño de Patio. TODO color, fuente y regla de la web sale de aquí. Ver DESIGN.md.
- * Concepto: azulejo sevillano. Tres colores de baldosa (añil, albero, cal) más almagra (el rojo de las fachadas)
- * solo para lo que es precio o negación. Nada de cristal salvo el selector del hero, nada de degradados de texto.
+ * Tokens de diseño de AlumHost. TODO color, fuente y regla de la web sale de aquí. Ver DESIGN.md.
+ * Concepto: "módulos sobre el agua". Baldosas rígidas (índigo, arena) flotando sobre luz de agua; cristal solo en lo
+ * que flota (nav, selector de plan, plan recomendado). Ladrillo (--brick) SOLO para lo tachado y los errores.
+ * Nombres neutros a propósito: nada regional en tokens, clases ni textos.
  *
- * IA: los colores fijos (--ink, --white, --albero, --anil-pool*) NO cambian en modo noche; son los de las bandas.
- * Contrastes: scripts/contrast.py mide todos los pares de abajo (WCAG AA ≥ 4.5, texto grande ≥ 3). Vuelve a ejecutarlo
- * si tocas un color.
+ * IA: los fijos (--ink, --white, --sand) no cambian en modo noche. Contrastes: scripts/contrast.py (WCAG AA).
  */
 :root {
   color-scheme: light dark;
 
-  /* Fijos (iguales de día y de noche) */
-  --ink: #0e1740;
+  /* Fijos */
+  --ink: #0d1640;
   --white: #ffffff;
-  --albero: #e0ae35;
+  --sand: #e6b53e;
 
   /* Día */
-  --cal: #eff1ee;
-  --cal-hondo: #e0e4df;
-  --tinta: #0e1740;
-  --pizarra: #465078;
-  --anil: #1a2a8c;
-  --almagra: #a3271c;
-  --link: #1a2a8c;
-  --focus: #1a2a8c;
-  --btn-bg: #1a2a8c;
+  --paper: #eef2f6;
+  --paper-2: #dfe6ef;
+  --text: #0d1640;
+  --muted: #34406a;
+  --indigo: #1b2c95;
+  --brick: #a3271c;
+  --link: #1b2c95;
+  --focus: #1b2c95;
+  --btn-bg: #1b2c95;
   --btn-fg: #ffffff;
-  --muted: var(--pizarra);
+  --rule-color: #0d1640;
 
-  /* Agua del hero (Caustics.astro). Es un estanque azul, no una piscina turquesa. */
-  --pool-base: #15226f;
-  --pool-water: #2a4fb0;
-  --pool-light: #6a92e0;
-  --pool-strength: 0.62;
+  /* Agua (Caustics.astro): fondo de toda la página */
+  --pool-base: #c9d9ee;
+  --pool-water: #8fb2e6;
+  --pool-light: #ffffff;
+  --pool-strength: 0.95;
+  /* Velo sobre el agua en las secciones de lectura (el agua se intuye, el texto se lee) */
+  --veil: rgb(238 242 246 / 0.74);
 
-  /* Cristal: solo el selector del hero */
-  --glass-bg: rgb(14 23 64 / 0.42);
-  --glass-border: rgb(255 255 255 / 0.28);
-  --glass-blur: 16px;
+  /* Cristal: solo en lo que flota */
+  --glass-bg: rgb(255 255 255 / 0.52);
+  --glass-border: rgb(255 255 255 / 0.85);
+  --glass-hi: rgb(255 255 255 / 0.95);
+  --glass-shadow: 0 1px 2px rgb(13 22 64 / 0.08), 0 18px 44px -18px rgb(13 22 64 / 0.35);
+  --glass-blur: 18px;
+  --r-glass: 16px;
 
-  /* Reglas y tipografía (autoalojada con @fontsource, ver src/layouts/Base.astro) */
-  --rule: 2px solid var(--tinta);
+  /* Tipografía (autoalojada con @fontsource, ver src/layouts/Base.astro) */
   --font-display: "Archivo Variable", "Archivo", ui-sans-serif, system-ui, sans-serif;
   --font-body: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", monospace;
-  --display-width: 68%; /* eje wdth de Archivo: 62 (muy condensada) a 125 */
+  --display-width: 70%; /* eje wdth de Archivo: 62 (muy condensada) a 125 */
 
   --step--1: clamp(0.84rem, 0.82rem + 0.1vw, 0.92rem);
   --step-0: clamp(1rem, 0.97rem + 0.15vw, 1.1rem);
   --step-1: clamp(1.2rem, 1.1rem + 0.5vw, 1.5rem);
   --step-2: clamp(1.8rem, 1.4rem + 1.6vw, 2.9rem);
-  --step-3: clamp(2.6rem, 1.8rem + 3.4vw, 5rem);
-  --step-4: clamp(3.4rem, 2rem + 6vw, 8rem);
-  --step-5: clamp(3.1rem, 1.4rem + 8.2vw, 10.5rem);
+  --step-3: clamp(2.4rem, 1.6rem + 3.4vw, 5rem);
+  --step-4: clamp(3rem, 1.8rem + 5vw, 7.5rem);
+  --step-5: clamp(3.3rem, 1.2rem + 8.4vw, 10.5rem);
 
-  /* Espaciado y layout */
+  --rule: 2px solid var(--rule-color);
   --gutter: clamp(1rem, 0.5rem + 2.4vw, 2.5rem);
   --section: clamp(4rem, 2.5rem + 6vw, 8.5rem);
-  --max: 1360px;
-  --nav-h: 68px;
+  --max: 1320px;
+  --nav-h: 62px;
 
-  /* Movimiento: una sola curva */
   --ease: cubic-bezier(0.16, 1, 0.3, 1);
 
-  /* Capas */
-  --z-bg: 0;
-  --z-content: 1;
+  --z-bg: -1;
   --z-nav: 40;
   --z-menu: 50;
 }
 
-/* Noche: el mismo patio con las luces apagadas */
+/* Noche */
 @media (prefers-color-scheme: dark) {
   :root {
-    --cal: #0a1030;
-    --cal-hondo: #131b48;
-    --tinta: #eef0fb;
-    --pizarra: #a6aed0;
-    --anil: #23369f;
-    --almagra: #ff9584;
-    --link: #e0ae35;
-    --focus: #e0ae35;
-    --btn-bg: #e0ae35;
-    --btn-fg: #0e1740;
+    --paper: #0a1030;
+    --paper-2: #131b48;
+    --text: #eef1fb;
+    --muted: #b3bbdc;
+    --indigo: #24389f;
+    --brick: #ff9584;
+    --link: #e6b53e;
+    --focus: #e6b53e;
+    --btn-bg: #e6b53e;
+    --btn-fg: #0d1640;
+    --rule-color: #eef1fb;
 
-    --pool-base: #0d1650;
+    --pool-base: #0b1447;
     --pool-water: #1d3a91;
-    --pool-light: #5075c9;
+    --pool-light: #5a82d8;
     --pool-strength: 0.55;
+    --veil: rgb(10 16 48 / 0.72);
+
+    --glass-bg: rgb(16 26 80 / 0.5);
+    --glass-border: rgb(255 255 255 / 0.16);
+    --glass-hi: rgb(255 255 255 / 0.2);
+    --glass-shadow: 0 1px 2px rgb(0 0 0 / 0.3), 0 20px 50px -18px rgb(0 0 0 / 0.7);
   }
 }

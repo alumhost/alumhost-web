@@ -1,0 +1,54 @@
+---
+/**
+ * Política de privacidad mínima del formulario (RGPD). Textos en i18n privacy.*.
+ * TODO(legal): borrador; revisarlo con un tercero antes de producción. El titular sale de site.legal.controller.
+ */
+import Base from "../layouts/Base.astro";
+import { site } from "../config/site";
+import { fill, useDict, type Lang } from "../i18n";
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = useDict(lang);
+const pr = t.privacy;
+const vars = { controller: site.legal.controller, email: site.email.privacy };
+---
+<Base lang={lang} page="privacy">
+  <div class="veil">
+    <article class="container doc">
+      <header>
+        <h1 class="rise" style="--i:0">{pr.title}</h1>
+        <p class="updated mono">{pr.updated}</p>
+      </header>
+      <div class="body">
+        {pr.sections.map((s) => (
+          <section>
+            <h2>{s.h}</h2>
+            <p>{fill(s.p, vars)}</p>
+          </section>
+        ))}
+      </div>
+    </article>
+  </div>
+</Base>
+
+<style>
+  .doc {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: clamp(2rem, 5vw, 5rem);
+    align-items: start;
+    padding-block: clamp(3rem, 6vw, 5.5rem) var(--section);
+  }
+  header { position: sticky; top: calc(var(--nav-h) + 2rem); }
+  h1 { font-size: var(--step-4); }
+  .updated { margin-top: 1rem; color: var(--muted); font-size: 0.85rem; }
+  section { border-top: var(--rule); padding-block: 1.3rem 1.6rem; }
+  section:last-child { border-bottom: var(--rule); }
+  h2 { font-size: var(--step-1); font-stretch: 85%; font-weight: 700; line-height: 1.15; margin-bottom: 0.6rem; }
+  .body p { max-width: 62ch; }
+  @media (max-width: 767px) {
+    .doc { grid-template-columns: 1fr; }
+    header { position: static; }
+  }
+</style>

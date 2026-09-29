@@ -20,18 +20,15 @@ def ratio(a, b):
 day = tokens(light_block)
 night = {**day, **tokens(dark_block)}
 
-# (texto, fondo, mínimo)
+# (texto, fondo, mínimo). Las secciones de lectura van sobre velo (~paper); el hero va directo sobre el agua.
 PAIRS = [
-    ("tinta", "cal", 4.5), ("tinta", "cal-hondo", 4.5),
-    ("pizarra", "cal", 4.5), ("pizarra", "cal-hondo", 4.5),
-    ("almagra", "cal", 4.5), ("almagra", "cal-hondo", 4.5),
-    ("link", "cal", 4.5), ("link", "cal-hondo", 4.5),
+    ("text", "paper", 4.5), ("text", "paper-2", 4.5),
+    ("muted", "paper", 4.5), ("muted", "paper-2", 4.5),
+    ("brick", "paper", 4.5), ("link", "paper", 4.5),
     ("btn-fg", "btn-bg", 4.5),
-    ("white", "anil", 4.5),          # texto sobre banda añil
-    ("albero", "anil", 4.5),         # enlaces y botón sobre banda añil
-    ("ink", "albero", 4.5),          # texto y botón sobre banda albero
-    ("white", "pool-light", 3.0),    # titular gigante (texto grande) sobre las líneas de luz del agua
-    ("white", "pool-water", 4.5),    # texto pequeño sobre el agua sin línea de luz
+    ("white", "indigo", 4.5), ("sand", "indigo", 4.5),   # banda índigo
+    ("ink", "sand", 4.5),                                  # banda arena
+    ("text", "pool-base", 4.5), ("text", "pool-water", 4.5),  # hero sobre el agua
 ]
 ok = True
 for name, t in (("día", day), ("noche", night)):
