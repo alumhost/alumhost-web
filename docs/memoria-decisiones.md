@@ -84,17 +84,19 @@ Repositorio: `alumhost/alumhost-web` (GitHub, ambos owners).
 
 ## Precios (con IVA incluido, PVP)
 
-### Anual equivalente a 10 mensualidades (excepto Publish)
+### Anual equivalente a 10 mensualidades
 
-- **Publish**: 18 €/año o 2 €/mes.
-- **Mini 512 MB**: 30 €/año o 3 €/mes (plan nuevo).
-- **Developer 1 vCPU 1 GB ~15 GB**: 50 €/año o 5 €/mes (subido desde 4 € por costes).
-- **Pro 4 GB**: 80 €/año o 8 €/mes (vCPU y disco sin definir hasta benchmarks).
+Precios de estudiante sobre OVH So you Start SYS-1 32 GB (decisión 29/09/2026).
+
+- **Publish**: 15 €/año o 1,50 €/mes.
+- **Mini 512 MB**: 25 €/año o 2,50 €/mes.
+- **Developer 1 vCPU 1 GB ~15 GB**: 40 €/año o 4 €/mes.
+- **Pro 2 GB**: 60 €/año o 6 €/mes (4 GB solo con un servidor mayor; vCPU y disco sin definir hasta benchmarks).
 
 ### Add-ons
 - **Backup Developer**: +1 €/mes (7 días).
 - **Backup Pro**: +2 €/mes (14 días).
-- **IPv4 dedicada (solo Pro)**: +4,50 €/mes (coste real 2,11 €/mes).
+- **IPv4 dedicada (solo Pro)**: +3 €/mes (IP adicional de OVH, 1,50 €/mes sin IVA).
 
 ### Estrategia de precios
 - Redondos a propósito (no .99).

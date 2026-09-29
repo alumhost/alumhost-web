@@ -3,7 +3,7 @@
  *
  * Origen: plan de negocio §1.1 y §2bis del documento de estado (29/09/2026), ver docs/memoria-decisiones.md.
  * - Precios en CÉNTIMOS y CON IVA incluido (PVP), que es lo que se publica. El neto se calcula con netOf().
- * - Anual = 10 mensualidades en los VPS ("2 meses gratis"). Publish: 18 €/año frente a 2 €/mes.
+ * - Anual = 10 mensualidades en los VPS ("2 meses gratis"). Publish igual: 15 €/año frente a 1,50 €/mes.
  * - Precios redondos a propósito: la evidencia reciente no encuentra efecto fiable de los ,99 en la compra
  *   y lo redondo encaja con la promesa de "sin letra pequeña". No los cambies a ,99 sin datos propios.
  * - PROVISIONALES hasta los benchmarks en Hetzner. Los textos están en src/i18n/*.ts bajo `plans.items[id]`.
@@ -33,14 +33,14 @@ export interface Plan {
 export const plans: Plan[] = [
   {
     id: "publish",
-    price: { yearly: 1800, monthly: 200 },
+    price: { yearly: 1500, monthly: 150 },
     specs: { vcpu: null, ramMb: null, diskGb: null, ssh: false },
     backup: null, // el repositorio del cliente es la copia
     featured: false,
   },
   {
     id: "mini",
-    price: { yearly: 3000, monthly: 300 },
+    price: { yearly: 2500, monthly: 250 },
     // 512 MB (plan nuevo del §2bis). vCPU y disco sin fijar hasta los benchmarks: null = la web no inventa cifra.
     specs: { vcpu: null, ramMb: 512, diskGb: null, ssh: true },
     backup: null, // TODO(negocio): decidir si Mini tiene backup
@@ -48,16 +48,16 @@ export const plans: Plan[] = [
   },
   {
     id: "developer",
-    price: { yearly: 5000, monthly: 500 }, // subido de 4 € a 5 €: a 4 € no cubre costes en un dedicado de 2026
+    price: { yearly: 4000, monthly: 400 }, // precio de estudiante sobre OVH SYS-1 32 GB (decisión 29/09/2026)
     specs: { vcpu: 1, ramMb: 1024, diskGb: 15, ssh: true },
     backup: { monthly: 100, retentionDays: 7 },
     featured: true,
   },
   {
     id: "pro",
-    price: { yearly: 8000, monthly: 800 },
-    // 4 GB. vCPU y disco sin definir: null = la web no inventa cifra.
-    specs: { vcpu: null, ramMb: 4096, diskGb: null, ssh: true },
+    price: { yearly: 6000, monthly: 600 },
+    // 2 GB mientras el servidor sea de 32 GB (con 4 GB a 8 € perdería dinero). vCPU y disco sin definir.
+    specs: { vcpu: null, ramMb: 2048, diskGb: null, ssh: true },
     backup: { monthly: 200, retentionDays: 14 },
     featured: false,
   },
@@ -65,7 +65,7 @@ export const plans: Plan[] = [
 
 /** Add-ons independientes del backup (PVP con IVA). */
 export const addons = {
-  dedicatedIpv4: { monthly: 450, availableOn: ["pro"] as PlanId[] }, // coste real ~2,11 €/mes (§2bis)
+  dedicatedIpv4: { monthly: 300, availableOn: ["pro"] as PlanId[] }, // IP adicional de OVH: 1,50 €/mes sin IVA
 };
 
 export const getPlan = (id: PlanId): Plan => {
