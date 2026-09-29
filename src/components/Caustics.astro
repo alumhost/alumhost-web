@@ -1,0 +1,175 @@
+---
+/**
+ * Firma visual: luz cáustica del agua del estanque del patio. Vive SOLO dentro del hero (posición absoluta en su
+ * contenedor, que debe ser position:relative + overflow:hidden). El resto de la página es plano a propósito.
+ * - Shader WebGL propio (no copiado de Shadertoy: su licencia por defecto no permite uso comercial).
+ * - Coste bajo: resolución 0.5x, máx. 30 fps, pausa con la pestaña oculta.
+ * - prefers-reduced-motion: un único fotograma estático. Sin WebGL: gradiente CSS de respaldo.
+ * - Colores desde tokens.css (--pool-base, --pool-water, --pool-light, --pool-strength).
+ * IA: si cambias el shader, comprueba el contraste del texto que queda directamente encima.
+ */
+---
+<div class="caustics" aria-hidden="true">
+  <canvas></canvas>
+</div>
+
+<style>
+  .caustics {
+    position: absolute;
+    inset: 0;
+    z-index: var(--z-bg);
+    pointer-events: none;
+    overflow: hidden;
+    /* Respaldo sin WebGL: la misma idea en estático */
+    background: radial-gradient(90% 110% at 92% -10%, var(--pool-water), var(--pool-base) 70%);
+  }
+  canvas {
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transition: opacity 1.2s var(--ease);
+  }
+  canvas.is-ready { opacity: 1; }
+</style>
+
+<script>
+  const FRAG = `
+precision mediump float;
+uniform vec2 uRes;
+uniform float uTime;
+uniform vec3 uBase;
+uniform vec3 uLight;
+uniform vec3 uWater;
+uniform float uStrength;
+
+// Red de luz: dominio deformado + minimos de |sin| => lineas finas que ondulan como el agua.
+float net(vec2 p, float t) {
+  vec2 q = p;
+  for (int i = 0; i < 3; i++) {
+    float fi = float(i);
+    q += 0.42 * vec2(sin(q.y * 1.7 + t * 0.9 + fi * 1.3), sin(q.x * 1.5 - t * 0.8 + fi * 2.1));
+  }
+  float a = abs(sin(q.x * 1.25));
+  float b = abs(sin(q.y * 1.25));
+  return pow(1.0 - min(a, b), 14.0);
+}
+
+void main() {
+  vec2 uv = gl_FragCoord.xy / uRes;
+  vec2 p = (gl_FragCoord.xy / min(uRes.x, uRes.y)) * 5.0;
+  float t = uTime * 0.18;
+  float c = net(p, t) * 0.7 + net(p * 1.7 + 4.0, t * 1.25) * 0.45;
+  // El sol entra arriba a la derecha: mas luz y mas agua ahi, casi nada abajo a la izquierda.
+  float sun = smoothstep(1.2, 0.0, distance(uv, vec2(0.85, 1.05)));
+  vec3 base = mix(uBase, uWater, 0.35 * sun);
+  vec3 col = mix(base, uLight, clamp(c * uStrength * (0.35 + 0.65 * sun), 0.0, 1.0));
+  gl_FragColor = vec4(col, 1.0);
+}`;
+
+  const VERT = "attribute vec2 a;void main(){gl_Position=vec4(a,0.0,1.0);}";
+  const SCALE = 0.5;
+  const FRAME_MS = 1000 / 30;
+
+  // Acepta cualquier color CSS (#fff, #f2f4f6, rgb(), oklch()...): el build minifica "#ffffff" a "#fff",
+  // así que no se puede suponer hex de 6 dígitos. El navegador lo normaliza a rgb() vía un canvas 2D.
+  const probe = document.createElement("canvas").getContext("2d");
+  const toRgb = (color: string): [number, number, number] => {
+    if (!probe) return [1, 1, 1];
+    probe.fillStyle = "#000";
+    probe.fillStyle = color.trim();
+    const v = String(probe.fillStyle);
+    if (v.startsWith("#")) return [1, 3, 5].map((i) => parseInt(v.slice(i, i + 2), 16) / 255) as [number, number, number];
+    const m = v.match(/[\d.]+/g) ?? ["0", "0", "0"];
+    return [0, 1, 2].map((i) => Number(m[i]) / 255) as [number, number, number];
+  };
+  
+  function init() {
+    const canvas = document.querySelector<HTMLCanvasElement>(".caustics canvas");
+    if (!canvas) return;
+    const gl = canvas.getContext("webgl", { antialias: false, alpha: false, powerPreference: "low-power" });
+    if (!gl) return; // se queda el gradiente CSS
+
+    const compile = (type: number, src: string) => {
+      const s = gl.createShader(type)!;
+      gl.shaderSource(s, src);
+      gl.compileShader(s);
+      return gl.getShaderParameter(s, gl.COMPILE_STATUS) ? s : null;
+    };
+    const vs = compile(gl.VERTEX_SHADER, VERT);
+    const fs = compile(gl.FRAGMENT_SHADER, FRAG);
+    if (!vs || !fs) return;
+    const prog = gl.createProgram()!;
+    gl.attachShader(prog, vs);
+    gl.attachShader(prog, fs);
+    gl.linkProgram(prog);
+    if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) return;
+    gl.useProgram(prog);
+
+    const buf = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+    const loc = gl.getAttribLocation(prog, "a");
+    gl.enableVertexAttribArray(loc);
+    gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+
+    const u = (n: string) => gl.getUniformLocation(prog, n);
+    const uRes = u("uRes"), uTime = u("uTime"), uBase = u("uBase"), uLight = u("uLight"), uWater = u("uWater"), uStrength = u("uStrength");
+
+    const readColors = () => {
+      const cs = getComputedStyle(document.documentElement);
+      const v = (n: string) => cs.getPropertyValue(n);
+      gl.uniform3fv(uBase, toRgb(v("--pool-base")));
+      gl.uniform3fv(uLight, toRgb(v("--pool-light")));
+      gl.uniform3fv(uWater, toRgb(v("--pool-water")));
+      gl.uniform1f(uStrength, parseFloat(v("--pool-strength")) || 0.6);
+    };
+
+    const resize = () => {
+      const host = canvas.parentElement!;
+      const w = Math.max(1, Math.round(host.clientWidth * SCALE));
+      const h = Math.max(1, Math.round(host.clientHeight * SCALE));
+      if (canvas.width !== w || canvas.height !== h) {
+        canvas.width = w;
+        canvas.height = h;
+        gl.viewport(0, 0, w, h);
+        gl.uniform2f(uRes, w, h);
+      }
+    };
+
+    // Arranca en un punto con buena composición (t=12) en vez de en 0.
+    const t0 = performance.now() - 12000;
+    const draw = (now: number) => {
+      gl.uniform1f(uTime, (now - t0) / 1000);
+      gl.drawArrays(gl.TRIANGLES, 0, 3);
+    };
+
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const dark = window.matchMedia("(prefers-color-scheme: dark)");
+    let raf = 0;
+    let last = 0;
+
+    const loop = (now: number) => {
+      raf = requestAnimationFrame(loop);
+      if (now - last < FRAME_MS) return;
+      last = now;
+      draw(now);
+    };
+    const start = () => {
+      cancelAnimationFrame(raf);
+      resize();
+      if (reduce.matches || document.hidden) draw(t0 + 12000);
+      else raf = requestAnimationFrame(loop);
+    };
+
+    readColors();
+    start();
+    canvas.classList.add("is-ready");
+
+    new ResizeObserver(() => { resize(); if (reduce.matches) draw(t0 + 12000); }).observe(canvas.parentElement!);
+    document.addEventListener("visibilitychange", () => (document.hidden ? cancelAnimationFrame(raf) : start()));
+    reduce.addEventListener("change", start);
+    dark.addEventListener("change", () => { readColors(); start(); });
+  }
+
+  init();
+</script>

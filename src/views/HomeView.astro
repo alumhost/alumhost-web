@@ -1,0 +1,232 @@
+---
+/**
+ * Portada. Cada sección usa un tratamiento distinto a propósito (no hay plantilla repetida):
+ * 1 hero añil con el agua y el titular a cartel · 2 libro de razones (filas con regla) · 3 pasos como verbos gigantes sobre albero
+ * · 4 lo que NO prometemos, tachado · 5 cierre. Textos: i18n home.*. CTA: primaryCta() (depende de site.salesMode).
+ * IA: los números de los pasos no existen porque el orden ya lo da la lectura; no los añadas.
+ */
+import Base from "../layouts/Base.astro";
+import Caustics from "../components/Caustics.astro";
+import Cenefa from "../components/Cenefa.astro";
+import PlanPicker from "../components/PlanPicker.astro";
+import { primaryCta } from "../config/cta";
+import { path, useDict, type Lang } from "../i18n";
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = useDict(lang);
+const h = t.home;
+const cta = primaryCta(lang);
+const [perkPerson, ...perkRest] = h.perks.items;
+---
+<Base lang={lang} page="home">
+  <!-- 1. HERO: titular a cartel sobre el estanque -->
+  <section class="hero band-anil">
+    <Caustics />
+    <div class="container hero-in">
+      <h1 class="rise" style="--i:0">{h.hero.titleA} {h.hero.titleEm}</h1>
+      <div class="hero-row">
+        <div class="hero-copy rise" style="--i:2">
+          <p class="lead">{h.hero.sub}</p>
+          <div class="ctas">
+            <a class="btn" href={cta.href}>{cta.label}</a>
+            <a class="textlink" href={path("plans", lang)}>{h.hero.ctaSecondary}</a>
+          </div>
+          <p class="status mono"><span class="dot" aria-hidden="true"></span>{h.hero.eyebrow}</p>
+        </div>
+        <div class="hero-picker rise" style="--i:3">
+          <PlanPicker lang={lang} />
+        </div>
+      </div>
+    </div>
+  </section>
+  <Cenefa />
+
+  <!-- 2. CÓMO TRABAJAMOS: libro de filas -->
+  <section class="section container perks" aria-labelledby="perks-title">
+    <h2 id="perks-title">{h.perks.title}</h2>
+    <div class="ledger">
+      <article class="row row--lead">
+        <h3>{perkPerson.title}</h3>
+        <p>{perkPerson.body}</p>
+      </article>
+      {perkRest.map((p, i) => (
+        <article class="row">
+          <h3>{p.title}</h3>
+          <div>
+            <p class="muted">{p.body}</p>
+            {i === perkRest.length - 1 && (
+              /* Nombres reales de los scripts del plan (§6). No inventar flags ni salidas. */
+              <ul class="scripts mono" aria-label="Scripts">
+                <li>./create-vps</li>
+                <li>./destroy-vps</li>
+                <li>./quarantine-vps</li>
+              </ul>
+            )}
+          </div>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <!-- 3. PASOS: tres verbos gigantes -->
+  <section class="section steps band-albero" aria-labelledby="steps-title">
+    <div class="container">
+      <h2 id="steps-title">{h.steps.title}</h2>
+      <ol class="steps-list">
+        {h.steps.items.map((s) => (
+          <li>
+            <span class="verb">{s.verb}</span>
+            <p>{s.body}</p>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <!-- 4. LO QUE NO PROMETEMOS: lo negado va tachado -->
+  <section class="section container honest" aria-labelledby="honest-title">
+    <h2 id="honest-title">{h.honest.title}</h2>
+    <ul class="honest-list">
+      {h.honest.items.map((it) => (
+        <li>
+          <p class="denied"><s>{it.title}</s></p>
+          <p class="muted">{it.body}</p>
+        </li>
+      ))}
+    </ul>
+  </section>
+
+  <!-- 5. CIERRE -->
+  <section class="container closing" aria-labelledby="closing-title">
+    <h2 id="closing-title">{h.closing.title}</h2>
+    <div>
+      <p class="lead">{h.closing.body}</p>
+      <a class="btn" href={cta.href}>{cta.label}</a>
+    </div>
+  </section>
+</Base>
+
+<style>
+  /* ---------- Hero ---------- */
+  .hero {
+    position: relative;
+    overflow: hidden;
+    padding-block: clamp(3rem, 7vw, 6.5rem) clamp(3rem, 6vw, 5.5rem);
+  }
+  .hero-in { position: relative; z-index: var(--z-content); }
+  .hero h1 { max-width: 14ch; text-wrap: balance; }
+  .hero-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+    gap: clamp(2rem, 5vw, 5rem);
+    align-items: end;
+    margin-top: clamp(2rem, 4vw, 3.5rem);
+  }
+  .hero .lead { color: var(--white); max-width: 34ch; }
+  .ctas { display: flex; flex-wrap: wrap; align-items: center; gap: 1.5rem; margin-top: 2rem; }
+  .status {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-top: 2.2rem;
+    color: var(--muted);
+    font-size: 0.85rem;
+  }
+  .dot { width: 10px; height: 10px; background: var(--albero); }
+
+  /* ---------- Libro de filas ---------- */
+  .perks h2 { margin-bottom: clamp(2rem, 4vw, 3.5rem); max-width: 12ch; }
+  .row {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: clamp(1rem, 4vw, 4rem);
+    align-items: start;
+    padding-block: clamp(1.4rem, 2.5vw, 2.2rem);
+    border-top: var(--rule);
+  }
+  .row:last-child { border-bottom: var(--rule); }
+  .row h3 {
+    font-stretch: var(--display-width);
+    font-weight: 800;
+    font-size: var(--step-2);
+    line-height: 0.95;
+    max-width: 14ch;
+  }
+  .row p { max-width: 46ch; }
+  .row--lead h3 { font-size: var(--step-4); }
+  .row--lead p { font-size: var(--step-1); line-height: 1.4; align-self: end; }
+  .scripts {
+    list-style: none;
+    padding: 1rem 1.2rem;
+    margin-top: 1.5rem;
+    background: var(--ink);
+    color: #e7ecf7;
+    line-height: 1.9;
+    max-width: 22rem;
+  }
+  .scripts li::before { content: "$ "; color: var(--albero); }
+
+  /* ---------- Pasos ---------- */
+  .steps h2 { margin-bottom: clamp(1.5rem, 3vw, 3rem); }
+  .steps-list { list-style: none; padding: 0; }
+  .steps-list li {
+    display: grid;
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    gap: clamp(1rem, 4vw, 4rem);
+    align-items: end;
+    padding-block: clamp(0.8rem, 1.5vw, 1.4rem);
+    border-top: var(--rule);
+  }
+  .verb {
+    font-family: var(--font-display);
+    font-stretch: var(--display-width);
+    font-weight: 800;
+    font-size: var(--step-4);
+    line-height: 0.9;
+    text-transform: uppercase;
+  }
+  .steps-list p { font-size: var(--step-1); line-height: 1.35; max-width: 30ch; }
+
+  /* ---------- Lo que no prometemos ---------- */
+  .honest h2 { margin-bottom: clamp(2rem, 4vw, 3.5rem); max-width: 14ch; }
+  .honest-list {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: clamp(2rem, 4vw, 3.5rem) clamp(2rem, 5vw, 5rem);
+  }
+  .honest-list li { border-top: var(--rule); padding-top: 1.2rem; }
+  .denied {
+    font-family: var(--font-display);
+    font-stretch: var(--display-width);
+    font-weight: 800;
+    font-size: var(--step-3);
+    line-height: 0.95;
+    margin-bottom: 0.8rem;
+  }
+  .denied s { text-decoration-color: var(--almagra); text-decoration-thickness: 0.09em; }
+  .honest-list .muted { max-width: 38ch; }
+
+  /* ---------- Cierre ---------- */
+  .closing {
+    display: grid;
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    gap: clamp(2rem, 5vw, 5rem);
+    align-items: end;
+    padding-bottom: var(--section);
+  }
+  .closing h2 { font-size: var(--step-4); }
+  .closing .lead { margin-bottom: 1.6rem; }
+
+  /* ---------- Móvil ---------- */
+  @media (max-width: 919px) {
+    .hero-row, .closing { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 767px) {
+    .row, .steps-list li { grid-template-columns: 1fr; gap: 0.7rem; }
+    .row--lead p { align-self: start; }
+    .honest-list { grid-template-columns: 1fr; }
+  }
+</style>

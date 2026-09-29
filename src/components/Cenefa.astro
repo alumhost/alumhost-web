@@ -1,0 +1,27 @@
+---
+/**
+ * Cenefa: la cinta de azulejos que remata los zócalos sevillanos. Divide secciones (hero/resto y resto/pie).
+ * SVG en línea (la CSP solo permite imágenes 'self', así que nada de data: URIs). Alterna dos baldosas.
+ * IA: solo sirve de separador. No la repitas dentro de una misma sección ni la conviertas en fondo.
+ */
+interface Props { flip?: boolean }
+const { flip = false } = Astro.props;
+const id = `cenefa-${flip ? "b" : "a"}`;
+---
+<svg class="cenefa" width="100%" height="28" aria-hidden="true" focusable="false">
+  <defs>
+    <pattern id={id} width="56" height="28" patternUnits="userSpaceOnUse">
+      <rect width="28" height="28" class="a" />
+      <circle cx="14" cy="14" r="8" class="b" />
+      <rect x="28" width="28" height="28" class="b" />
+      <rect x="35" y="7" width="14" height="14" class="a" transform="rotate(45 42 14)" />
+    </pattern>
+  </defs>
+  <rect width="100%" height="28" fill={`url(#${id})`} />
+</svg>
+
+<style>
+  .cenefa { display: block; }
+  .a { fill: var(--anil); }
+  .b { fill: var(--albero); }
+</style>

@@ -1,0 +1,72 @@
+---
+/**
+ * Pie sobre banda añil, rematado arriba por la cenefa. Los enlaces externos (estado, devlog, repo) solo aparecen
+ * si están definidos en site.links.
+ * TODO(legal): antes de cobrar, añadir enlaces a Términos, Privacidad (RGPD) y DPA (plan §4.3).
+ *              No añadas los enlaces hasta que existan las páginas (nada de enlaces muertos).
+ */
+import Cenefa from "./Cenefa.astro";
+import { site } from "../config/site";
+import { fill, path, useDict, type Lang } from "../i18n";
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = useDict(lang);
+const external = [
+  { href: site.links.status, label: t.footer.status },
+  { href: site.links.devlog, label: t.footer.devlog },
+  { href: site.links.repo, label: t.footer.repo },
+].filter((l): l is { href: string; label: string } => Boolean(l.href));
+---
+<Cenefa flip />
+<footer class="footer band-anil">
+  <div class="container top">
+    <div>
+      <p class="word">{site.name}</p>
+      <p class="tagline">{t.footer.tagline}</p>
+    </div>
+    <nav class="cols" aria-label={t.footer.tagline}>
+      <ul>
+        <li><a href={path("plans", lang)}>{t.nav.plans}</a></li>
+        <li><a href={path("contact", lang)}>{t.nav.contact}</a></li>
+        {external.map((l) => <li><a href={l.href} rel="noopener">{l.label}</a></li>)}
+      </ul>
+      <ul class="mail">
+        <li><a href={`mailto:${site.email.hello}`}>{site.email.hello}</a></li>
+        <li><span class="label">{t.contact.channels.abuseLabel}</span><a href={`mailto:${site.email.abuse}`}>{site.email.abuse}</a></li>
+      </ul>
+    </nav>
+  </div>
+  <div class="container legal">
+    <p>{fill(t.footer.rights, { year: new Date().getFullYear(), name: site.name })}</p>
+  </div>
+</footer>
+
+<style>
+  .footer { padding-block: clamp(3rem, 6vw, 5rem) 2rem; font-size: var(--step--1); }
+  .top {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+    gap: 3rem;
+    align-items: end;
+  }
+  .word {
+    font-family: var(--font-display);
+    font-stretch: 68%;
+    font-weight: 800;
+    font-size: var(--step-4);
+    line-height: 0.85;
+    text-transform: uppercase;
+  }
+  .tagline { margin-top: 1rem; color: var(--muted); max-width: 32ch; font-size: var(--step-0); }
+  .cols { display: grid; grid-template-columns: 1fr 1.5fr; gap: 2rem; }
+  ul { list-style: none; padding: 0; display: grid; gap: 0.6rem; }
+  a { color: var(--white); }
+  .mail a { font-family: var(--font-mono); }
+  .label { display: block; color: var(--muted); }
+  .legal { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid rgb(255 255 255 / 0.3); color: var(--muted); }
+  @media (max-width: 767px) {
+    .top { grid-template-columns: 1fr; gap: 2rem; }
+    .cols { grid-template-columns: 1fr; }
+  }
+</style>

@@ -1,0 +1,92 @@
+/*
+ * Tokens de diseño de Patio. TODO color, fuente y regla de la web sale de aquí. Ver DESIGN.md.
+ * Concepto: azulejo sevillano. Tres colores de baldosa (añil, albero, cal) más almagra (el rojo de las fachadas)
+ * solo para lo que es precio o negación. Nada de cristal salvo el selector del hero, nada de degradados de texto.
+ *
+ * IA: los colores fijos (--ink, --white, --albero, --anil-pool*) NO cambian en modo noche; son los de las bandas.
+ * Contrastes: scripts/contrast.py mide todos los pares de abajo (WCAG AA ≥ 4.5, texto grande ≥ 3). Vuelve a ejecutarlo
+ * si tocas un color.
+ */
+:root {
+  color-scheme: light dark;
+
+  /* Fijos (iguales de día y de noche) */
+  --ink: #0e1740;
+  --white: #ffffff;
+  --albero: #e0ae35;
+
+  /* Día */
+  --cal: #eff1ee;
+  --cal-hondo: #e0e4df;
+  --tinta: #0e1740;
+  --pizarra: #465078;
+  --anil: #1a2a8c;
+  --almagra: #a3271c;
+  --link: #1a2a8c;
+  --focus: #1a2a8c;
+  --btn-bg: #1a2a8c;
+  --btn-fg: #ffffff;
+  --muted: var(--pizarra);
+
+  /* Agua del hero (Caustics.astro). Es un estanque azul, no una piscina turquesa. */
+  --pool-base: #15226f;
+  --pool-water: #2a4fb0;
+  --pool-light: #6a92e0;
+  --pool-strength: 0.62;
+
+  /* Cristal: solo el selector del hero */
+  --glass-bg: rgb(14 23 64 / 0.42);
+  --glass-border: rgb(255 255 255 / 0.28);
+  --glass-blur: 16px;
+
+  /* Reglas y tipografía (autoalojada con @fontsource, ver src/layouts/Base.astro) */
+  --rule: 2px solid var(--tinta);
+  --font-display: "Archivo Variable", "Archivo", ui-sans-serif, system-ui, sans-serif;
+  --font-body: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", monospace;
+  --display-width: 68%; /* eje wdth de Archivo: 62 (muy condensada) a 125 */
+
+  --step--1: clamp(0.84rem, 0.82rem + 0.1vw, 0.92rem);
+  --step-0: clamp(1rem, 0.97rem + 0.15vw, 1.1rem);
+  --step-1: clamp(1.2rem, 1.1rem + 0.5vw, 1.5rem);
+  --step-2: clamp(1.8rem, 1.4rem + 1.6vw, 2.9rem);
+  --step-3: clamp(2.6rem, 1.8rem + 3.4vw, 5rem);
+  --step-4: clamp(3.4rem, 2rem + 6vw, 8rem);
+  --step-5: clamp(3.1rem, 1.4rem + 8.2vw, 10.5rem);
+
+  /* Espaciado y layout */
+  --gutter: clamp(1rem, 0.5rem + 2.4vw, 2.5rem);
+  --section: clamp(4rem, 2.5rem + 6vw, 8.5rem);
+  --max: 1360px;
+  --nav-h: 68px;
+
+  /* Movimiento: una sola curva */
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Capas */
+  --z-bg: 0;
+  --z-content: 1;
+  --z-nav: 40;
+  --z-menu: 50;
+}
+
+/* Noche: el mismo patio con las luces apagadas */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --cal: #0a1030;
+    --cal-hondo: #131b48;
+    --tinta: #eef0fb;
+    --pizarra: #a6aed0;
+    --anil: #23369f;
+    --almagra: #ff9584;
+    --link: #e0ae35;
+    --focus: #e0ae35;
+    --btn-bg: #e0ae35;
+    --btn-fg: #0e1740;
+
+    --pool-base: #0d1650;
+    --pool-water: #1d3a91;
+    --pool-light: #5075c9;
+    --pool-strength: 0.55;
+  }
+}
