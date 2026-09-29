@@ -1,0 +1,69 @@
+---
+/**
+ * Contacto sobre velo: titular y canales directos (izq.) + formulario (der.). Abuso con canal propio (plan §4.3).
+ */
+import Base from "../layouts/Base.astro";
+import ContactForm from "../components/ContactForm.astro";
+import { site } from "../config/site";
+import { useDict, type Lang } from "../i18n";
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = useDict(lang);
+const c = t.contact;
+---
+<Base lang={lang} page="contact">
+  <div class="veil">
+  <div class="container contact">
+    <div class="intro">
+      <h1 class="rise" style="--i:0">{c.header.title}</h1>
+      <p class="lead rise" style="--i:1">{c.header.sub}</p>
+      <dl class="channels rise" style="--i:2">
+        <div>
+          <dt>{c.channels.emailLabel}</dt>
+          <dd><a class="mono" href={`mailto:${site.email.hello}`}>{site.email.hello}</a></dd>
+        </div>
+        <div>
+          <dt>{c.channels.supportLabel}</dt>
+          <dd><a class="mono" href={`mailto:${site.email.support}`}>{site.email.support}</a></dd>
+        </div>
+        <div>
+          <dt>{c.channels.abuseLabel}</dt>
+          <dd>
+            <a class="mono" href={`mailto:${site.email.abuse}`}>{site.email.abuse}</a>
+            <span class="muted note">{c.channels.abuseNote}</span>
+          </dd>
+        </div>
+      </dl>
+    </div>
+    <div class="form-col rise" style="--i:2">
+      <ContactForm lang={lang} />
+    </div>
+  </div>
+  </div>
+</Base>
+
+<style>
+  .contact {
+    display: grid;
+    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+    gap: clamp(2rem, 5vw, 5rem);
+    align-items: start;
+    padding-block: clamp(3rem, 6vw, 5.5rem) var(--section);
+  }
+  .intro { position: sticky; top: calc(var(--nav-h) + 2rem); }
+  .intro h1 { font-size: var(--step-4); }
+  .intro .lead { margin-top: 1.4rem; }
+  .channels { margin-top: 2.5rem; display: grid; gap: 0; }
+  .channels > div { border-top: var(--rule); padding-block: 1rem; display: grid; gap: 0.2rem; }
+  .channels > div:last-child { border-bottom: var(--rule); }
+  dt { font-weight: 600; }
+  dd { margin: 0; display: grid; gap: 0.2rem; }
+  .channels a { overflow-wrap: anywhere; }
+  .note { font-size: var(--step--1); }
+
+  @media (max-width: 919px) {
+    .contact { grid-template-columns: 1fr; }
+    .intro { position: static; }
+  }
+</style>

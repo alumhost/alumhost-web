@@ -1,0 +1,229 @@
+---
+/**
+ * Formulario de contacto / reserva de beta.
+ * - Envía JSON a POST /api/contact (worker/index.ts), que re-valida TODO y verifica Turnstile en servidor.
+ * - Lee ?motivo= y ?plan= de la URL para preseleccionar (los CTAs de la web los ponen).
+ * - Estados: validación inline, enviando, error de servidor, éxito. Sin alert().
+ * - Los mensajes van en data-messages (JSON) para no usar scripts inline (CSP estricta).
+ * IA: si añades un campo, añádelo también a la validación de worker/index.ts (mismos límites).
+ */
+import { plans } from "../config/plans";
+import { site } from "../config/site";
+import { fill, path, useDict, type Lang } from "../i18n";
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = useDict(lang);
+const f = t.contact.form;
+const reasons = Object.entries(f.reasons) as [keyof typeof f.reasons, string][];
+const messages = JSON.stringify({
+  ...f.errors,
+  server: fill(f.errors.server, { email: site.email.hello }),
+  success: f.success,
+  sending: f.sending,
+  submit: f.submit,
+});
+---
+<form class="form" id="form" novalidate data-contact-form data-messages={messages} data-lang={lang}>
+  <h2 class="form-title">{f.title}</h2>
+
+  <div class="row">
+    <div class="field">
+      <label for="cf-name">{f.name}</label>
+      <input id="cf-name" name="name" type="text" autocomplete="name" required maxlength="100" aria-describedby="cf-name-err" />
+      <p class="error" id="cf-name-err" data-error-for="name" hidden></p>
+    </div>
+    <div class="field">
+      <label for="cf-email">{f.email}</label>
+      <input id="cf-email" name="email" type="email" autocomplete="email" required maxlength="254" aria-describedby="cf-email-help cf-email-err" />
+      <p class="help" id="cf-email-help">{f.emailHelp}</p>
+      <p class="error" id="cf-email-err" data-error-for="email" hidden></p>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="field">
+      <label for="cf-reason">{f.reason}</label>
+      <select id="cf-reason" name="reason">
+        {reasons.map(([value, label]) => <option value={value}>{label}</option>)}
+      </select>
+    </div>
+    <div class="field">
+      <label for="cf-plan">{f.plan}</label>
+      <select id="cf-plan" name="plan">
+        <option value="">{f.planUnknown}</option>
+        {plans.map((p) => <option value={p.id}>{t.plans.items[p.id].name}</option>)}
+      </select>
+    </div>
+  </div>
+
+  <div class="field">
+    <label for="cf-message">{f.message}</label>
+    <textarea id="cf-message" name="message" rows="5" required minlength="10" maxlength="4000" aria-describedby="cf-message-help cf-message-err"></textarea>
+    <p class="help" id="cf-message-help">{f.messageHelp}</p>
+    <p class="error" id="cf-message-err" data-error-for="message" hidden></p>
+  </div>
+
+  <!-- Trampa para bots: los humanos no la ven. Si llega rellena, el Worker descarta en silencio. -->
+  <div class="hp" aria-hidden="true">
+    <label for="cf-website">Website</label>
+    <input id="cf-website" name="website" type="text" tabindex="-1" autocomplete="off" />
+  </div>
+
+  <div class="turnstile">
+    <div class="cf-turnstile" data-sitekey={site.turnstileSiteKey} data-language={lang} data-theme="auto"></div>
+    <p class="error" data-error-for="turnstile" hidden></p>
+  </div>
+
+  <div class="submit-row">
+    <button class="btn" type="submit" data-submit>{f.submit}</button>
+    <p class="help">{f.privacy} <a href={path("privacy", lang)}>{f.privacyLink}</a></p>
+  </div>
+  <p class="error form-error" data-error-for="form" role="alert" hidden></p>
+</form>
+
+<div class="success band-sand" data-success tabindex="-1" role="status" hidden>
+  <p data-success-text></p>
+</div>
+
+<script is:inline src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+
+<style>
+  .form {
+    padding: clamp(1.4rem, 3vw, 2.4rem);
+    display: grid;
+    gap: 1.4rem;
+    scroll-margin-top: calc(var(--nav-h) + 1rem);
+    border: var(--rule);
+    background: var(--paper-2);
+  }
+  .form-title { font-size: var(--step-2); }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 1.4rem; }
+  .field { display: grid; gap: 0.4rem; align-content: start; }
+  label { font-weight: 600; font-size: 0.95rem; }
+  input, select, textarea {
+    width: 100%;
+    min-height: 52px;
+    padding: 0.7rem 0.9rem;
+    border-radius: 0;
+    border: 2px solid var(--text);
+    background: var(--paper);
+    color: var(--text);
+  }
+  textarea { resize: vertical; min-height: 8rem; line-height: 1.5; }
+  input:focus-visible, select:focus-visible, textarea:focus-visible { outline-offset: 0; }
+  [aria-invalid="true"] { border-color: var(--brick); box-shadow: inset 0 -4px 0 var(--brick); }
+  .help { font-size: var(--step--1); color: var(--muted); }
+  .error { font-size: var(--step--1); color: var(--brick); font-weight: 600; }
+  .hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+  .turnstile { min-height: 65px; }
+  .submit-row { display: flex; align-items: center; gap: 1rem 1.5rem; flex-wrap: wrap; }
+  .btn[disabled] { opacity: 0.7; cursor: progress; }
+  .success {
+    padding: clamp(1.5rem, 3vw, 2.4rem);
+    font-family: var(--font-display);
+    font-stretch: var(--display-width);
+    font-weight: 800;
+    font-size: var(--step-2);
+    line-height: 1;
+  }
+  @media (max-width: 767px) {
+    .row { grid-template-columns: 1fr; }
+  }
+</style>
+
+<script>
+  type Field = "name" | "email" | "message" | "turnstile" | "form";
+  const form = document.querySelector<HTMLFormElement>("[data-contact-form]");
+
+  if (form) {
+    const msg = JSON.parse(form.dataset.messages ?? "{}") as Record<string, string>;
+    const submit = form.querySelector<HTMLButtonElement>("[data-submit]")!;
+    const success = document.querySelector<HTMLElement>("[data-success]")!;
+    const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
+    // Preselección desde la URL (?motivo=beta&plan=developer)
+    const q = new URLSearchParams(location.search);
+    const setSelect = (name: string, value: string | null) => {
+      const el = form.elements.namedItem(name) as HTMLSelectElement | null;
+      if (el && value && [...el.options].some((o) => o.value === value)) el.value = value;
+    };
+    setSelect("reason", q.get("motivo"));
+    setSelect("plan", q.get("plan"));
+
+    const showError = (field: Field, text: string | null) => {
+      const p = form.querySelector<HTMLElement>(`[data-error-for="${field}"]`);
+      const input = form.elements.namedItem(field) as HTMLElement | null;
+      if (p) {
+        p.textContent = text ?? "";
+        p.hidden = !text;
+      }
+      if (input && "setAttribute" in input) input.setAttribute("aria-invalid", text ? "true" : "false");
+    };
+
+    const validate = (data: FormData): Field | null => {
+      const name = String(data.get("name") ?? "").trim();
+      const email = String(data.get("email") ?? "").trim();
+      const message = String(data.get("message") ?? "").trim();
+      const token = String(data.get("cf-turnstile-response") ?? "");
+      let first: Field | null = null;
+      const check = (field: Field, bad: boolean, text: string) => {
+        showError(field, bad ? text : null);
+        if (bad && !first) first = field;
+      };
+      check("name", name.length < 1 || name.length > 100, msg.name);
+      check("email", !EMAIL.test(email) || email.length > 254, msg.email);
+      check("message", message.length < 10 || message.length > 4000, msg.message);
+      check("turnstile", token.length === 0, msg.turnstile);
+      return first;
+    };
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      showError("form", null);
+      const data = new FormData(form);
+      const invalid = validate(data);
+      if (invalid) {
+        (form.elements.namedItem(invalid) as HTMLElement | null)?.focus();
+        return;
+      }
+
+      submit.disabled = true;
+      submit.textContent = msg.sending;
+      try {
+        const res = await fetch("/api/contact", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({
+            name: data.get("name"),
+            email: data.get("email"),
+            reason: data.get("reason"),
+            plan: data.get("plan"),
+            message: data.get("message"),
+            website: data.get("website"),
+            token: data.get("cf-turnstile-response"),
+            lang: form.dataset.lang,
+          }),
+        });
+        const body = (await res.json().catch(() => ({}))) as { ok?: boolean; error?: string };
+        if (res.ok && body.ok) {
+          const email = String(data.get("email"));
+          success.querySelector("[data-success-text]")!.textContent = msg.success.replace("{email}", email);
+          form.hidden = true;
+          success.hidden = false;
+          success.focus();
+          return;
+        }
+        const key = body.error === "turnstile" ? "turnstile" : body.error === "rate_limited" ? "rateLimited" : "server";
+        showError(key === "turnstile" ? "turnstile" : "form", msg[key]);
+      } catch {
+        showError("form", msg.server);
+      } finally {
+        submit.disabled = false;
+        submit.textContent = msg.submit;
+        // Un token de Turnstile solo vale una vez: pedimos otro.
+        (window as unknown as { turnstile?: { reset: () => void } }).turnstile?.reset();
+      }
+    });
+  }
+</script>

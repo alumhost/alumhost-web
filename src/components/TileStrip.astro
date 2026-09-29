@@ -1,0 +1,32 @@
+---
+/**
+ * TileStrip: cinta de módulos (dos baldosas alternas: cuarto de círculo y rombo). Separa bloques grandes
+ * (agua/bandas, contenido/pie). SVG en línea (la CSP solo permite imágenes 'self': nada de data: URIs).
+ * `vertical` la dibuja en columna, para el canto del plan recomendado.
+ * IA: es estructura, no papel pintado. Como máximo una a la vista por pantalla. Nada de motivos figurativos o regionales.
+ */
+interface Props { id: string; vertical?: boolean; size?: number }
+const { id, vertical = false, size = 28 } = Astro.props;
+const s = size;
+const h = s / 2;
+---
+<svg class:list={["strip", { "strip--v": vertical }]} aria-hidden="true" focusable="false"
+  style={vertical ? `width:${s}px` : `height:${s}px`}>
+  <defs>
+    <pattern id={id} width={vertical ? s : s * 2} height={vertical ? s * 2 : s} patternUnits="userSpaceOnUse">
+      <rect width={s} height={s} class="a" />
+      <path d={`M0 0h${h}a${h} ${h} 0 0 1-${h} ${h}zM${s} ${s}H${h}a${h} ${h} 0 0 1 ${h}-${h}z`} class="b" />
+      <rect x={vertical ? 0 : s} y={vertical ? s : 0} width={s} height={s} class="b" />
+      <rect x={(vertical ? 0 : s) + s * 0.27} y={(vertical ? s : 0) + s * 0.27} width={s * 0.46} height={s * 0.46} class="a"
+        transform={`rotate(45 ${(vertical ? 0 : s) + h} ${(vertical ? s : 0) + h})`} />
+    </pattern>
+  </defs>
+  <rect width="100%" height="100%" fill={`url(#${id})`} />
+</svg>
+
+<style>
+  .strip { display: block; width: 100%; }
+  .strip--v { height: 100%; }
+  .a { fill: var(--indigo); }
+  .b { fill: var(--sand); }
+</style>
