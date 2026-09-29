@@ -21,7 +21,7 @@ IVA 21 % mostrado siempre incluido. Facturación anual por defecto (§1.2).
 ## Diferenciación (§11), lo que la web debe contar
 - Soporte humano en español; onboarding 1:1 en la primera contratación.
 - Pensado para TFG/TFM, prácticas y hackathons. Sin tarjeta internacional ni facturación en dólares.
-- Descuento con correo universitario (importe sin definir: no se muestra una cifra).
+- Sin descuento universitario: el precio publicado ya es el de estudiante. Con los márgenes de 2026 no hay hueco (ver estado del proyecto, 29/09/2026).
 - Transparencia: página de estado pública, devlog y scripts en abierto (URLs pendientes → `site.ts`).
 
 ## Honestidad obligatoria (§1.4, §3, §5)

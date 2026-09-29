@@ -79,8 +79,8 @@ const es = {
           body: "TFG, TFM, prácticas de sistemas y hackathons. Sin tarjeta internacional ni facturas en dólares.",
         },
         {
-          title: "Precio de estudiante.",
-          body: "Escríbenos desde el correo de tu universidad y te aplicamos el descuento.",
+          title: "Precio de estudiante, sin cupones.",
+          body: "No hay descuentos que pedir ni letra pequeña: el precio que ves es el de estudiante, para todo el mundo.",
         },
         {
           title: "Construido en abierto.",
@@ -214,7 +214,7 @@ const es = {
       title: "Escríbenos",
       name: "Nombre",
       email: "Correo",
-      emailHelp: "Si usas el de tu universidad, podemos aplicarte el precio de estudiante.",
+      emailHelp: "El que uses a diario. Te responderemos ahí.",
       reason: "Motivo",
       reasons: {
         beta: "Reservar plaza en la beta",
@@ -262,7 +262,7 @@ const es = {
       },
       {
         h: "Con quién los compartimos",
-        p: "Con los proveedores que hacen funcionar la web: Cloudflare (alojamiento, verificación antispam y reenvío de correo) y Google (nuestra bandeja de correo). Pueden tratarlos fuera del Espacio Económico Europeo con las garantías que exige el RGPD. No vendemos tus datos ni los usamos para publicidad.",
+        p: "Con los proveedores que hacen funcionar la web: Cloudflare (alojamiento, verificación antispam y reenvío de correo), Google (nuestra bandeja de correo) y Brevo (el envío de nuestras respuestas). Pueden tratarlos fuera del Espacio Económico Europeo con las garantías que exige el RGPD. No vendemos tus datos ni los usamos para publicidad.",
       },
       {
         h: "Cuánto tiempo",

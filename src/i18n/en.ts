@@ -76,8 +76,8 @@ const en: Dict = {
           body: "Theses, coursework, systems labs and hackathons. Billed in euros, no international card needed.",
         },
         {
-          title: "Student pricing.",
-          body: "Write to us from your university email and we apply the student discount.",
+          title: "Student pricing, no coupons.",
+          body: "No discounts to ask for and no small print: the price you see is the student price, for everyone.",
         },
         {
           title: "Built in the open.",
@@ -211,7 +211,7 @@ const en: Dict = {
       title: "Write to us",
       name: "Name",
       email: "Email",
-      emailHelp: "Use your university email and we can apply student pricing.",
+      emailHelp: "The one you check every day. We will reply there.",
       reason: "Reason",
       reasons: {
         beta: "Reserve a beta spot",
@@ -258,7 +258,7 @@ const en: Dict = {
       },
       {
         h: "Who we share it with",
-        p: "With the providers that run the site: Cloudflare (hosting, anti-spam check and email forwarding) and Google (our inbox). They may process it outside the European Economic Area under the safeguards the GDPR requires. We never sell your data or use it for advertising.",
+        p: "With the providers that run the site: Cloudflare (hosting, anti-spam check and email forwarding), Google (our inbox) and Brevo (sending our replies). They may process it outside the European Economic Area under the safeguards the GDPR requires. We never sell your data or use it for advertising.",
       },
       {
         h: "How long",

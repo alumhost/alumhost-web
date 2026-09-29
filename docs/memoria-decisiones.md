@@ -100,7 +100,7 @@ Repositorio: `alumhost/alumhost-web` (GitHub, ambos owners).
 - Redondos a propósito (no .99).
 - Reciente evidencia (meta-análisis Troll 2024; experimentos 2026) indica efecto casi nulo de terminación .99.
 - Encaja con marca "sin letra pequeña".
-- Descuento universitario: existe, sin cifra publicada.
+- Descuento universitario: descartado (29/09/2026). El precio ya es de estudiante; anual = 2 meses gratis agota el margen del Developer.
 
 ## Reglas de Contenido
 

@@ -41,7 +41,9 @@ export const site = {
    */
   /** Responsable del tratamiento que sale en /privacidad. TODO(legal): nombre legal y NIF cuando haya alta. */
   legal: {
-    controller: "AlumHost, proyecto de Blas y Alonso",
+    // Beta sin actividad económica: nombres de los responsables. NIF/DNI NO se publica hasta el alta (aviso legal LSSI);
+    // el repo es público y el historial de Git es permanente.
+    controller: "Alonso Carballar Barrientos y Blas Cosano Molina, responsables de AlumHost",
   },
 
   turnstileSiteKey: "1x00000000000000000000AA",
