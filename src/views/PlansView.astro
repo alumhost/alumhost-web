@@ -1,0 +1,264 @@
+---
+/**
+ * Planes como libro de cuentas: una fila ancha por plan (no tarjetas iguales). El recomendado FLOTA: es de cristal
+ * y lleva un canto de módulos. Precios (PVP con IVA) solo de config/plans.ts. Interruptor anual/mensual sin JS (:has()).
+ * Cada fila tiene id = plan.id para que el selector del hero enlace a /planes#developer, etc.
+ * Lo que no encaja en un plan va a "Pedir presupuesto" (formulario con motivo "custom"): no se calcula automáticamente.
+ */
+import Base from "../layouts/Base.astro";
+import TileStrip from "../components/TileStrip.astro";
+import { addons, formatEur, plans } from "../config/plans";
+import { primaryCta } from "../config/cta";
+import { priceView, specLines } from "../lib/planText";
+import { contactHref, fill, useDict, type Lang } from "../i18n";
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = useDict(lang);
+const p = t.plans;
+const backupPlans = plans.filter((pl) => pl.backup !== null);
+---
+<Base lang={lang} page="plans">
+  <div class="plans-page">
+    <header class="container head">
+      <h1 class="rise" style="--i:0">{p.header.title}</h1>
+      <div class="head-row rise" style="--i:1">
+        <p class="lead">{p.header.sub}</p>
+        <fieldset class="billing glass">
+          <legend class="sr-only">{p.billing.label}</legend>
+          <label>
+            <input type="radio" name="billing" value="yearly" checked />
+            <span>{p.billing.yearly}</span>
+          </label>
+          <label>
+            <input type="radio" name="billing" value="monthly" />
+            <span>{p.billing.monthly}</span>
+          </label>
+        </fieldset>
+      </div>
+    </header>
+
+    <div class="veil">
+      <section class="container rows" aria-label={t.nav.plans}>
+        {plans.map((plan) => {
+          const yearly = priceView(plan, "yearly", lang);
+          const monthly = priceView(plan, "monthly", lang);
+          const cta = primaryCta(lang, plan.id);
+          const item = p.items[plan.id];
+          return (
+            <article id={plan.id} class:list={["plan", { "plan--featured glass": plan.featured }]} aria-labelledby={`${plan.id}-name`}>
+              {plan.featured && (
+                <div class="edge" aria-hidden="true"><TileStrip id={`edge-${plan.id}`} vertical size={26} /></div>
+              )}
+              <div class="who">
+                {plan.featured && <p class="flag mono">{p.recommended}</p>}
+                <h2 id={`${plan.id}-name`}>{item.name}</h2>
+                <p class="tagline muted">{item.tagline}</p>
+              </div>
+
+              <ul class="features">
+                {specLines(plan, lang).map((line) => <li>{line}</li>)}
+              </ul>
+
+              <div class="buy">
+                <div class="price price--yearly">
+                  <p class="line"><span class="amount">{yearly.amount}</span><span class="per">{yearly.per}</span></p>
+                  <p class="note muted">{yearly.note}</p>
+                </div>
+                <div class="price price--monthly">
+                  <p class="line"><span class="amount">{monthly.amount}</span><span class="per">{monthly.per}</span></p>
+                  <p class="note muted">{monthly.note}</p>
+                </div>
+                <a class:list={["btn", { "btn--outline": !plan.featured }]} href={cta.href}>{cta.label}</a>
+              </div>
+            </article>
+          );
+        })}
+
+        <div class="custom">
+          <h2>{p.custom.title}</h2>
+          <p class="muted">{p.custom.body}</p>
+          <a class="textlink" href={contactHref(lang, { reason: "custom" })}>{p.custom.cta}</a>
+        </div>
+      </section>
+
+      <section class="section container extras" aria-labelledby="addons-title">
+        <h2 id="addons-title">{p.addons.title}</h2>
+        <div class="extras-grid">
+          <div class="extra">
+            <h3>{p.addons.backup.title}</h3>
+            <ul class="backup-lines">
+              {backupPlans.map((pl) => (
+                <li>
+                  {fill(p.addons.backup.line, {
+                    price: formatEur(pl.backup!.monthly, lang),
+                    plan: p.items[pl.id].name,
+                    days: pl.backup!.retentionDays,
+                  })}
+                </li>
+              ))}
+            </ul>
+            <p class="muted">{p.addons.backup.note}</p>
+          </div>
+          <div class="extra">
+            <h3>{p.addons.ipv4.title}</h3>
+            <p class="muted">{fill(p.addons.ipv4.body, { price: formatEur(addons.dedicatedIpv4.monthly, lang) })}</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="container faq" aria-labelledby="faq-title">
+        <h2 id="faq-title">{p.faq.title}</h2>
+        <div class="faq-list">
+          {p.faq.items.map((f) => (
+            <details>
+              <summary>{f.q}</summary>
+              <p class="muted">{f.a}</p>
+            </details>
+          ))}
+        </div>
+      </section>
+    </div>
+  </div>
+</Base>
+
+<style>
+  .head { padding-block: clamp(3rem, 6vw, 5.5rem) clamp(2rem, 4vw, 3.5rem); }
+  .head h1 { font-size: var(--step-4); max-width: 13ch; }
+  .head .lead { color: var(--text); }
+  .head-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    justify-content: space-between;
+    gap: 1.5rem 3rem;
+    margin-top: clamp(1.5rem, 3vw, 2.5rem);
+  }
+
+  /* Interruptor anual / mensual: cristal (flota sobre el agua) */
+  .billing { display: inline-grid; grid-template-columns: 1fr 1fr; padding: 0.35rem; gap: 0.35rem; }
+  .billing label { position: relative; }
+  .billing input { position: absolute; inset: 0; opacity: 0; margin: 0; cursor: pointer; }
+  .billing span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    min-width: 7.5rem;
+    padding: 0 1.1rem;
+    font-weight: 600;
+    transition: background-color 160ms var(--ease), color 160ms var(--ease);
+  }
+  .billing input:checked + span { background: var(--text); color: var(--paper); }
+  .billing input:focus-visible + span { outline: 3px solid var(--focus); outline-offset: 2px; }
+
+  .price--monthly { display: none; }
+  .plans-page:has(input[name="billing"][value="monthly"]:checked) .price--monthly { display: block; }
+  .plans-page:has(input[name="billing"][value="monthly"]:checked) .price--yearly { display: none; }
+
+  /* Filas de plan */
+  .rows { padding-top: clamp(2rem, 4vw, 3.5rem); }
+  .rows { --plan-gap: clamp(1.2rem, 3vw, 3rem); }
+  .plan {
+    display: grid;
+    grid-template-columns: minmax(0, 4fr) minmax(0, 4fr) minmax(0, 4fr);
+    gap: var(--plan-gap);
+    align-items: start;
+    padding-block: clamp(1.6rem, 3vw, 2.6rem);
+    border-top: var(--rule);
+    scroll-margin-top: calc(var(--nav-h) + 2rem);
+  }
+  .plan--featured {
+    grid-template-columns: 26px minmax(0, 4fr) minmax(0, 4fr) minmax(0, 4fr);
+    padding: clamp(1.6rem, 3vw, 2.6rem) clamp(1.2rem, 3vw, 2.6rem) clamp(1.6rem, 3vw, 2.6rem) 0;
+    margin-block: 1rem;
+    overflow: hidden;
+    border-top: 0;
+  }
+  .plan--featured + .plan { border-top-color: transparent; }
+  /* En escritorio el cristal se sale por los lados para que las columnas de texto sigan alineadas con las otras filas */
+  @media (min-width: 920px) {
+    .plan--featured { margin-inline: calc(-26px - var(--plan-gap)) calc(-1 * clamp(1.2rem, 3vw, 2.6rem)); }
+  }
+  .edge { align-self: stretch; margin-block: calc(-1 * clamp(1.6rem, 3vw, 2.6rem)); }
+  .flag { font-size: 0.82rem; margin-bottom: 0.7rem; display: flex; align-items: center; gap: 0.5rem; }
+  .flag::before { content: ""; width: 10px; height: 10px; background: var(--sand); outline: 1px solid var(--text); }
+  .who h2 { font-size: var(--step-3); }
+  .tagline { margin-top: 0.8rem; max-width: 30ch; }
+  .features { list-style: none; padding: 0; display: grid; gap: 0.55rem; }
+  .features li { display: grid; grid-template-columns: 10px 1fr; gap: 0.8rem; align-items: baseline; }
+  .features li::before { content: ""; width: 8px; height: 8px; background: currentColor; translate: 0 -1px; }
+  .buy { display: grid; gap: 1.4rem; justify-items: start; }
+  .line { display: flex; align-items: baseline; gap: 0.3rem; }
+  .amount {
+    font-family: var(--font-display);
+    font-stretch: 68%;
+    font-weight: 800;
+    font-size: var(--step-4);
+    line-height: 0.85;
+    font-variant-numeric: tabular-nums;
+  }
+  .per { color: var(--muted); font-weight: 600; }
+  .note { font-size: var(--step--1); margin-top: 0.5rem; max-width: 34ch; }
+
+  .custom {
+    display: grid;
+    grid-template-columns: minmax(0, 4fr) minmax(0, 5fr) minmax(0, 3fr);
+    gap: clamp(1.2rem, 3vw, 3rem);
+    align-items: baseline;
+    padding-block: 1.8rem;
+    border-top: var(--rule);
+    border-bottom: var(--rule);
+  }
+  .custom h2 { font-size: var(--step-2); }
+
+  /* Extras */
+  .extras h2, .faq h2 { font-size: var(--step-3); margin-bottom: clamp(1.5rem, 3vw, 2.5rem); }
+  .extras-grid { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(2rem, 5vw, 5rem); }
+  .extra { border-top: var(--rule); padding-top: 1.2rem; }
+  .extra h3 { font-size: var(--step-2); font-stretch: var(--display-width); font-weight: 800; margin-bottom: 0.8rem; }
+  .backup-lines { list-style: none; padding: 0; display: grid; gap: 0.3rem; margin-bottom: 0.8rem; font-weight: 600; }
+
+  /* Preguntas */
+  .faq { padding-bottom: var(--section); }
+  .faq-list { border-bottom: var(--rule); }
+  details { border-top: var(--rule); }
+  summary {
+    cursor: pointer;
+    list-style: none;
+    padding: 1.2rem 3rem 1.2rem 0;
+    font-size: var(--step-1);
+    font-weight: 600;
+    position: relative;
+    min-height: 44px;
+  }
+  summary::-webkit-details-marker { display: none; }
+  summary::after {
+    content: "+";
+    position: absolute;
+    right: 0;
+    top: 50%;
+    translate: 0 -50%;
+    font-family: var(--font-mono);
+    font-size: 1.6rem;
+    transition: rotate 200ms var(--ease);
+  }
+  details[open] summary::after { rotate: 45deg; }
+  details p { padding: 0 3rem 1.4rem 0; max-width: 60ch; }
+
+  @media (max-width: 919px) {
+    .plan { grid-template-columns: 1fr 1fr; }
+    .plan .buy { grid-column: 1 / -1; }
+    .plan--featured { grid-template-columns: 22px 1fr 1fr; }
+    .plan--featured .edge { grid-row: span 2; }
+    .plan--featured .buy { grid-column: 2 / -1; }
+    .custom { grid-template-columns: 1fr; gap: 0.8rem; }
+  }
+  @media (max-width: 639px) {
+    .plan { grid-template-columns: 1fr; }
+    .plan--featured { grid-template-columns: 22px 1fr; }
+    .plan--featured > :not(.edge) { grid-column: 2; }
+    .plan--featured .edge { grid-row: span 3; }
+    .extras-grid { grid-template-columns: 1fr; }
+  }
+</style>

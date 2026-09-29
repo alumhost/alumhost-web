@@ -1,0 +1,32 @@
+{
+  // Worker que sirve la web estática (dist/) y un único endpoint: POST /api/contact.
+  // Docs: https://developers.cloudflare.com/workers/static-assets/
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "alumhost-web",
+  "main": "worker/index.ts",
+  "compatibility_date": "2026-09-01",
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS",
+    "html_handling": "auto-trailing-slash",
+    "not_found_handling": "404-page",
+    // Solo /api/* pasa por el Worker; todo lo demás lo sirve Static Assets directamente (gratis y rápido).
+    "run_worker_first": ["/api/*"]
+  },
+  "observability": { "enabled": true },
+
+  // Rate limit del formulario: 5 envíos por minuto por IP (threat model, fase 2).
+  "ratelimits": [
+    { "name": "CONTACT_LIMITER", "namespace_id": "1001", "simple": { "limit": 5, "period": 60 } }
+  ],
+
+  // Variables NO secretas. Los secretos van con:  npx wrangler secret put TURNSTILE_SECRET
+  "vars": {
+    "CONTACT_FROM": "web@alumhost.dev", // TODO(dominio): remitente en un dominio con Email Routing activo
+    "CONTACT_TO": "hola@alumhost.dev"   // TODO(dominio): buzón verificado en Email Routing
+  }
+
+  // TODO(email): cuando el dominio esté en Cloudflare con Email Routing y CONTACT_TO verificado, descomenta:
+  // ,"send_email": [{ "name": "CONTACT_MAILER", "destination_address": "hola@alumhost.dev" }]
+  // Alternativa futura (IA: elige una sola): guardar en D1, o enviar con Resend vía fetch. Ver worker/index.ts → deliver().
+}

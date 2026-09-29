@@ -1,0 +1,227 @@
+---
+/**
+ * Portada. "Módulos sobre el agua": cada bloque usa un tratamiento distinto a propósito (no hay plantilla repetida).
+ * 1 hero directamente sobre el agua (titular a cartel + selector de cristal) · cinta de módulos
+ * · 2 cómo trabajamos: libro de filas sobre velo · 3 pasos: verbos gigantes en baldosa índigo con textura
+ * · 4 lo que NO prometemos, tachado, sobre velo · 5 cierre en baldosa arena.
+ * Textos: i18n home.*. CTA: primaryCta() (depende de site.salesMode).
+ * IA: los pasos no llevan números porque el orden ya lo da la lectura; no los añadas.
+ */
+import Base from "../layouts/Base.astro";
+import TileStrip from "../components/TileStrip.astro";
+import TileMotif from "../components/TileMotif.astro";
+import PlanPicker from "../components/PlanPicker.astro";
+import { primaryCta } from "../config/cta";
+import { path, useDict, type Lang } from "../i18n";
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = useDict(lang);
+const h = t.home;
+const cta = primaryCta(lang);
+const [perkPerson, ...perkRest] = h.perks.items;
+---
+<Base lang={lang} page="home">
+  <!-- 1. HERO: titular a cartel sobre el agua -->
+  <section class="container hero">
+    <h1 class="rise" style="--i:0">{h.hero.titleA} <em>{h.hero.titleEm}</em></h1>
+    <div class="hero-row">
+      <div class="rise" style="--i:2">
+        <p class="lead">{h.hero.sub}</p>
+        <div class="ctas">
+          <a class="btn" href={cta.href}>{cta.label}</a>
+          <a class="textlink" href={path("plans", lang)}>{h.hero.ctaSecondary}</a>
+        </div>
+        <p class="status mono"><span class="dot" aria-hidden="true"></span>{h.hero.eyebrow}</p>
+      </div>
+      <div class="rise" style="--i:3">
+        <PlanPicker lang={lang} />
+      </div>
+    </div>
+  </section>
+  <TileStrip id="strip-hero" />
+
+  <!-- 2. CÓMO TRABAJAMOS: libro de filas -->
+  <div class="veil">
+    <section class="section container perks" aria-labelledby="perks-title">
+      <h2 id="perks-title">{h.perks.title}</h2>
+      <div>
+        <article class="row row--lead">
+          <h3>{perkPerson.title}</h3>
+          <p>{perkPerson.body}</p>
+        </article>
+        {perkRest.map((p, i) => (
+          <article class="row">
+            <h3>{p.title}</h3>
+            <div>
+              <p class="muted">{p.body}</p>
+              {i === perkRest.length - 1 && (
+                /* Nombres reales de los scripts del plan (§6). No inventar flags ni salidas. */
+                <ul class="scripts mono" aria-label="Scripts">
+                  <li>./create-vps</li>
+                  <li>./destroy-vps</li>
+                  <li>./quarantine-vps</li>
+                </ul>
+              )}
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
+  </div>
+
+  <!-- 3. PASOS: tres verbos gigantes en baldosa índigo -->
+  <section class="section steps band-indigo" aria-labelledby="steps-title">
+    <TileMotif id="motif-steps" />
+    <div class="container steps-in">
+      <h2 id="steps-title">{h.steps.title}</h2>
+      <ol class="steps-list">
+        {h.steps.items.map((s) => (
+          <li>
+            <span class="verb">{s.verb}</span>
+            <p>{s.body}</p>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <!-- 4. LO QUE NO PROMETEMOS: lo negado va tachado -->
+  <div class="veil">
+    <section class="section container honest" aria-labelledby="honest-title">
+      <h2 id="honest-title">{h.honest.title}</h2>
+      <ul class="honest-list">
+        {h.honest.items.map((it) => (
+          <li>
+            <p class="denied"><s>{it.title}</s></p>
+            <p class="muted">{it.body}</p>
+          </li>
+        ))}
+      </ul>
+    </section>
+  </div>
+
+  <!-- 5. CIERRE en baldosa arena -->
+  <section class="band-sand closing" aria-labelledby="closing-title">
+    <div class="container closing-in">
+      <h2 id="closing-title">{h.closing.title}</h2>
+      <div>
+        <p class="lead">{h.closing.body}</p>
+        <a class="btn" href={cta.href}>{cta.label}</a>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  /* ---------- Hero ---------- */
+  .hero { padding-block: clamp(3rem, 7vw, 6.5rem) clamp(3rem, 6vw, 5rem); }
+  .hero h1 { max-width: 13ch; }
+  .hero h1 em {
+    font-style: normal;
+    background: linear-gradient(var(--sand), var(--sand)) 0 88% / 100% 0.14em no-repeat;
+  }
+  .hero-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+    gap: clamp(2rem, 5vw, 5rem);
+    align-items: start;
+    margin-top: clamp(2rem, 4vw, 3.5rem);
+  }
+  .hero .lead { color: var(--text); max-width: 36ch; }
+  .ctas { display: flex; flex-wrap: wrap; align-items: center; gap: 1.5rem; margin-top: 2rem; }
+  .status { display: flex; align-items: center; gap: 0.6rem; margin-top: 2rem; font-size: 0.85rem; color: var(--text); }
+  .dot { width: 10px; height: 10px; background: var(--sand); outline: 1px solid var(--text); }
+
+  /* ---------- Libro de filas ---------- */
+  .perks h2 { margin-bottom: clamp(2rem, 4vw, 3.5rem); max-width: 12ch; }
+  .row {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: clamp(1rem, 4vw, 4rem);
+    align-items: start;
+    padding-block: clamp(1.4rem, 2.5vw, 2.2rem);
+    border-top: var(--rule);
+  }
+  .row:last-child { border-bottom: var(--rule); }
+  .row h3 { font-stretch: var(--display-width); font-weight: 800; font-size: var(--step-2); line-height: 0.95; max-width: 14ch; }
+  .row p { max-width: 46ch; }
+  .row--lead h3 { font-size: var(--step-4); }
+  .row--lead p { font-size: var(--step-1); line-height: 1.4; align-self: end; }
+  .scripts {
+    list-style: none;
+    padding: 1rem 1.2rem;
+    margin-top: 1.5rem;
+    background: var(--ink);
+    color: #e7ecf7;
+    line-height: 1.9;
+    max-width: 22rem;
+    border: 1px solid var(--rule-color);
+  }
+  .scripts li::before { content: "$ "; color: var(--sand); }
+
+  /* ---------- Pasos ---------- */
+  .steps { position: relative; overflow: hidden; }
+  .steps-in { position: relative; }
+  .steps h2 { margin-bottom: clamp(1.5rem, 3vw, 3rem); }
+  .steps-list { list-style: none; padding: 0; }
+  .steps-list li {
+    display: grid;
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    gap: clamp(1rem, 4vw, 4rem);
+    align-items: end;
+    padding-block: clamp(0.8rem, 1.5vw, 1.4rem);
+    border-top: var(--rule);
+  }
+  .verb {
+    font-family: var(--font-display);
+    font-stretch: 68%;
+    font-weight: 800;
+    font-size: var(--step-4);
+    line-height: 0.88;
+    text-transform: uppercase;
+  }
+  .steps-list p { font-size: var(--step-1); line-height: 1.35; max-width: 30ch; }
+
+  /* ---------- Lo que no prometemos ---------- */
+  .honest h2 { margin-bottom: clamp(2rem, 4vw, 3.5rem); max-width: 14ch; }
+  .honest-list {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: clamp(2rem, 4vw, 3.5rem) clamp(2rem, 5vw, 5rem);
+  }
+  .honest-list li { border-top: var(--rule); padding-top: 1.2rem; }
+  .denied {
+    font-family: var(--font-display);
+    font-stretch: var(--display-width);
+    font-weight: 800;
+    font-size: var(--step-3);
+    line-height: 0.95;
+    margin-bottom: 0.8rem;
+  }
+  .denied s { text-decoration-color: var(--brick); text-decoration-thickness: 0.09em; }
+  .honest-list .muted { max-width: 38ch; }
+
+  /* ---------- Cierre ---------- */
+  .closing { padding-block: var(--section); }
+  .closing-in {
+    display: grid;
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    gap: clamp(2rem, 5vw, 5rem);
+    align-items: end;
+  }
+  .closing h2 { font-size: var(--step-4); }
+  .closing .lead { margin-bottom: 1.6rem; }
+
+  /* ---------- Móvil ---------- */
+  @media (max-width: 919px) {
+    .hero-row, .closing-in { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 767px) {
+    .row, .steps-list li { grid-template-columns: 1fr; gap: 0.7rem; }
+    .row--lead p { align-self: start; }
+    .honest-list { grid-template-columns: 1fr; }
+  }
+</style>
