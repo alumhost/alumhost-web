@@ -46,5 +46,5 @@ export const site = {
     controller: "Alonso Carballar Barrientos y Blas Cosano Molina, responsables de AlumHost",
   },
 
-  turnstileSiteKey: "1x00000000000000000000AA",
+  turnstileSiteKey: "0x4AAAAAAFKBNs44FuYDq8eS",
 } as const;
