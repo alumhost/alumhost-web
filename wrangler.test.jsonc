@@ -1,0 +1,31 @@
+{
+  // Worker de PRUEBA de pagos (Stripe sandbox). NO sirve alumhost.dev: vive en <nombre>.<cuenta>.workers.dev.
+  // Despliegue:  npm run build && npx wrangler deploy -c wrangler.test.jsonc
+  // Secretos:    npx wrangler secret put STRIPE_SECRET_KEY -c wrangler.test.jsonc   (y STRIPE_WEBHOOK_SECRET, TURNSTILE_SECRET)
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "alumhost-web-test",
+  "main": "worker/index.ts",
+  "compatibility_date": "2026-09-01",
+  "workers_dev": true,
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS",
+    "html_handling": "auto-trailing-slash",
+    "not_found_handling": "404-page",
+    "run_worker_first": ["/api/*"]
+  },
+  "observability": { "enabled": true },
+  "ratelimits": [{ "name": "CONTACT_LIMITER", "namespace_id": "1002", "simple": { "limit": 5, "period": 60 } }],
+  // Sin "routes": no toca el dominio. Sin send_email: el formulario de contacto no funciona aquí (no hace falta).
+  "vars": {
+    "CONTACT_FROM": "web@alumhost.dev",
+    "PUBLISH_EMAIL_DOMAINS": "us.es,alum.us.es",
+    "PUBLISH_FROM": "hola@alumhost.dev",
+    // price_... de la SANDBOX de Stripe (los crea Alonso en el panel; plans.ts sigue siendo la fuente de precios).
+    "STRIPE_PRICES": "{\"mini.monthly\":\"price_REEMPLAZAR\",\"mini.yearly\":\"price_REEMPLAZAR\",\"developer.monthly\":\"price_REEMPLAZAR\",\"developer.yearly\":\"price_REEMPLAZAR\",\"pro.monthly\":\"price_REEMPLAZAR\",\"pro.yearly\":\"price_REEMPLAZAR\"}"
+  },
+  // D1 SEPARADA de la de producción:  npx wrangler d1 create alumhost-test --location eeur   y pega el id aquí.
+  "d1_databases": [
+    { "binding": "PUBLISH_DB", "database_name": "alumhost-test", "database_id": "REEMPLAZAR", "migrations_dir": "migrations" }
+  ]
+}

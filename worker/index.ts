@@ -13,8 +13,9 @@
 import { EmailMessage } from "cloudflare:email";
 import { json, verifyTurnstile } from "./turnstile";
 import { handlePublish, type PublishEnv } from "./publish";
+import { handleCheckout, handleStripeWebhook, type StripeEnv } from "./stripe";
 
-export interface Env extends PublishEnv {
+export interface Env extends PublishEnv, StripeEnv {
   ASSETS: Fetcher;
   TURNSTILE_SECRET?: string; // wrangler secret put TURNSTILE_SECRET
   CONTACT_FROM: string;
@@ -157,6 +158,8 @@ export default {
   async fetch(req, env, ctx): Promise<Response> {
     const url = new URL(req.url);
     if (url.pathname === "/api/contact") return handleContact(req, env);
+    if (url.pathname === "/api/checkout") return handleCheckout(req, env);
+    if (url.pathname === "/api/stripe/webhook") return handleStripeWebhook(req, env);
     if (url.pathname.startsWith("/api/publish/")) return handlePublish(req, env, ctx);
     if (url.pathname.startsWith("/api/")) return json({ ok: false, error: "not_found" }, 404);
     return env.ASSETS.fetch(req);

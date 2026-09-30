@@ -3,3 +3,8 @@
 TURNSTILE_SECRET=1x0000000000000000000000000000000AA
 # Sin binding de email, en local se acepta el envío y solo se registra en consola:
 ALLOW_LOG_ONLY=1
+
+# Stripe (rama feat/stripe-test, SOLO sandbox)
+STRIPE_SECRET_KEY=sk_test_xxx
+STRIPE_WEBHOOK_SECRET=whsec_xxx   # el que imprime `stripe listen` (local); el del panel es otro distinto
+STRIPE_PRICES={"mini.monthly":"price_xxx","mini.yearly":"price_xxx","developer.monthly":"price_xxx","developer.yearly":"price_xxx","pro.monthly":"price_xxx","pro.yearly":"price_xxx"}
