@@ -5,7 +5,7 @@
  */
 import { site } from "./site";
 import type { PlanId } from "./plans";
-import { contactHref, path, useDict, type Lang } from "../i18n";
+import { path, useDict, type Lang } from "../i18n";
 
 export interface Cta {
   href: string;
@@ -18,7 +18,8 @@ export const primaryCta = (lang: Lang, plan?: PlanId): Cta => {
   if (plan === "publish") return { href: path("publish", lang), label: t.publish.cta };
   switch (site.salesMode) {
     case "waitlist":
-      return { href: contactHref(lang, { reason: "beta", plan }), label: t.nav.cta };
+      // Beta: todo "Reservar plaza" lleva a /beta (con ?plan= si viene de un plan). /contacto queda para dudas generales.
+      return { href: path("beta", lang) + (plan ? `?plan=${plan}` : "") + "#apuntarme", label: t.nav.cta };
     case "deposit":
     case "checkout":
       throw new Error(`salesMode "${site.salesMode}" requiere /api/checkout (no implementado).`);

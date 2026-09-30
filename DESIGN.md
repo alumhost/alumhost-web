@@ -65,3 +65,12 @@ Tres firmas: el agua, el reflejo del puntero y la entrada del titular de cada p�
   sin flechas pegadas a los botones, sin cápsulas.
 - Movimiento: nunca la misma animación en todos los bloques.
 - Copy: sin "eleva / sin fricción / potente". Frases cortas y concretas. Nada regional.
+
+## Variante negro y blanco (rama `design/black-white`)
+Misma estructura, tipografía y patrones; solo cambia el color, y solo en `src/styles/tokens.css`. Un único tema, siempre
+oscuro (se quita el modo día/noche). Fondo `#000`, texto y reglas `#fff`, texto secundario `#b5b5b5`, baldosa oscura
+`#181818` (antes índigo), acento y banda de cierre en blanco (antes arena) con texto negro, agua en grises, cristal gris
+translúcido. `--brick` (`#ff8a7a`) sigue solo para lo tachado y los errores. No hay neón: la lista anti-IA se cumple.
+Pendiente de revisar en pantalla (no se ha renderizado): contraste real del velo sobre el agua gris, la cinta de
+baldosas y la textura de la banda oscura (`TileMotif`), que se calculó para el índigo. El logo conserva sus colores
+de marca (crema, añil, terracota) sobre su baldosa; si se quiere monocromo, es un cambio aparte en `Mark.astro` y `public/favicon.svg`.

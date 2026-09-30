@@ -104,6 +104,13 @@ Precios de estudiante sobre OVH So you Start SYS-1 32 GB (decisión 29/09/2026).
 - Encaja con marca "sin letra pequeña".
 - Descuento universitario: descartado (29/09/2026). El precio ya es de estudiante; anual = 2 meses gratis agota el margen del Developer.
 
+### Beta pública en /beta (decisión 30/09/2026)
+- /beta es pública (no oculta). Todo "Reservar plaza" (menú, portada, planes) lleva a /beta vía `primaryCta()`; `?plan=` preselecciona el plan.
+- Enlaces cortos de los QR en `public/_redirects`: /t (tarjeta), /c (cartel), /w (whatsapp). El formulario añade "Origen: <utm_source>" al mensaje.
+- Ventajas del beta tester: precio congelado el primer año, **backup diario incluido el primer año en los VPS** (decidido por Blas), ayuda con el primer despliegue y con el dominio del GitHub Student Pack, trato directo.
+- Se arranca cuando haya "un mínimo" de personas apuntadas: **nunca publicar la cifra**. Sin fechas. "Beta tester", nunca "fundador".
+- El formulario de /beta no pregunta por precio.
+
 ## Reglas de Contenido
 
 - No prometer SLA (mejor esfuerzo).

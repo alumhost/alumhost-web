@@ -4,19 +4,37 @@ import { path, useDict, type Lang } from "../i18n";
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const t = useDict(lang);
+const en = useDict("en");
 ---
 <Base lang={lang} page="notFound">
   <div class="veil">
   <section class="container nf">
     <p class="code" aria-hidden="true">404</p>
-    <div>
-      <h1>{t.notFound.title}</h1>
-      <p class="lead">{t.notFound.body}</p>
-      <a class="btn" href={path("home", lang)}>{t.notFound.back}</a>
+    <div data-nf-en={JSON.stringify({ title: en.notFound.title, body: en.notFound.body, back: en.notFound.back, home: path("home", "en"), doc: en.meta.notFound.title.replace("{name}", "AlumHost") })}>
+      <h1 data-nf="title">{t.notFound.title}</h1>
+      <p class="lead" data-nf="body">{t.notFound.body}</p>
+      <a class="btn" data-nf="back" href={path("home", lang)}>{t.notFound.back}</a>
     </div>
   </section>
   </div>
 </Base>
+
+<script>
+  // Cloudflare sirve un único 404.html para todo el sitio: bajo /en/ lo pasamos a inglés en el navegador.
+  if (location.pathname.indexOf("/en/") === 0 || location.pathname === "/en") {
+    var box = document.querySelector("[data-nf-en]");
+    if (box) {
+      var d = JSON.parse(box.getAttribute("data-nf-en"));
+      document.documentElement.lang = "en";
+      document.title = d.doc;
+      box.querySelector('[data-nf="title"]').textContent = d.title;
+      box.querySelector('[data-nf="body"]').textContent = d.body;
+      var a = box.querySelector('[data-nf="back"]');
+      a.textContent = d.back;
+      a.setAttribute("href", d.home);
+    }
+  }
+</script>
 
 <style>
   .nf {

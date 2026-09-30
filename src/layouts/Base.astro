@@ -35,8 +35,7 @@ const canonical = page === "notFound" ? null : new URL(path(page, lang), site).h
     <title>{meta.title}</title>
     <meta name="description" content={meta.description} />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <meta name="theme-color" content="#c9d9ee" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#0b1447" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#000000" />
     {canonical && <link rel="canonical" href={canonical} />}
     {page !== "notFound" &&
       langs.map((l) => <link rel="alternate" hreflang={l} href={new URL(path(page, l), site).href} />)}

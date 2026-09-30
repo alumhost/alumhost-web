@@ -3,7 +3,7 @@ Texto normal >= 4.5. Texto grande (titulares del hero sobre el agua) >= 3. Sale 
 import re, pathlib
 
 css = pathlib.Path(__file__).resolve().parents[1].joinpath("src/styles/tokens.css").read_text()
-light_block, dark_block = css.split("@media (prefers-color-scheme: dark)")
+light_block, _, dark_block = css.partition("@media (prefers-color-scheme: dark)")  # sin bloque oscuro = un solo tema
 
 def tokens(block):
     return dict(re.findall(r"--([\w-]+):\s*(#[0-9a-fA-F]{6})", block))
@@ -31,7 +31,7 @@ PAIRS = [
     ("text", "pool-base", 4.5), ("text", "pool-water", 4.5),  # hero sobre el agua
 ]
 ok = True
-for name, t in (("día", day), ("noche", night)):
+for name, t in ((("día", day), ("noche", night)) if dark_block else (("único", day),)):
     for fg, bg, need in PAIRS:
         r = ratio(t[fg], t[bg])
         good = r >= need

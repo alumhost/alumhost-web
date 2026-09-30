@@ -30,6 +30,11 @@ const es = {
       description: "Tu web estática en tunombre.alumhost.dev, gratis y con HTTPS. Sin tarjeta ni cuenta: solo tu correo de la universidad.",
     },
     publishUpload: { title: "Sube tu web · {name}", description: "Sube un .zip, una carpeta o un repositorio de GitHub." },
+    beta: {
+      title: "Beta · {name}",
+      description:
+        "Apúntate gratis a la beta: VPS y webs estáticas para estudiantes, con soporte en español. No pagas nada por adelantado.",
+    },
     notFound: { title: "Página no encontrada · {name}", description: "Esta página no existe." },
   },
 
@@ -366,12 +371,73 @@ const es = {
     },
   },
 
+  // Página /beta. Nunca "fundador"; nunca una cifra del mínimo de personas; nunca fechas.
+  beta: {
+    status: "Beta abierta",
+    titleA: "Hazte beta",
+    titleEm: "tester.",
+    sub: "Todavía no hemos lanzado. Arrancamos cuando haya un mínimo de personas apuntadas.",
+    free: "Apuntarse es gratis y no te compromete a nada.",
+    cta: "Apuntarme",
+    gains: {
+      title: "Qué te llevas.",
+      items: [
+        {
+          title: "Precio congelado un año.",
+          body: "El precio de tu plan no sube durante tu primer año, aunque cambiemos las tarifas después de la beta.",
+        },
+        { title: "Backup incluido un año.", body: "En los VPS, la copia diaria va incluida el primer año sin pagar el extra." },
+        {
+          title: "Tu primer despliegue, con nosotros.",
+          body: "Lo montamos contigo y te ayudamos a conseguir el dominio gratis del GitHub Student Pack.",
+        },
+        {
+          title: "Hablas con nosotros.",
+          body: "Sin tickets ni bots. Te responden las mismas personas que montan tu servidor.",
+        },
+      ],
+    },
+    steps: {
+      title: "Cómo funciona.",
+      items: [
+        { verb: "Apúntate", body: "Rellenas el formulario de abajo. Es gratis y no pagas nada por adelantado." },
+        { verb: "Decide", body: "Cuando lleguemos al mínimo te avisamos por correo. Entonces decides si sigues." },
+        { verb: "Arranca", body: "Tu primer mes empieza el día que te damos acceso a tu servidor, no antes." },
+      ],
+    },
+    signup: {
+      title: "Apúntate.",
+      body: "Te escribimos cuando haya fecha. Hasta entonces no te mandamos nada más.",
+      messageHelp:
+        "Qué quieres montar y cuánta RAM crees que necesitas. Si no lo sabes, cuéntanos el proyecto y te orientamos. Mínimo 10 caracteres.",
+      submit: "Apuntarme a la beta",
+      success: "Apuntado. Te escribimos a {email} cuando haya fecha.",
+    },
+    faq: {
+      title: "Preguntas.",
+      items: [
+        {
+          q: "¿Cuándo pago?",
+          a: "Ahora, nada. Cuando lleguemos al mínimo te escribimos con el precio de tu plan. Si decides seguir, pagas y tu primer mes empieza el día que tienes acceso a tu servidor.",
+        },
+        { q: "¿Y si no llegáis al mínimo?", a: "No se cobra nada a nadie. Te avisamos igualmente de lo que hacemos." },
+        { q: "¿Cómo me borro de la lista?", a: "Responde a cualquier correo nuestro pidiéndolo y te quitamos." },
+        {
+          q: "¿Qué datos guardáis?",
+          a: "Los del formulario: nombre, correo, plan y mensaje, solo para escribirte sobre la beta. El resto está en la",
+        },
+      ],
+      privacyLink: "política de privacidad",
+    },
+  },
+
   footer: {
     tagline: "Hosting boutique para estudiantes y desarrolladores.",
     status: "Estado del servicio",
     devlog: "Devlog",
     repo: "Código abierto",
     privacy: "Privacidad",
+    beta: "Beta",
     rights: "© {year} {name}",
   },
 
