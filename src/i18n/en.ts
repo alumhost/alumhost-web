@@ -82,8 +82,8 @@ const en: Dict = {
           body: "No discounts to ask for and no small print: the price you see is the student price, for everyone.",
         },
         {
-          title: "Built in the open.",
-          body: "We publish how it works: network isolation, the scripts, and what we learn along the way.",
+          title: "Automated, not improvised",
+          body: "Creating, removing and isolating a server are concrete, repeatable commands, not manual steps that depend on someone's memory.",
         },
       ],
     },
