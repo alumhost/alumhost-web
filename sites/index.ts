@@ -13,6 +13,8 @@ interface Env {
 }
 
 const BASE = ".alumhost.dev";
+// La caché del edge de Cloudflare (caches.default). Los tipos del DOM, que también carga astro check, no la conocen.
+const edge = () => (caches as unknown as { default: Cache }).default;
 
 const SECURITY = {
   "x-content-type-options": "nosniff",
@@ -31,7 +33,7 @@ const page = (status: number, title: string, text: string) =>
 
 /** Versión activa del sitio, con caché de 60 s en el edge para no consultar D1 en cada visita. */
 async function activeVersion(env: Env, name: string, ctx: ExecutionContext): Promise<string | null> {
-  const cache = caches.default;
+  const cache = edge();
   const key = new Request(`https://publish-cache.internal/v/${name}`);
   const hit = await cache.match(key);
   if (hit) return (await hit.text()) || null;
@@ -43,18 +45,17 @@ async function activeVersion(env: Env, name: string, ctx: ExecutionContext): Pro
   return v || null;
 }
 
-/** Lee un archivo (todos sus trozos, en orden). null si no existe. */
-async function readFile(env: Env, name: string, version: string, path: string): Promise<Uint8Array | null> {
+/** Lee un archivo (todos sus trozos, en orden). null si no existe. Devuelve un ArrayBuffer (válido como cuerpo de Response). */
+async function readFile(env: Env, name: string, version: string, path: string): Promise<ArrayBuffer | null> {
   const { results } = await env.PUBLISH_DB.prepare("SELECT data FROM blobs WHERE site = ? AND version = ? AND path = ? ORDER BY chunk")
     .bind(name, version, path)
     .all<{ data: ArrayBuffer | number[] }>();
   if (!results.length) return null;
   const parts = results.map((r) => (Array.isArray(r.data) ? Uint8Array.from(r.data) : new Uint8Array(r.data)));
-  if (parts.length === 1) return parts[0];
   const out = new Uint8Array(parts.reduce((n, p) => n + p.length, 0));
   let o = 0;
   for (const p of parts) { out.set(p, o); o += p.length; }
-  return out;
+  return out.buffer;
 }
 
 export default {
@@ -63,6 +64,11 @@ export default {
     const host = url.hostname.toLowerCase();
     if (host === "www.alumhost.dev") return Response.redirect(`https://alumhost.dev${url.pathname}${url.search}`, 301);
     if (req.method !== "GET" && req.method !== "HEAD") return new Response("Method Not Allowed", { status: 405, headers: { allow: "GET, HEAD" } });
+    // Sin service workers: uno registrado seguiría sirviendo la web (o phishing) desde la caché del visitante
+    // aunque el sitio se suspenda o se borre. El navegador marca la descarga del script con esta cabecera.
+    if (req.headers.get("service-worker") === "script") {
+      return new Response("Service workers are not allowed on AlumHost Publish.", { status: 403, headers: { ...SECURITY, "content-type": "text/plain; charset=utf-8" } });
+    }
     if (!host.endsWith(BASE)) return page(404, "Sitio no encontrado", "Esta dirección no pertenece a AlumHost.");
     const name = host.slice(0, -BASE.length);
     if (!validName(name)) return page(404, "Sitio no encontrado", "Esta dirección no está en uso.");
@@ -92,7 +98,7 @@ export default {
     const etag = `"${version}"`;
     if (req.headers.get("if-none-match") === etag) return new Response(null, { status: 304, headers: { ...SECURITY, etag } });
     const cacheKey = new Request(`https://publish-cache.internal/f/${name}/${version}${url.pathname}`);
-    const cached = await caches.default.match(cacheKey);
+    const cached = await edge().match(cacheKey);
     if (cached) return req.method === "HEAD" ? new Response(null, cached) : cached;
 
     for (const p of candidates) {
@@ -103,7 +109,7 @@ export default {
         return Response.redirect(`${url.origin}/${p.slice(0, -"index.html".length)}${url.search}`, 301);
       }
       const res = new Response(data, { headers: { ...SECURITY, "content-type": contentType(p), "cache-control": "public, max-age=300", etag } });
-      ctx.waitUntil(caches.default.put(cacheKey, res.clone()));
+      ctx.waitUntil(edge().put(cacheKey, res.clone()));
       return req.method === "HEAD" ? new Response(null, res) : res;
     }
 

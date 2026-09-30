@@ -375,6 +375,8 @@ const es = {
         name_taken: "Ese nombre ya lo ha publicado otra persona.",
         one_site: "Tu correo ya tiene otra web.",
         session: "El enlace ha caducado. Pide uno nuevo.",
+        rate_limited: "Has pedido demasiadas acciones seguidas. Espera un minuto y vuelve a intentarlo.",
+        suspended: "Esta web está suspendida por una revisión de abuso. Escríbenos a abuse@alumhost.dev.",
         server: "Algo ha fallado en nuestro lado. Inténtalo de nuevo en un minuto.",
       },
     },

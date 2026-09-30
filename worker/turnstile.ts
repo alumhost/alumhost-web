@@ -24,6 +24,45 @@ export async function verifyTurnstile(
   }
 }
 
+/**
+ * Lee el cuerpo como máximo `max` bytes, aunque venga sin content-length (chunked). null = demasiado grande.
+ * Evita que un cliente se salte los límites de tamaño y obligue al Worker a leer cuerpos enormes.
+ */
+export async function readLimited(req: Request | Response, max: number): Promise<Uint8Array | null> {
+  const declared = req.headers.get("content-length");
+  if (declared !== null && Number(declared) > max) return null;
+  if (!req.body) return new Uint8Array(0);
+  const reader = req.body.getReader();
+  const parts: Uint8Array[] = [];
+  let total = 0;
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    total += value.byteLength;
+    if (total > max) {
+      await reader.cancel().catch(() => {});
+      return null;
+    }
+    parts.push(value);
+  }
+  const out = new Uint8Array(total);
+  let o = 0;
+  for (const p of parts) { out.set(p, o); o += p.byteLength; }
+  return out;
+}
+
+/** JSON con límite de tamaño. "too_big" → 413, "bad" → 400. */
+export async function readJson(req: Request, max: number): Promise<Record<string, unknown> | "too_big" | "bad"> {
+  const bytes = await readLimited(req, max);
+  if (!bytes) return "too_big";
+  try {
+    const v = JSON.parse(new TextDecoder().decode(bytes)) as unknown;
+    return v && typeof v === "object" && !Array.isArray(v) ? (v as Record<string, unknown>) : "bad";
+  } catch {
+    return "bad";
+  }
+}
+
 export const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), {
     status,

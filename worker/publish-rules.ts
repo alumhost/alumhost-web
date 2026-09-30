@@ -14,6 +14,10 @@ export const RESERVED = new Set([
   "docs", "help", "ayuda", "soporte", "support", "hola", "abuse", "privacidad", "privacy", "postmaster", "security",
   "seguridad", "beta", "publish", "publicar", "billing", "pago", "pagos", "stripe", "alumhost", "test", "prueba",
   "demo", "universidad", "us", "secretaria", "campus", "moodle", "ev", "sso", "cas", "idp",
+  // Nombres con significado especial para clientes de correo, navegadores y PKI (autoconfiguración, claves, políticas).
+  "autoconfig", "autodiscover", "openpgpkey", "mta-sts", "wpad", "isatap", "email", "correo", "mail2", "mx", "ns",
+  "ns3", "ns4", "pop3", "imap4", "webdisk", "cpanel", "whm", "staging", "dev", "local", "localhost", "root",
+  "sites", "site", "www2", "portal", "intranet", "verify", "verificar", "signin", "signup", "registro", "pay",
 ]);
 
 export const LIMITS = {
@@ -56,7 +60,9 @@ const TYPES: Record<string, string> = {
 };
 
 export const contentType = (path: string): string => {
-  const ext = path.slice(path.lastIndexOf(".") + 1).toLowerCase();
+  const dot = path.lastIndexOf(".");
+  if (dot <= path.lastIndexOf("/")) return "application/octet-stream"; // sin extensión: nunca se interpreta como HTML
+  const ext = path.slice(dot + 1).toLowerCase();
   return TYPES[ext] ?? "application/octet-stream";
 };
 

@@ -267,3 +267,9 @@ a:focus-visible .ch { transform: rotateX(90deg); }
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Pantallas táctiles: zona pulsable de ~44 px en enlaces de texto sin mover el texto (el padding vertical de un
+   elemento en línea amplía el área de toque pero no cambia la maquetación). WCAG 2.5.5 / recomendación de 44 px. */
+@media (pointer: coarse) {
+  .textlink { padding-block: 0.7em; }
+}
