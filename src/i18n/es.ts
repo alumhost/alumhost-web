@@ -85,8 +85,8 @@ const es = {
           body: "No hay descuentos que pedir ni letra pequeña: el precio que ves es el de estudiante, para todo el mundo.",
         },
         {
-          title: "Construido en abierto.",
-          body: "Publicamos cómo está montado: el aislamiento de red, los scripts y lo que aprendemos por el camino.",
+          title: "Automatizado, no improvisado.",
+          body: "Crear, retirar y aislar un servidor son comandos concretos y repetibles, no pasos a mano que dependen de la memoria de alguien.",
         },
       ],
     },
