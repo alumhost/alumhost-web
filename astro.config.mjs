@@ -19,7 +19,7 @@ export default defineConfig({
         "default-src 'self'",
         "img-src 'self' data:",
         "font-src 'self'",
-        "connect-src 'self'",
+        "connect-src 'self' https://api.github.com", // Publish: listar un repo público desde el navegador
         "frame-src https://challenges.cloudflare.com",
         "base-uri 'self'",
         "form-action 'self'",

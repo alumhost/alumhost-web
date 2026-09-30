@@ -2,7 +2,8 @@
  * Worker de AlumHost. Static Assets sirve la web; este código solo recibe /api/* (ver run_worker_first en wrangler.jsonc).
  *
  * Endpoints:
- *   POST /api/contact  formulario de contacto / reserva de beta
+ *   POST /api/contact     formulario de contacto / reserva de beta
+ *   /api/publish/*        Publish gratis: alta con enlace mágico y despliegue de webs estáticas (worker/publish.ts)
  *
  * Futuro (NO implementado, ver CLAUDE.md "pare y pregunte"):
  *   POST /api/checkout     crea una Stripe Checkout Session. Precio resuelto AQUÍ desde src/config/plans.ts.
@@ -10,8 +11,10 @@
  *                          de la VM en Cloudflare Queues. Nunca llamar a Proxmox desde aquí directamente.
  */
 import { EmailMessage } from "cloudflare:email";
+import { json, verifyTurnstile } from "./turnstile";
+import { handlePublish, type PublishEnv } from "./publish";
 
-export interface Env {
+export interface Env extends PublishEnv {
   ASSETS: Fetcher;
   TURNSTILE_SECRET?: string; // wrangler secret put TURNSTILE_SECRET
   CONTACT_FROM: string;
@@ -34,12 +37,6 @@ interface ContactInput {
   lang: "es" | "en";
 }
 
-const json = (body: unknown, status = 200) =>
-  new Response(JSON.stringify(body), {
-    status,
-    headers: { "content-type": "application/json; charset=utf-8", "cache-control": "no-store" },
-  });
-
 /** Misma validación que el cliente (ContactForm.astro), pero aquí es la que cuenta. */
 function parseContact(raw: unknown): ContactInput | null {
   if (!raw || typeof raw !== "object") return null;
@@ -56,31 +53,6 @@ function parseContact(raw: unknown): ContactInput | null {
   if (message.length < 10 || message.length > 4000) return null;
   if (!REASONS.includes(reason) || !PLANS.includes(plan)) return null;
   return { name, email, reason, plan, message, lang };
-}
-
-/**
- * "human" = token válido · "bot" = token inválido/caducado · "unavailable" = no se pudo consultar a Cloudflare.
- * Separar "bot" de "unavailable" evita decirle a una persona real que no ha pasado la verificación por un fallo de red.
- */
-async function verifyTurnstile(
-  token: string,
-  secret: string,
-  ip: string | null,
-): Promise<"human" | "bot" | "unavailable"> {
-  if (!token || token.length > 2048) return "bot";
-  const body = new FormData();
-  body.append("secret", secret);
-  body.append("response", token);
-  if (ip) body.append("remoteip", ip);
-  try {
-    const res = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", { method: "POST", body });
-    if (!res.ok) return "unavailable";
-    const data = (await res.json()) as { success?: boolean };
-    return data.success === true ? "human" : "bot";
-  } catch (err) {
-    console.error("[contact] siteverify no disponible", err);
-    return "unavailable";
-  }
 }
 
 /** Quita saltos de línea para que nada del usuario pueda inyectar cabeceras de correo. */
@@ -182,9 +154,10 @@ async function handleContact(req: Request, env: Env): Promise<Response> {
 }
 
 export default {
-  async fetch(req, env): Promise<Response> {
+  async fetch(req, env, ctx): Promise<Response> {
     const url = new URL(req.url);
     if (url.pathname === "/api/contact") return handleContact(req, env);
+    if (url.pathname.startsWith("/api/publish/")) return handlePublish(req, env, ctx);
     if (url.pathname.startsWith("/api/")) return json({ ok: false, error: "not_found" }, 404);
     return env.ASSETS.fetch(req);
   },

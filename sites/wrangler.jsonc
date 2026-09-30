@@ -1,0 +1,12 @@
+{
+  // Worker que sirve las webs de Publish: <nombre>.alumhost.dev → D1 (tabla blobs). Solo lectura, sin secretos.
+  // Requisitos en Cloudflare DNS: registro AAAA "*" → 100:: con la nube NARANJA (proxied), para que la ruta capture el tráfico.
+  // Despliegue: npx wrangler deploy -c sites/wrangler.jsonc
+  "$schema": "../node_modules/wrangler/config-schema.json",
+  "name": "alumhost-sites",
+  "main": "index.ts",
+  "compatibility_date": "2026-09-01",
+  "routes": [{ "pattern": "*.alumhost.dev/*", "zone_name": "alumhost.dev" }],
+  "observability": { "enabled": true },
+  "d1_databases": [{ "binding": "PUBLISH_DB", "database_name": "alumhost-publish", "database_id": "34c625b4-5465-4883-9611-0ed7111ce381" }]
+}

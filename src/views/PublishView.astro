@@ -1,0 +1,206 @@
+---
+/**
+ * Publish gratis, paso 1: nombre + correo de la universidad → enlace mágico por correo (worker/publish.ts).
+ * Sin cuentas ni contraseñas. El paso 2 (subir la web) está en PublishUploadView.astro, al que lleva el enlace.
+ * Los mensajes van en data-messages (JSON) para no usar scripts inline (CSP estricta).
+ */
+import Base from "../layouts/Base.astro";
+import { site } from "../config/site";
+import { fill, path, useDict, type Lang } from "../i18n";
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = useDict(lang);
+const p = t.publish;
+const messages = JSON.stringify({
+  ...p.errors,
+  suspended: fill(p.errors.suspended, { email: site.email.support }),
+  server: fill(p.errors.server, { email: site.email.support }),
+  success: p.form.success,
+  sending: p.form.sending,
+  submit: p.form.submit,
+});
+---
+<Base lang={lang} page="publish">
+  <div class="veil">
+    <div class="container publish">
+      <div class="intro">
+        <h1 class="rise" style="--i:0">{p.title}</h1>
+        <p class="lead rise" style="--i:1">{p.sub}</p>
+        <ol class="steps rise" style="--i:2">
+          {p.steps.map((s) => <li>{s}</li>)}
+        </ol>
+        <p class="muted limits rise" style="--i:3">{p.limits}</p>
+      </div>
+
+      <div class="form-col rise" style="--i:2">
+        <form class="form" id="form" novalidate data-publish-form data-messages={messages} data-lang={lang}>
+          <h2 class="form-title">{p.form.title}</h2>
+
+          <div class="field">
+            <label for="pf-name">{p.form.name}</label>
+            <div class="suffix">
+              <input id="pf-name" name="name" type="text" inputmode="url" autocomplete="off" autocapitalize="none" spellcheck="false"
+                required minlength="2" maxlength="30" pattern="[a-z0-9]([a-z0-9-]{0,28}[a-z0-9])" aria-describedby="pf-name-help pf-name-err" />
+              <span class="mono" aria-hidden="true">.alumhost.dev</span>
+            </div>
+            <p class="help" id="pf-name-help">{p.form.nameHelp}</p>
+            <p class="error" id="pf-name-err" data-error-for="name" hidden></p>
+          </div>
+
+          <div class="field">
+            <label for="pf-email">{p.form.email}</label>
+            <input id="pf-email" name="email" type="email" autocomplete="email" required maxlength="254" aria-describedby="pf-email-help pf-email-err" />
+            <p class="help" id="pf-email-help">{p.form.emailHelp}</p>
+            <p class="error" id="pf-email-err" data-error-for="email" hidden></p>
+          </div>
+
+          <div class="field check">
+            <input id="pf-accept" name="accept" type="checkbox" aria-describedby="pf-accept-err" />
+            <label for="pf-accept">{p.form.accept}</label>
+            <p class="error" id="pf-accept-err" data-error-for="accept" hidden></p>
+          </div>
+
+          <div class="hp" aria-hidden="true">
+            <label for="pf-website">Website</label>
+            <input id="pf-website" name="website" type="text" tabindex="-1" autocomplete="off" />
+          </div>
+
+          <div class="turnstile">
+            <div class="cf-turnstile" data-sitekey={site.turnstileSiteKey} data-language={lang} data-theme="auto"></div>
+            <p class="error" data-error-for="turnstile" hidden></p>
+          </div>
+
+          <div class="submit-row">
+            <button class="btn" type="submit" data-submit>{p.form.submit}</button>
+            <p class="help">{t.contact.form.privacy} <a href={path("privacy", lang)}>{t.contact.form.privacyLink}</a></p>
+          </div>
+          <p class="error form-error" data-error-for="form" role="alert" hidden></p>
+        </form>
+
+        <div class="success band-sand" data-success tabindex="-1" role="status" hidden>
+          <p data-success-text></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</Base>
+
+<script is:inline src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+
+<style>
+  .publish {
+    display: grid;
+    grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+    gap: clamp(2rem, 5vw, 5rem);
+    align-items: start;
+    padding-block: clamp(3rem, 6vw, 5.5rem) var(--section);
+  }
+  .intro { position: sticky; top: calc(var(--nav-h) + 2rem); }
+  .intro h1 { font-size: var(--step-4); }
+  .intro .lead { margin-top: 1.4rem; }
+  .steps { margin-top: 2rem; padding: 0; list-style: none; counter-reset: s; display: grid; }
+  .steps li { counter-increment: s; border-top: var(--rule); padding: 1rem 0 1rem 2.6rem; position: relative; }
+  .steps li:last-child { border-bottom: var(--rule); }
+  .steps li::before { content: counter(s); position: absolute; left: 0; top: 0.9rem; font-family: var(--font-mono); font-weight: 600; }
+  .limits { margin-top: 1.4rem; font-size: var(--step--1); }
+
+  .form { padding: clamp(1.4rem, 3vw, 2.4rem); display: grid; gap: 1.4rem; border: var(--rule); background: var(--paper-2); scroll-margin-top: calc(var(--nav-h) + 1rem); }
+  .form-title { font-size: var(--step-2); }
+  .field { display: grid; gap: 0.4rem; align-content: start; }
+  label { font-weight: 600; font-size: 0.95rem; }
+  input[type="text"], input[type="email"] {
+    width: 100%; min-height: 52px; padding: 0.7rem 0.9rem; border-radius: 0; border: 2px solid var(--text); background: var(--paper); color: var(--text);
+  }
+  .suffix { display: flex; align-items: stretch; }
+  .suffix input { flex: 1; min-width: 0; border-right: 0; }
+  .suffix span { display: flex; align-items: center; padding-inline: 0.8rem; border: 2px solid var(--text); background: var(--paper-2); white-space: nowrap; }
+  .check { grid-template-columns: auto 1fr; column-gap: 0.7rem; align-items: start; }
+  .check input { width: 1.3rem; height: 1.3rem; margin-top: 0.15rem; accent-color: var(--indigo); }
+  .check label { font-weight: 400; }
+  .check .error { grid-column: 1 / -1; }
+  [aria-invalid="true"] { border-color: var(--brick); box-shadow: inset 0 -4px 0 var(--brick); }
+  .help { font-size: var(--step--1); color: var(--muted); }
+  .error { font-size: var(--step--1); color: var(--brick); font-weight: 600; }
+  .hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+  .turnstile { min-height: 65px; }
+  .submit-row { display: flex; align-items: center; gap: 1rem 1.5rem; flex-wrap: wrap; }
+  .btn[disabled] { opacity: 0.7; cursor: progress; }
+  .success { padding: clamp(1.5rem, 3vw, 2.4rem); font-family: var(--font-display); font-stretch: var(--display-width); font-weight: 800; font-size: var(--step-2); line-height: 1.1; }
+
+  @media (max-width: 919px) {
+    .publish { grid-template-columns: 1fr; }
+    .intro { position: static; }
+  }
+</style>
+
+<script>
+  type Field = "name" | "email" | "accept" | "turnstile" | "form";
+  const form = document.querySelector<HTMLFormElement>("[data-publish-form]");
+
+  if (form) {
+    const msg = JSON.parse(form.dataset.messages ?? "{}") as Record<string, string>;
+    const submit = form.querySelector<HTMLButtonElement>("[data-submit]")!;
+    const success = document.querySelector<HTMLElement>("[data-success]")!;
+    const NAME = /^[a-z0-9](?:[a-z0-9-]{0,28}[a-z0-9])$/;
+    const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+    const nameInput = form.elements.namedItem("name") as HTMLInputElement;
+
+    // Minúsculas al escribir: "Mi-Web" → "mi-web"
+    nameInput.addEventListener("input", () => {
+      const v = nameInput.value.toLowerCase().replace(/[^a-z0-9-]/g, "");
+      if (v !== nameInput.value) nameInput.value = v;
+    });
+
+    const showError = (field: Field, text: string | null) => {
+      const p = form.querySelector<HTMLElement>(`[data-error-for="${field}"]`);
+      const input = form.elements.namedItem(field) as HTMLElement | null;
+      if (p) { p.textContent = text ?? ""; p.hidden = !text; }
+      if (input && "setAttribute" in input) input.setAttribute("aria-invalid", text ? "true" : "false");
+    };
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      showError("form", null);
+      const data = new FormData(form);
+      const name = String(data.get("name") ?? "").trim();
+      const email = String(data.get("email") ?? "").trim();
+      const accept = data.get("accept") === "on";
+      const token = String(data.get("cf-turnstile-response") ?? "");
+      let first: Field | null = null;
+      const check = (f: Field, bad: boolean) => { showError(f, bad ? msg[f] : null); if (bad && !first) first = f; };
+      check("name", !NAME.test(name));
+      check("email", !EMAIL.test(email));
+      check("accept", !accept);
+      check("turnstile", token.length === 0);
+      if (first) { (form.elements.namedItem(first) as HTMLElement | null)?.focus(); return; }
+
+      submit.disabled = true;
+      submit.textContent = msg.sending;
+      try {
+        const res = await fetch("/api/publish/request", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ name, email, accept, token, website: data.get("website"), lang: form.dataset.lang }),
+        });
+        const body = (await res.json().catch(() => ({}))) as { ok?: boolean; error?: string };
+        if (res.ok && body.ok) {
+          success.querySelector("[data-success-text]")!.textContent = msg.success.replace("{email}", email);
+          form.hidden = true;
+          success.hidden = false;
+          success.focus();
+          return;
+        }
+        const err = body.error ?? "server";
+        const field: Field = err === "name" || err === "name_taken" ? "name" : err === "email" || err === "email_domain" || err === "one_site" ? "email" : err === "turnstile" ? "turnstile" : err === "accept" ? "accept" : "form";
+        showError(field, msg[err] ?? msg.server);
+      } catch {
+        showError("form", msg.server);
+      } finally {
+        submit.disabled = false;
+        submit.textContent = msg.submit;
+        (window as unknown as { turnstile?: { reset: () => void } }).turnstile?.reset();
+      }
+    });
+  }
+</script>

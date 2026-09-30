@@ -1,0 +1,335 @@
+---
+/**
+ * Publish gratis, paso 2: se llega desde el enlace mágico (…/publicar/subir/#t=TOKEN).
+ * El token va en el fragmento (#), que el navegador no envía a ningún servidor ni pone en el Referer; al cargar,
+ * se guarda en sessionStorage y se quita de la barra de direcciones.
+ * El navegador hace el trabajo pesado (descomprimir el .zip, leer la carpeta, listar el repo en la API de GitHub) y
+ * sube archivo a archivo (en trozos de 1 MB) a worker/publish.ts, que solo valida y guarda. Así cabe en el plan gratuito.
+ */
+import Base from "../layouts/Base.astro";
+import { path, useDict, type Lang } from "../i18n";
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = useDict(lang);
+const u = t.publish.upload;
+const messages = JSON.stringify({ ...u, errors: u.errors, tabs: undefined });
+---
+<Base lang={lang} page="publishUpload">
+  <div class="veil">
+    <div class="container upload" data-publish-upload data-messages={messages} data-lang={lang}>
+      <h1 class="rise" style="--i:0">{u.title}</h1>
+
+      <p class="lead" data-state="loading" role="status">{u.loading}</p>
+
+      <div data-state="expired" hidden>
+        <p class="lead">{u.expired}</p>
+        <p><a class="btn" href={path("publish", lang)}>{u.askNew}</a></p>
+      </div>
+
+      <div data-state="ready" hidden>
+        <p class="lead" data-current></p>
+
+        <form class="form" data-form novalidate>
+          <fieldset class="tabs">
+            <legend class="sr-only">{u.title}</legend>
+            <label><input type="radio" name="source" value="zip" checked /> {u.tabs.zip}</label>
+            <label><input type="radio" name="source" value="folder" /> {u.tabs.folder}</label>
+            <label><input type="radio" name="source" value="github" /> {u.tabs.github}</label>
+          </fieldset>
+
+          <div class="field" data-panel="zip">
+            <label for="pu-zip">{u.zipLabel}</label>
+            <input id="pu-zip" name="zip" type="file" accept=".zip,application/zip" />
+            <p class="help">{u.zipHelp}</p>
+          </div>
+
+          <div class="field" data-panel="folder" hidden>
+            <label for="pu-folder">{u.folderLabel}</label>
+            <input id="pu-folder" name="folder" type="file" webkitdirectory multiple />
+            <p class="help">{u.folderHelp}</p>
+          </div>
+
+          <div class="github" data-panel="github" hidden>
+            <div class="field">
+              <label for="pu-repo">{u.githubRepo}</label>
+              <input id="pu-repo" name="repo" type="text" placeholder="usuario/mi-web" autocomplete="off" autocapitalize="none" spellcheck="false" />
+              <p class="help">{u.githubRepoHelp}</p>
+            </div>
+            <div class="row">
+              <div class="field">
+                <label for="pu-branch">{u.githubBranch}</label>
+                <input id="pu-branch" name="branch" type="text" value="main" autocomplete="off" autocapitalize="none" spellcheck="false" />
+              </div>
+              <div class="field">
+                <label for="pu-dir">{u.githubDir}</label>
+                <input id="pu-dir" name="dir" type="text" placeholder="dist" autocomplete="off" autocapitalize="none" spellcheck="false" />
+              </div>
+            </div>
+            <p class="help">{u.githubDirHelp}</p>
+          </div>
+
+          <div class="submit-row">
+            <button class="btn" type="submit" data-publish>{u.publish}</button>
+            <p class="help" data-progress role="status" aria-live="polite"></p>
+          </div>
+          <progress max="1" value="0" data-bar hidden></progress>
+          <p class="error" data-error role="alert" hidden></p>
+        </form>
+
+        <div class="success band-sand" data-done tabindex="-1" role="status" hidden>
+          <p data-done-text></p>
+          <p><a class="btn" data-done-link href="#">{u.view}</a></p>
+          <p class="note">{u.update}</p>
+        </div>
+
+        <div class="danger">
+          <button class="textbtn" type="button" data-delete>{u.delete}</button>
+          <span data-delete-confirm hidden>
+            <span>{u.deleteConfirm}</span>
+            <button class="textbtn strong" type="button" data-delete-yes>{u.delete}</button>
+          </span>
+          <p class="help" data-deleted role="status" hidden>{u.deleted}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</Base>
+
+<style>
+  .upload { padding-block: clamp(3rem, 6vw, 5.5rem) var(--section); max-width: 52rem; display: grid; gap: 1.6rem; }
+  .upload h1 { font-size: var(--step-4); }
+  .form { padding: clamp(1.4rem, 3vw, 2.4rem); display: grid; gap: 1.4rem; border: var(--rule); background: var(--paper-2); }
+  .tabs { border: 0; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 0.6rem; }
+  .tabs label { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.6rem 1rem; border: 2px solid var(--text); cursor: pointer; font-weight: 600; }
+  .tabs label:has(input:checked) { background: var(--text); color: var(--paper); }
+  .tabs input { accent-color: var(--sand); }
+  .field { display: grid; gap: 0.4rem; align-content: start; }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 1.4rem; }
+  .github { display: grid; gap: 1rem; }
+  label { font-weight: 600; font-size: 0.95rem; }
+  input[type="text"], input[type="file"] { width: 100%; min-height: 52px; padding: 0.7rem 0.9rem; border-radius: 0; border: 2px solid var(--text); background: var(--paper); color: var(--text); }
+  .help { font-size: var(--step--1); color: var(--muted); }
+  .error { font-size: var(--step--1); color: var(--brick); font-weight: 600; }
+  .submit-row { display: flex; align-items: center; gap: 1rem 1.5rem; flex-wrap: wrap; }
+  .btn[disabled] { opacity: 0.7; cursor: progress; }
+  progress { width: 100%; height: 0.8rem; accent-color: var(--indigo); }
+  .success { padding: clamp(1.5rem, 3vw, 2.4rem); display: grid; gap: 1rem; }
+  .success [data-done-text] { font-family: var(--font-display); font-stretch: var(--display-width); font-weight: 800; font-size: var(--step-2); line-height: 1.1; overflow-wrap: anywhere; }
+  .success .note { font-size: var(--step--1); }
+  .danger { display: flex; flex-wrap: wrap; gap: 0.6rem 1rem; align-items: center; font-size: var(--step--1); }
+  .textbtn { background: none; border: 0; padding: 0; color: var(--brick); text-decoration: underline; cursor: pointer; font: inherit; }
+  .textbtn.strong { font-weight: 700; }
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  @media (max-width: 767px) { .row { grid-template-columns: 1fr; } }
+</style>
+
+<script>
+  import { readZip, tidyPaths } from "../lib/unzip";
+  import { LIMITS, chunksOf, cleanPath } from "../../worker/publish-rules";
+
+  interface Item { path: string; size: number; blob?: () => Promise<Blob> }
+  type Msg = Record<string, string> & { errors: Record<string, string> };
+
+  const root = document.querySelector<HTMLElement>("[data-publish-upload]");
+  if (root) {
+    const m = JSON.parse(root.dataset.messages ?? "{}") as Msg;
+    const lang = root.dataset.lang === "en" ? "en" : "es";
+    const $ = <T extends HTMLElement>(sel: string) => root.querySelector<T>(sel)!;
+    const show = (state: "loading" | "expired" | "ready") =>
+      root.querySelectorAll<HTMLElement>("[data-state]").forEach((el) => (el.hidden = el.dataset.state !== state));
+    const fillIn = (s: string, v: Record<string, string | number>) => s.replace(/\{(\w+)\}/g, (_, k: string) => String(v[k] ?? ""));
+    const fmtSize = (b: number) => (b < 1024 * 1024 ? `${Math.max(1, Math.round(b / 1024))} KB` : `${(b / 1024 / 1024).toFixed(1)} MB`);
+
+    // Token: del fragmento a sessionStorage, y fuera de la barra de direcciones.
+    const hashToken = new URLSearchParams(location.hash.slice(1)).get("t");
+    if (hashToken) {
+      try { sessionStorage.setItem("publish-token", hashToken); } catch { /* modo privado: seguimos en memoria */ }
+      history.replaceState(null, "", location.pathname);
+    }
+    let token = hashToken;
+    try { token = token ?? sessionStorage.getItem("publish-token"); } catch { /* sin almacenamiento */ }
+
+    const api = async (url: string, init: RequestInit = {}) => {
+      const headers = new Headers(init.headers);
+      headers.set("authorization", `Bearer ${token}`);
+      if (init.body && typeof init.body === "string") headers.set("content-type", "application/json");
+      const res = await fetch(url, { ...init, headers });
+      const body = (await res.json().catch(() => ({}))) as Record<string, unknown> & { ok?: boolean; error?: string };
+      if (res.status === 401) { show("expired"); throw new Error("session"); }
+      if (!res.ok || !body.ok) throw Object.assign(new Error(String(body.error ?? "server")), { body });
+      return body;
+    };
+
+    const errorBox = $("[data-error]");
+    const setError = (code: string | null, vars: Record<string, string> = {}) => {
+      errorBox.textContent = code ? fillIn(m.errors[code] ?? m.errors.server, vars) : "";
+      errorBox.hidden = !code;
+    };
+
+    // ---------------------------------------------------------------- estado inicial
+    const load = async () => {
+      if (!token) return show("expired");
+      try {
+        const s = (await api("/api/publish/session", { method: "POST", body: "{}" })) as unknown as {
+          url: string; exists: boolean; files: number; bytes: number; updatedAt: number | null;
+        };
+        const date = s.updatedAt ? new Date(s.updatedAt * 1000).toLocaleDateString(lang === "es" ? "es-ES" : "en-GB") : "";
+        $("[data-current]").textContent = s.exists
+          ? fillIn(m.current, { url: s.url.replace("https://", ""), files: s.files, size: fmtSize(s.bytes), date })
+          : fillIn(m.empty, { url: s.url.replace("https://", "") });
+        show("ready");
+      } catch (e) {
+        if ((e as Error).message !== "session") { show("ready"); setError("server"); }
+      }
+    };
+
+    // ---------------------------------------------------------------- pestañas
+    const form = $<HTMLFormElement>("[data-form]");
+    const source = () => (new FormData(form).get("source") as "zip" | "folder" | "github") ?? "zip";
+    form.addEventListener("change", (e) => {
+      if ((e.target as HTMLInputElement).name !== "source") return;
+      root.querySelectorAll<HTMLElement>("[data-panel]").forEach((p) => (p.hidden = p.dataset.panel !== source()));
+      setError(null);
+    });
+
+    // ---------------------------------------------------------------- reunir archivos
+    const fromZip = async (): Promise<Item[]> => {
+      const file = (form.elements.namedItem("zip") as HTMLInputElement).files?.[0];
+      if (!file) throw new Error("nothing");
+      const entries = tidyPaths(await readZip(file));
+      return entries.map((e) => ({ path: e.path, size: e.size, blob: e.read }));
+    };
+    const fromFolder = async (): Promise<Item[]> => {
+      const files = [...((form.elements.namedItem("folder") as HTMLInputElement).files ?? [])];
+      if (files.length === 0) throw new Error("nothing");
+      return tidyPaths(files.map((f) => ({ path: f.webkitRelativePath || f.name, size: f.size, blob: async () => f as Blob })));
+    };
+    const fromGithub = async (): Promise<{ items: Item[]; github: { repo: string; sha: string; dir: string } }> => {
+      const rawRepo = String(new FormData(form).get("repo") ?? "").trim();
+      const repo = rawRepo.replace(/^https?:\/\/github\.com\//i, "").replace(/\.git$/i, "").replace(/\/+$/, "");
+      const branch = String(new FormData(form).get("branch") ?? "").trim() || "main";
+      const dirRaw = String(new FormData(form).get("dir") ?? "").trim().replace(/^\/+|\/+$/g, "");
+      if (!/^[A-Za-z0-9-]{1,39}\/[A-Za-z0-9._-]{1,100}$/.test(repo)) throw new Error(rawRepo ? "github" : "nothing");
+      const dir = dirRaw ? cleanPath(dirRaw) : "";
+      if (dir === null) throw new Error("github");
+      const gh = async (u: string) => {
+        const r = await fetch(`https://api.github.com/repos/${repo}/${u}`, { headers: { accept: "application/vnd.github+json" } });
+        if (!r.ok) throw new Error("github");
+        return r.json();
+      };
+      const commit = (await gh(`commits/${encodeURIComponent(branch)}`)) as { sha: string };
+      const tree = (await gh(`git/trees/${commit.sha}?recursive=1`)) as { truncated: boolean; tree: { path: string; type: string; size?: number }[] };
+      if (tree.truncated) throw new Error("too_many_files");
+      const prefix = dir ? `${dir}/` : "";
+      const items = tree.tree
+        .filter((e) => e.type === "blob" && e.path.startsWith(prefix))
+        .map((e) => ({ path: e.path.slice(prefix.length), size: e.size ?? 0 }));
+      if (items.length === 0) throw new Error("github");
+      return { items, github: { repo, sha: commit.sha, dir } };
+    };
+
+    // Mismas reglas que el servidor, para avisar antes de subir nada.
+    const checkItems = (items: Item[]) => {
+      const out: Item[] = [];
+      let total = 0;
+      for (const it of items) {
+        if (it.path.split("/").some((p) => p.startsWith(".") && p !== ".well-known")) continue; // ocultos: se omiten
+        const p = cleanPath(it.path);
+        if (!p) throw Object.assign(new Error("bad_path"), { vars: { path: it.path } });
+        if (it.size > LIMITS.maxFileBytes) throw Object.assign(new Error("file_too_big"), { vars: { path: p } });
+        total += it.size;
+        out.push({ ...it, path: p });
+      }
+      if (out.length === 0 || out.length > LIMITS.maxFiles) throw new Error("too_many_files");
+      if (total > LIMITS.maxSiteBytes) throw new Error("site_too_big");
+      if (!out.some((i) => i.path === "index.html")) throw new Error("no_index");
+      return out;
+    };
+
+    // ---------------------------------------------------------------- publicar
+    const button = $<HTMLButtonElement>("[data-publish]");
+    const progress = $("[data-progress]");
+    const bar = $<HTMLProgressElement>("[data-bar]");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      setError(null);
+      button.disabled = true;
+      progress.textContent = m.reading;
+      try {
+        const kind = source();
+        let items: Item[];
+        let github: { repo: string; sha: string; dir: string } | undefined;
+        if (kind === "github") ({ items, github } = await fromGithub());
+        else items = kind === "zip" ? await fromZip() : await fromFolder();
+        items = checkItems(items);
+
+        const started = await api("/api/publish/deploy/start", {
+          method: "POST",
+          body: JSON.stringify({ source: kind, github, files: items.map((i) => ({ p: i.path, s: i.size })) }),
+        });
+        const d = String(started.d);
+
+        let done = 0;
+        bar.hidden = false;
+        const tick = () => {
+          progress.textContent = fillIn(m.progress, { done, total: items.length });
+          bar.value = items.length ? done / items.length : 1;
+        };
+        tick();
+        const queue = [...items];
+        const worker = async () => {
+          for (let it = queue.shift(); it; it = queue.shift()) {
+            if (github) {
+              await api("/api/publish/deploy/fetch", { method: "POST", body: JSON.stringify({ d, p: it.path }) });
+            } else {
+              const blob = await it.blob!();
+              // Trozos de 1 MB: es lo que cabe en una fila de la base de datos (D1).
+              for (let c = 0; c < chunksOf(it.size); c++) {
+                const part = blob.slice(c * LIMITS.chunkBytes, (c + 1) * LIMITS.chunkBytes);
+                await api(`/api/publish/deploy/file?d=${encodeURIComponent(d)}&p=${encodeURIComponent(it.path)}&c=${c}`, { method: "PUT", body: part });
+              }
+            }
+            done++;
+            tick();
+          }
+        };
+        await Promise.all(Array.from({ length: 4 }, worker));
+
+        const fin = await api("/api/publish/deploy/finish", { method: "POST", body: JSON.stringify({ d }) });
+        const url = String(fin.url);
+        $("[data-done-text]").textContent = fillIn(m.done, { url: url.replace("https://", "") });
+        $<HTMLAnchorElement>("[data-done-link]").href = url;
+        form.hidden = true;
+        $("[data-done]").hidden = false;
+        $("[data-done]").focus();
+      } catch (err) {
+        const e2 = err as Error & { vars?: Record<string, string>; body?: { path?: string } };
+        if (e2.message !== "session") setError(e2.message in m.errors ? e2.message : "server", e2.vars ?? { path: e2.body?.path ?? "" });
+      } finally {
+        button.disabled = false;
+        progress.textContent = "";
+        bar.hidden = true;
+      }
+    });
+
+    // ---------------------------------------------------------------- borrar (dos pasos, sin confirm())
+    $("[data-delete]").addEventListener("click", () => { $("[data-delete-confirm]").hidden = false; });
+    $("[data-delete-yes]").addEventListener("click", async () => {
+      try {
+        await api("/api/publish/delete", { method: "POST", body: "{}" });
+        form.hidden = true;
+        $("[data-done]").hidden = true;
+        $("[data-delete]").hidden = true;
+        $("[data-delete-confirm]").hidden = true;
+        $("[data-deleted]").hidden = false;
+        $("[data-current]").textContent = "";
+      } catch (err) {
+        if ((err as Error).message !== "session") setError("server");
+      }
+    });
+
+    load();
+  }
+</script>

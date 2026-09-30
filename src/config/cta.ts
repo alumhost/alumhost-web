@@ -5,7 +5,7 @@
  */
 import { site } from "./site";
 import type { PlanId } from "./plans";
-import { contactHref, useDict, type Lang } from "../i18n";
+import { contactHref, path, useDict, type Lang } from "../i18n";
 
 export interface Cta {
   href: string;
@@ -14,6 +14,8 @@ export interface Cta {
 
 export const primaryCta = (lang: Lang, plan?: PlanId): Cta => {
   const t = useDict(lang);
+  // Publish es gratis y se da de alta solo, desde /publicar (worker/publish.ts): no pasa por la lista de espera.
+  if (plan === "publish") return { href: path("publish", lang), label: t.publish.cta };
   switch (site.salesMode) {
     case "waitlist":
       return { href: contactHref(lang, { reason: "beta", plan }), label: t.nav.cta };

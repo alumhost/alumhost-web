@@ -135,3 +135,13 @@ Precios de estudiante sobre OVH So you Start SYS-1 32 GB (decisión 29/09/2026).
 
 ### Limitación Conocida
 - Claude en la nube puede leer el repo pero no hacer push hasta que admin instale GitHub App en la organización.
+
+## Publish gratis automático en Cloudflare (30/09/2026)
+- Decisión de Alonso y Blas: el Publish gratis se da de alta solo desde la web, sin esperar a OVH. Se aloja en Cloudflare, no en nuestro servidor.
+- Flujo: `/publicar` (nombre + correo @us.es / @alum.us.es + Turnstile) → enlace mágico por correo (Brevo, 24 h, sin cuentas ni contraseñas) → `/publicar/subir` → el estudiante sube un .zip, una carpeta o un repo público de GitHub.
+- El navegador hace el trabajo pesado (descomprimir, listar el repo en la API de GitHub) y sube archivo a archivo en trozos de 1 MB; `worker/publish.ts` solo valida y guarda todo en D1 (tabla `blobs`). Sin R2 porque pide tarjeta (decisión 30/09); si se activa R2, se pueden subir los límites. Así cabe en el plan gratuito de Workers (10 ms de CPU por petición).
+- Las webs las sirve otro Worker, `sites/` (`alumhost-sites`), solo lectura y sin secretos, en `*.alumhost.dev`, con caché en el edge por versión.
+- Límites (por el tope de 500 MB por base de datos D1 gratuita): 20 MB y 1.000 archivos por web, 5 MB por archivo, una web por correo en la beta, 3 enlaces por correo y hora. Nombres reservados en `worker/publish-rules.ts`.
+- Actualizar = pedir un enlace nuevo con el mismo nombre y correo y volver a publicar. El despliegue automático en cada `git push` y el dominio propio quedan para después.
+- `publish-site` (script para la VM de Caddy, en el proyecto VPS) queda como plan B si Cloudflare se queda corto. Caddy en el servidor sigue haciendo falta para las webs de los VPS.
+- Pendiente: meter `*.alumhost.dev` en la Public Suffix List cuando haya volumen (aísla cookies entre sitios de estudiantes, como hace github.io).
