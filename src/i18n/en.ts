@@ -32,6 +32,8 @@ const en: Dict = {
       description:
         "Join the beta for free: VPS and static sites for students, with one-to-one onboarding. Nothing to pay upfront.",
     },
+    terms: { title: "Terms · {name}", description: "AlumHost terms: free Publish, paid plans, withdrawal, refunds and suspension." },
+    aup: { title: "Acceptable use · {name}", description: "What is not allowed on AlumHost and how to report abuse." },
     notFound: { title: "Page not found · {name}", description: "This page does not exist." },
   },
 
@@ -263,35 +265,147 @@ const en: Dict = {
 
   privacy: {
     title: "Privacy.",
-    updated: "Last updated: 29 September 2026.",
+    updated: "Last updated: 30 September 2026.",
     sections: [
       {
-        h: "Who handles your data",
+        h: "Who processes your data",
         p: "{controller}. For anything about your data, write to {email}.",
       },
       {
         h: "What we collect",
-        p: "What you type into the contact form: name, email, reason, plan and message. Your IP address is also processed for security, only to stop spam and rate-limit messages.",
+        p: "From the contact and beta forms: name, email, reason, plan and message. From Publish: your site name, your university email, the files you upload and, if you publish from GitHub, the repository and commit. For the magic link we keep only an encrypted fingerprint (hash), never the link itself. For security your IP address is processed to stop spam and limit submissions, without storing it in our database.",
       },
       {
-        h: "Why",
-        p: "To reply to you and, if you ask, to manage your beta spot. The legal basis is your consent when you send the form and, if you are about to sign up, steps taken before a contract.",
+        h: "What for",
+        p: "To reply to you, manage your beta place and run Publish: send you the publishing link, serve your site and tell you about anything that affects it (such as the yearly inactivity check). The legal basis is your consent when you send the form and, for Publish and paid plans, performing the service you ask for.",
       },
       {
         h: "Who we share it with",
-        p: "With the providers that run the site: Cloudflare (hosting, anti-spam check and email forwarding), Google (our inbox) and Brevo (sending our replies). They may process it outside the European Economic Area under the safeguards the GDPR requires. We never sell your data or use it for advertising.",
+        p: "With the providers that run the website: Cloudflare (hosting, the Publish database in the European Union, anti-spam checks and email forwarding), Brevo (sending the Publish link and our replies), Google (our inbox) and GitHub (only if you publish from a public repository). They may process data outside the European Economic Area with the safeguards required by the GDPR. We do not sell your data or use it for advertising.",
       },
       {
         h: "How long",
-        p: "Until your question is solved and for twelve months at most. If you become a customer, as long as the law requires.",
+        p: "Enquiries: until resolved and at most twelve months. Publish: while you keep your site; if you delete it, we delete it and its files immediately, and links expire after 24 hours. If you become a paying customer, for as long as the law requires for invoices and contracts.",
       },
       {
         h: "Your rights",
-        p: "You can ask for access, correction, deletion, objection, restriction and portability by writing to {email}. If you think we got it wrong, you can complain to the Spanish Data Protection Agency (aepd.es).",
+        p: "You can ask for access, rectification, erasure, objection, restriction and portability by writing to {email}. If you think we got it wrong, you can complain to the Spanish Data Protection Agency (aepd.es).",
       },
       {
         h: "Cookies",
-        p: "We use no analytics or advertising cookies.",
+        p: "We use no analytics or advertising cookies. The Publish page keeps your link in your tab's storage (sessionStorage), which is cleared when you close it.",
+      },
+    ],
+  },
+
+  terms: {
+    title: "Terms.",
+    updated: "Last updated: 30 September 2026. Beta draft.",
+    sections: [
+      {
+        h: "Who provides the service",
+        p: [
+          "AlumHost is run by {controller}. Write to {email} about anything and to {abuse} to report abuse.",
+          "We are in beta: the service works, but it may change and there is no availability commitment (SLA) yet. We do our best to keep everything running and we tell you about any incident.",
+        ],
+      },
+      {
+        h: "Free Publish",
+        p: [
+          "Publish hosts static websites (HTML, CSS, JavaScript, images) at yourname.alumhost.dev. It is free and meant for learning and showing your projects.",
+          "Only people with an email from the supported universities can use it. One site per person, within the limits shown on the Publish page (currently 20 MB, 1,000 files and 5 MB per file).",
+          "What you publish is yours and you are responsible for it: you must have the right to use everything you upload (text, images, code) and follow the acceptable use policy.",
+          "Inactivity: once a year we email you to confirm you still use the site. If you do not confirm within 30 days and have not updated it in the last 12 months, we suspend it, and after another 60 days without news we delete it and the name becomes free.",
+          "You can delete your site at any time from the link we send to your email.",
+        ],
+      },
+      {
+        h: "Paid plans",
+        p: [
+          "Prices on the website include VAT. They are paid in advance, monthly or yearly, and renew automatically until you cancel.",
+          "You can cancel at any time: the service runs until the end of the paid period and does not renew. We do not refund the unused part of a period, except for withdrawal and for serious failures on our side as explained below.",
+          "If a payment fails we email you and you have 7 days to fix it. After that we suspend the server; before deleting it we keep a copy for 14 more days in case you come back.",
+        ],
+      },
+      {
+        h: "Right of withdrawal (14 days)",
+        p: [
+          "If you are a consumer in the European Union, you have 14 days from purchase to withdraw without giving reasons, by writing to {email}.",
+          "Because the server is delivered immediately, when you buy we ask you to expressly agree that it starts before those 14 days end. If you withdraw, we refund what you paid minus the part proportional to the days it was running, within 14 days and using the same payment method.",
+        ],
+      },
+      {
+        h: "Refunds for our failures",
+        p: [
+          "If the service stops working because of us for more than 72 hours in a row in a month, you can ask for that month back. This does not cover outages caused by your own software, by abuse or by providers outside our control.",
+        ],
+      },
+      {
+        h: "Backups",
+        p: [
+          "Unless you buy the backup add-on, you are responsible for keeping copies of your data. For Publish, your copy is your own repository or folder.",
+        ],
+      },
+      {
+        h: "Suspension and removal",
+        p: [
+          "We may suspend a site or server without notice in cases of serious abuse (phishing, malware, attacks, illegal content) or when an authority asks us to. Otherwise we warn you first and give you time to fix it.",
+          "While a service is suspended for abuse we keep its content for as long as needed to handle complaints.",
+        ],
+      },
+      {
+        h: "Liability",
+        p: [
+          "We are liable for damage we cause intentionally or through gross negligence. Otherwise our liability is limited to what you paid us in the last 12 months (Publish is free, so there is no amount). This does not limit any right you have as a consumer by law.",
+        ],
+      },
+      {
+        h: "Changes to these terms",
+        p: [
+          "If we change them in a significant way we email you 30 days in advance. If you disagree, you can cancel before they apply.",
+        ],
+      },
+      {
+        h: "Governing law",
+        p: [
+          "Spanish law applies. If you are a consumer, you can bring a claim before the courts where you live.",
+        ],
+      },
+    ],
+  },
+
+  aup: {
+    title: "Acceptable use.",
+    updated: "Last updated: 30 September 2026. Beta draft.",
+    sections: [
+      {
+        h: "The idea",
+        p: [
+          "AlumHost is for learning, building and showing projects. We share machines and a domain with other students, so what one person does affects everyone. This policy says what is not allowed on Publish or on the servers.",
+        ],
+      },
+      {
+        h: "Not allowed",
+        p: [
+          "Nothing illegal, and no links to it: content that infringes copyright or trademarks, child sexual abuse material, glorification of terrorism, incitement to hatred or harassment.",
+          "Nothing that deceives or impersonates: phishing, pages that imitate the login of a university, a bank or another service, scams or fake shops.",
+          "Nothing that attacks: malware, scanning other people's networks, denial of service attacks, brute force, open proxies or relays used for abuse.",
+          "No bulk email: spam, bought lists or unsolicited mailings. Outbound port 25 is closed and submission ports are opened only on request on the plans that allow it.",
+          "Nothing that exhausts the shared machine: cryptocurrency mining or workloads that use all the CPU or disk continuously.",
+          "Nothing that processes other people's personal data without a legal basis, such as forms that collect passwords or third-party data.",
+        ],
+      },
+      {
+        h: "What we do if it happens",
+        p: [
+          "In serious cases we suspend immediately and, where appropriate, inform the authorities. Otherwise we write to you, give you time to fix it and, if it is not fixed, we suspend or close the service.",
+        ],
+      },
+      {
+        h: "Report abuse",
+        p: [
+          "If you see something hosted on AlumHost that breaks this policy, write to {abuse} with the exact address and what you saw. We review it as soon as possible.",
+        ],
       },
     ],
   },
@@ -312,6 +426,7 @@ const en: Dict = {
       nameHelp: "Lowercase letters, numbers and hyphens (2-30). It becomes yourname.alumhost.dev.",
       email: "Your university email",
       emailHelp: "For now, only the University of Seville: @us.es or @alum.us.es.",
+      acceptLinks: "Full conditions: {terms} and {aup}.",
       accept: "I won't publish anything illegal, misleading or impersonating anyone. I know AlumHost takes the site down if I do.",
       submit: "Send me the link",
       sending: "Sending…",
@@ -413,6 +528,7 @@ const en: Dict = {
     },
     signup: {
       title: "Sign up.",
+      message: "What do you want to build?",
       body: "We will email you when there is a date. Until then, we send you nothing else.",
       messageHelp:
         "What you want to run and how much RAM you think you need. If you are not sure, tell us about the project and we will help. At least 10 characters.",
@@ -443,6 +559,8 @@ const en: Dict = {
     devlog: "Devlog",
     repo: "Open source",
     privacy: "Privacy",
+    terms: "Terms",
+    aup: "Acceptable use",
     beta: "Beta",
     rights: "© {year} {name}",
   },

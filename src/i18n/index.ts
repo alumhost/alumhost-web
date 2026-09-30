@@ -12,7 +12,7 @@ export const defaultLang: Lang = "es";
 
 const dicts: Record<Lang, Dict> = { es, en };
 
-export type RouteKey = "home" | "plans" | "beta" | "contact" | "privacy" | "publish" | "publishUpload";
+export type RouteKey = "home" | "plans" | "beta" | "contact" | "privacy" | "terms" | "aup" | "publish" | "publishUpload";
 
 export const routes: Record<RouteKey, Record<Lang, string>> = {
   home: { es: "/", en: "/en/" },
@@ -20,6 +20,8 @@ export const routes: Record<RouteKey, Record<Lang, string>> = {
   beta: { es: "/beta/", en: "/en/beta/" },
   contact: { es: "/contacto/", en: "/en/contact/" },
   privacy: { es: "/privacidad/", en: "/en/privacy/" },
+  terms: { es: "/terminos/", en: "/en/terms/" },
+  aup: { es: "/uso-aceptable/", en: "/en/acceptable-use/" },
   publish: { es: "/publicar/", en: "/en/publish/" },
   publishUpload: { es: "/publicar/subir/", en: "/en/publish/upload/" },
 };
