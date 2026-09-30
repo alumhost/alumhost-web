@@ -28,7 +28,7 @@
 
   // Variables NO secretas. Secretos (no van en el repo, que es público):
   //   npx wrangler secret put TURNSTILE_SECRET   -> secret key de Turnstile
-  //   npx wrangler secret put CONTACT_TO         -> correo personal VERIFICADO en Email Routing (destino del formulario)
+  //   npx wrangler secret put CONTACT_TO         -> correos VERIFICADOS en Email Routing, separados por comas (destino del formulario)
   "vars": {
     "CONTACT_FROM": "web@alumhost.dev" // remitente en alumhost.dev (Email Routing activo)
   },

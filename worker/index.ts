@@ -109,21 +109,31 @@ async function deliver(input: ContactInput, env: Env): Promise<boolean> {
     "",
     input.message,
   ].join("\r\n");
-  const raw = [
-    `From: ${env.CONTACT_FROM}`,
-    `To: ${env.CONTACT_TO}`,
-    `Reply-To: ${headerSafe(input.email)}`,
-    `Subject: ${subject}`,
-    `Date: ${new Date().toUTCString()}`,
-    `Message-ID: <${crypto.randomUUID()}@${env.CONTACT_FROM.split("@")[1] ?? "localhost"}>`,
-    "MIME-Version: 1.0",
-    "Content-Type: text/plain; charset=utf-8",
-    "Content-Transfer-Encoding: 8bit",
-    "",
-    bodyText,
-  ].join("\r\n");
-  await env.CONTACT_MAILER.send(new EmailMessage(env.CONTACT_FROM, env.CONTACT_TO, raw));
-  return true;
+  // CONTACT_TO admite varias direcciones separadas por comas (secreto). Cada una debe estar VERIFICADA en
+  // Email Routing → Destination addresses. Se envía una copia a cada una; basta con que llegue a una.
+  const recipients = env.CONTACT_TO.split(",").map((s) => s.trim()).filter(Boolean);
+  const results = await Promise.allSettled(
+    recipients.map((to) => {
+      const raw = [
+        `From: ${env.CONTACT_FROM}`,
+        `To: ${to}`,
+        `Reply-To: ${headerSafe(input.email)}`,
+        `Subject: ${subject}`,
+        `Date: ${new Date().toUTCString()}`,
+        `Message-ID: <${crypto.randomUUID()}@${env.CONTACT_FROM.split("@")[1] ?? "localhost"}>`,
+        "MIME-Version: 1.0",
+        "Content-Type: text/plain; charset=utf-8",
+        "Content-Transfer-Encoding: 8bit",
+        "",
+        bodyText,
+      ].join("\r\n");
+      return env.CONTACT_MAILER!.send(new EmailMessage(env.CONTACT_FROM, to, raw));
+    }),
+  );
+  results.forEach((r, i) => {
+    if (r.status === "rejected") console.error(`[contact] fallo al enviar a destino #${i + 1}:`, String(r.reason));
+  });
+  return results.some((r) => r.status === "fulfilled");
 }
 
 async function handleContact(req: Request, env: Env): Promise<Response> {
