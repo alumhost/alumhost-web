@@ -27,6 +27,11 @@ const en: Dict = {
       description: "Your static site at yourname.alumhost.dev, free and with HTTPS. No card, no account: just your university email.",
     },
     publishUpload: { title: "Upload your website · {name}", description: "Upload a .zip, a folder or a GitHub repository." },
+    beta: {
+      title: "Beta · {name}",
+      description:
+        "Join the beta for free: VPS and static sites for students, with one-to-one onboarding. Nothing to pay upfront.",
+    },
     notFound: { title: "Page not found · {name}", description: "This page does not exist." },
   },
 
@@ -362,12 +367,72 @@ const en: Dict = {
     },
   },
 
+  beta: {
+    status: "Beta open",
+    titleA: "Become a beta",
+    titleEm: "tester.",
+    sub: "We have not launched yet. We start once a minimum number of people have signed up.",
+    free: "Signing up is free and commits you to nothing.",
+    cta: "Sign me up",
+    gains: {
+      title: "What you get.",
+      items: [
+        {
+          title: "Price locked for a year.",
+          body: "Your plan's price does not go up during your first year, even if we change prices after the beta.",
+        },
+        { title: "Backup included for a year.", body: "On VPS plans, the daily backup is included for the first year at no extra cost." },
+        {
+          title: "Your first deploy, with us.",
+          body: "We set it up with you and help you claim the free domain from the GitHub Student Pack.",
+        },
+        {
+          title: "You talk to us.",
+          body: "No tickets, no bots. The same people who set up your server answer you.",
+        },
+      ],
+    },
+    steps: {
+      title: "How it works.",
+      items: [
+        { verb: "Sign up", body: "Fill in the form below. It is free and you pay nothing upfront." },
+        { verb: "Decide", body: "Once we reach the minimum we email you. Then you decide whether to go ahead." },
+        { verb: "Start", body: "Your first month starts the day we give you access to your server, not before." },
+      ],
+    },
+    signup: {
+      title: "Sign up.",
+      body: "We will email you when there is a date. Until then, we send you nothing else.",
+      messageHelp:
+        "What you want to run and how much RAM you think you need. If you are not sure, tell us about the project and we will help. At least 10 characters.",
+      submit: "Join the beta",
+      success: "You are in. We will email {email} when there is a date.",
+    },
+    faq: {
+      title: "Questions.",
+      items: [
+        {
+          q: "When do I pay?",
+          a: "Nothing now. Once we reach the minimum we email you with your plan's price. If you go ahead, you pay and your first month starts the day you get access to your server.",
+        },
+        { q: "What if you do not reach the minimum?", a: "Nobody is charged anything. We will still let you know what we do." },
+        { q: "How do I leave the list?", a: "Reply to any of our emails asking to be removed and we take you off." },
+        {
+          q: "What data do you keep?",
+          a: "What you enter in the form: name, email, plan and message, only to write to you about the beta. The rest is in our",
+        },
+      ],
+      privacyLink: "privacy policy",
+    },
+  },
+
   footer: {
     tagline: "Boutique hosting for students and developers.",
     status: "Service status",
     devlog: "Devlog",
     repo: "Open source",
     privacy: "Privacy",
+    beta: "Beta",
     rights: "© {year} {name}",
   },
 

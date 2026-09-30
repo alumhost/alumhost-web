@@ -34,6 +34,8 @@ interface Manifest { files: Record<string, number>; github?: { repo: string; sha
 
 const EMAIL = /^[^\s@]+@([^\s@]+\.[^\s@]{2,})$/;
 const REPO = /^[A-Za-z0-9-]{1,39}\/[A-Za-z0-9._-]{1,100}$/;
+/** El nombre del repo no puede ser "." ni ".." (la regex los deja pasar). */
+const repoOk = (r: string) => REPO.test(r) && !/^\.{1,2}$/.test(r.split("/")[1]);
 const SHA = /^[0-9a-f]{40}$/;
 const now = () => Math.floor(Date.now() / 1000);
 
@@ -109,7 +111,7 @@ async function request(req: Request, env: Env): Promise<Response> {
   const lang = raw.lang === "en" ? "en" : "es";
   if (!validName(name)) return json({ ok: false, error: "name" }, 400);
   const m = EMAIL.exec(email);
-  if (!m || email.length > 254) return json({ ok: false, error: "email" }, 400);
+  if (!m || email.length > 254 || email.split("@")[0].includes("+")) return json({ ok: false, error: "email" }, 400); // sin alias +: evita saltarse "un sitio por correo"
   const allowed = (env.PUBLISH_EMAIL_DOMAINS ?? "").split(",").map((d) => d.trim().toLowerCase()).filter(Boolean);
   if (!allowed.includes(m[1])) return json({ ok: false, error: "email_domain" }, 400);
   if (raw.accept !== true) return json({ ok: false, error: "accept" }, 400);
@@ -176,6 +178,9 @@ async function loadDeploy(env: Env, s: Session, id: string | null) {
 
 async function start(req: Request, s: Session, env: Env): Promise<Response> {
   if (Number(req.headers.get("content-length") ?? 0) > 400_000) return json({ ok: false, error: "size" }, 413);
+  // Un sitio suspendido no puede desplegar aunque conserve un token de 24 h anterior a la suspensión.
+  const st = await env.PUBLISH_DB.prepare("SELECT status FROM sites WHERE name = ?").bind(s.name).first<{ status: string }>();
+  if (st && st.status !== "active") return json({ ok: false, error: "suspended" }, 403);
   let raw: Record<string, unknown>;
   try {
     raw = (await req.json()) as Record<string, unknown>;
@@ -210,7 +215,7 @@ async function start(req: Request, s: Session, env: Env): Promise<Response> {
     const repo = String(gh?.repo ?? "");
     const sha = String(gh?.sha ?? "");
     const dir = gh?.dir ? cleanPath(String(gh.dir)) : "";
-    if (!REPO.test(repo) || !SHA.test(sha) || dir === null) return json({ ok: false, error: "github" }, 400);
+    if (!repoOk(repo) || !SHA.test(sha) || dir === null) return json({ ok: false, error: "github" }, 400);
     manifest.github = { repo, sha, dir };
     source = `github:${repo}@${sha.slice(0, 12)}${dir ? `:${dir}` : ""}`;
   }
@@ -260,6 +265,8 @@ async function fetchFile(req: Request, s: Session, env: Env): Promise<Response> 
   const full = (gh.dir ? `${gh.dir}/${p}` : p).split("/").map(encodeURIComponent).join("/");
   const res = await fetch(`https://raw.githubusercontent.com/${gh.repo}/${gh.sha}/${full}`, { redirect: "follow" });
   if (!res.ok) return json({ ok: false, error: "github_fetch", status: res.status }, 502);
+  const announced = Number(res.headers.get("content-length") ?? expected);
+  if (announced > LIMITS.maxFileBytes) return json({ ok: false, error: "size_mismatch" }, 400);
   const body = await res.arrayBuffer();
   if (body.byteLength !== expected) return json({ ok: false, error: "size_mismatch" }, 400);
   for (let c = 0; c < chunksOf(expected); c++) {

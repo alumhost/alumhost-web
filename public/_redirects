@@ -1,0 +1,5 @@
+# Enlaces cortos de los QR (tarjetas, carteles, WhatsApp). Son atajos, no llaves: /beta es pública.
+# El formulario de /beta añade "Origen: <utm_source>" al mensaje para saber de qué canal llega cada persona.
+/t  /beta/?utm_source=tarjeta   302
+/c  /beta/?utm_source=cartel    302
+/w  /beta/?utm_source=whatsapp  302

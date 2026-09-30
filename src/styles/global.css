@@ -96,7 +96,7 @@ main { position: relative; }
   --btn-fg: var(--white);
   --link: var(--ink);
   --focus: var(--ink);
-  --muted: rgb(13 22 64 / 0.86);
+  --muted: rgb(0 0 0 / 0.78);
   --rule-color: var(--ink);
 }
 
