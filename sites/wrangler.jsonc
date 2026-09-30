@@ -8,5 +8,6 @@
   "compatibility_date": "2026-09-01",
   "routes": [{ "pattern": "*.alumhost.dev/*", "zone_name": "alumhost.dev" }],
   "observability": { "enabled": true },
+  "workers_dev": false,
   "d1_databases": [{ "binding": "PUBLISH_DB", "database_name": "alumhost-publish", "database_id": "34c625b4-5465-4883-9611-0ed7111ce381" }]
 }

@@ -10,6 +10,8 @@ import Base from "../layouts/Base.astro";
 import { path, useDict, type Lang } from "../i18n";
 
 interface Props { lang: Lang }
+// webkitdirectory (elegir una carpeta entera) funciona en todos los navegadores actuales pero no está en los tipos de Astro.
+const folderAttrs: Record<string, boolean> = { webkitdirectory: true };
 const { lang } = Astro.props;
 const t = useDict(lang);
 const u = t.publish.upload;
@@ -46,7 +48,7 @@ const messages = JSON.stringify({ ...u, errors: u.errors, tabs: undefined });
 
           <div class="field" data-panel="folder" hidden>
             <label for="pu-folder">{u.folderLabel}</label>
-            <input id="pu-folder" name="folder" type="file" webkitdirectory multiple />
+            <input id="pu-folder" name="folder" type="file" multiple {...folderAttrs} />
             <p class="help">{u.folderHelp}</p>
           </div>
 
@@ -154,7 +156,12 @@ const messages = JSON.stringify({ ...u, errors: u.errors, tabs: undefined });
       const headers = new Headers(init.headers);
       headers.set("authorization", `Bearer ${token}`);
       if (init.body && typeof init.body === "string") headers.set("content-type", "application/json");
-      const res = await fetch(url, { ...init, headers });
+      // Si el servidor pide calma (429, límite por sitio), esperamos y reintentamos: subir 1.000 archivos puede tocarlo.
+      let res = await fetch(url, { ...init, headers });
+      for (let attempt = 1; res.status === 429 && attempt <= 6; attempt++) {
+        await new Promise((r) => setTimeout(r, 2000 * attempt));
+        res = await fetch(url, { ...init, headers });
+      }
       const body = (await res.json().catch(() => ({}))) as Record<string, unknown> & { ok?: boolean; error?: string };
       if (res.status === 401) { show("expired"); throw new Error("session"); }
       if (!res.ok || !body.ok) throw Object.assign(new Error(String(body.error ?? "server")), { body });

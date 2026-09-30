@@ -11,7 +11,7 @@
  *                          de la VM en Cloudflare Queues. Nunca llamar a Proxmox desde aquí directamente.
  */
 import { EmailMessage } from "cloudflare:email";
-import { json, verifyTurnstile } from "./turnstile";
+import { json, readJson, verifyTurnstile } from "./turnstile";
 import { handlePublish, type PublishEnv } from "./publish";
 
 export interface Env extends PublishEnv {
@@ -26,7 +26,8 @@ export interface Env extends PublishEnv {
 
 const REASONS = ["beta", "plans", "custom", "support", "other"] as const;
 const PLANS = ["", "publish", "mini", "developer", "pro"] as const;
-const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+// Sin comas, punto y coma ni <>": una sola dirección (antes "a@b.com,c@d.com" pasaba y el Reply-To tenía dos).
+const EMAIL = /^[^\s@,;<>"]+@[^\s@,;<>"]+\.[^\s@,;<>"]{2,}$/;
 
 interface ContactInput {
   name: string;
@@ -57,6 +58,17 @@ function parseContact(raw: unknown): ContactInput | null {
 
 /** Quita saltos de línea para que nada del usuario pueda inyectar cabeceras de correo. */
 const headerSafe = (s: string) => s.replace(/[\r\n]+/g, " ").slice(0, 200);
+
+const b64 = (s: string) => {
+  const bytes = new TextEncoder().encode(s);
+  let bin = "";
+  for (let i = 0; i < bytes.length; i += 0x8000) bin += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
+  return btoa(bin);
+};
+/** Cabecera con acentos (José, Peña...) codificada según RFC 2047; si es ASCII se deja tal cual. */
+const encodeHeader = (s: string) => (/^[\x20-\x7e]*$/.test(s) ? s : `=?UTF-8?B?${b64(s)}?=`);
+/** Cuerpo en base64 con líneas de 76 caracteres (RFC 2045): ninguna línea pasa del máximo de 998 del RFC 5322. */
+const bodyBase64 = (s: string) => b64(s).replace(/.{76}/g, "$&\r\n");
 
 /**
  * Entrega del mensaje. Hoy: Email Routing (send_email). IA: si se cambia de canal (D1, Resend...),
@@ -90,14 +102,14 @@ async function deliver(input: ContactInput, env: Env): Promise<boolean> {
         `From: ${env.CONTACT_FROM}`,
         `To: ${to}`,
         `Reply-To: ${headerSafe(input.email)}`,
-        `Subject: ${subject}`,
+        `Subject: ${encodeHeader(subject)}`,
         `Date: ${new Date().toUTCString()}`,
         `Message-ID: <${crypto.randomUUID()}@${env.CONTACT_FROM.split("@")[1] ?? "localhost"}>`,
         "MIME-Version: 1.0",
         "Content-Type: text/plain; charset=utf-8",
-        "Content-Transfer-Encoding: 8bit",
+        "Content-Transfer-Encoding: base64",
         "",
-        bodyText,
+        bodyBase64(bodyText),
       ].join("\r\n");
       return env.CONTACT_MAILER!.send(new EmailMessage(env.CONTACT_FROM, to, raw));
     }),
@@ -111,7 +123,6 @@ async function deliver(input: ContactInput, env: Env): Promise<boolean> {
 async function handleContact(req: Request, env: Env): Promise<Response> {
   if (req.method !== "POST") return json({ ok: false, error: "method" }, 405);
   if (!(req.headers.get("content-type") ?? "").includes("application/json")) return json({ ok: false, error: "type" }, 415);
-  if (Number(req.headers.get("content-length") ?? 0) > 16_384) return json({ ok: false, error: "size" }, 413);
 
   // Mismo origen: el formulario solo se envía desde nuestra propia web.
   const origin = req.headers.get("origin");
@@ -123,12 +134,9 @@ async function handleContact(req: Request, env: Env): Promise<Response> {
     if (!success) return json({ ok: false, error: "rate_limited" }, 429);
   }
 
-  let raw: Record<string, unknown>;
-  try {
-    raw = (await req.json()) as Record<string, unknown>;
-  } catch {
-    return json({ ok: false, error: "validation" }, 400);
-  }
+  const raw = await readJson(req, 16_384); // con límite también si llega sin content-length (chunked)
+  if (raw === "too_big") return json({ ok: false, error: "size" }, 413);
+  if (raw === "bad") return json({ ok: false, error: "validation" }, 400);
 
   // Trampa para bots: respondemos "ok" sin hacer nada.
   if (typeof raw.website === "string" && raw.website.length > 0) return json({ ok: true });

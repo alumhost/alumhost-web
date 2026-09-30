@@ -371,6 +371,8 @@ const en: Dict = {
         name_taken: "Someone else already published that name.",
         one_site: "Your email already has another site.",
         session: "The link has expired. Ask for a new one.",
+        rate_limited: "Too many actions in a row. Wait a minute and try again.",
+        suspended: "This site is suspended pending an abuse review. Write to abuse@alumhost.dev.",
         server: "Something failed on our side. Try again in a minute.",
       },
     },
