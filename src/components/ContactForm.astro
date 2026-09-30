@@ -5,16 +5,28 @@
  * - Lee ?motivo= y ?plan= de la URL para preseleccionar (los CTAs de la web los ponen).
  * - Estados: validación inline, enviando, error de servidor, éxito. Sin alert().
  * - Los mensajes van en data-messages (JSON) para no usar scripts inline (CSP estricta).
+ * - Props opcionales para /beta: `reason` fija el motivo (campo oculto, sin selector) y `copy` cambia título,
+ *   ayuda del mensaje, botón y mensaje de éxito. Sin props se comporta como siempre (/contacto).
+ * - Si la URL trae ?utm_source= (enlaces cortos de los QR, public/_redirects), se añade "Origen: ..." al final del
+ *   mensaje. Así sabemos el canal sin tocar el Worker ni añadir campos.
  * IA: si añades un campo, añádelo también a la validación de worker/index.ts (mismos límites).
  */
 import { plans } from "../config/plans";
 import { site } from "../config/site";
 import { fill, path, useDict, type Lang } from "../i18n";
 
-interface Props { lang: Lang }
-const { lang } = Astro.props;
+type Reason = keyof ReturnType<typeof useDict>["contact"]["form"]["reasons"];
+interface Props {
+  lang: Lang;
+  /** Motivo fijo: oculta el selector de motivo y envía este valor. */
+  reason?: Reason;
+  /** Textos que cambian respecto a /contacto. title: null = sin título dentro del formulario. */
+  copy?: { title?: string | null; messageHelp?: string; submit?: string; success?: string };
+}
+const { lang, reason: fixedReason, copy = {} } = Astro.props;
 const t = useDict(lang);
-const f = t.contact.form;
+const f = { ...t.contact.form, ...Object.fromEntries(Object.entries(copy).filter(([, v]) => v !== undefined)) };
+const formTitle = copy.title === null ? null : (copy.title ?? t.contact.form.title);
 const reasons = Object.entries(f.reasons) as [keyof typeof f.reasons, string][];
 const messages = JSON.stringify({
   ...f.errors,
@@ -25,7 +37,7 @@ const messages = JSON.stringify({
 });
 ---
 <form class="form" id="form" novalidate data-contact-form data-messages={messages} data-lang={lang}>
-  <h2 class="form-title">{f.title}</h2>
+  {formTitle && <h2 class="form-title">{formTitle}</h2>}
 
   <div class="row">
     <div class="field">
@@ -41,13 +53,17 @@ const messages = JSON.stringify({
     </div>
   </div>
 
-  <div class="row">
-    <div class="field">
-      <label for="cf-reason">{f.reason}</label>
-      <select id="cf-reason" name="reason">
-        {reasons.map(([value, label]) => <option value={value}>{label}</option>)}
-      </select>
-    </div>
+  <div class:list={["row", { "row--single": fixedReason }]}>
+    {fixedReason ? (
+      <input type="hidden" name="reason" value={fixedReason} />
+    ) : (
+      <div class="field">
+        <label for="cf-reason">{f.reason}</label>
+        <select id="cf-reason" name="reason">
+          {reasons.map(([value, label]) => <option value={value}>{label}</option>)}
+        </select>
+      </div>
+    )}
     <div class="field">
       <label for="cf-plan">{f.plan}</label>
       <select id="cf-plan" name="plan">
@@ -99,6 +115,7 @@ const messages = JSON.stringify({
   }
   .form-title { font-size: var(--step-2); }
   .row { display: grid; grid-template-columns: 1fr 1fr; gap: 1.4rem; }
+  .row--single { grid-template-columns: 1fr; }
   .field { display: grid; gap: 0.4rem; align-content: start; }
   label { font-weight: 600; font-size: 0.95rem; }
   input, select, textarea {
@@ -145,11 +162,15 @@ const messages = JSON.stringify({
     // Preselección desde la URL (?motivo=beta&plan=developer)
     const q = new URLSearchParams(location.search);
     const setSelect = (name: string, value: string | null) => {
-      const el = form.elements.namedItem(name) as HTMLSelectElement | null;
-      if (el && value && [...el.options].some((o) => o.value === value)) el.value = value;
+      const el = form.elements.namedItem(name);
+      // Con motivo fijo, "reason" es un input oculto y no se toca.
+      if (el instanceof HTMLSelectElement && value && [...el.options].some((o) => o.value === value)) el.value = value;
     };
     setSelect("reason", q.get("motivo"));
     setSelect("plan", q.get("plan"));
+    // Canal de llegada (QR). Solo letras, números, _ y -: nunca se pega texto arbitrario de la URL al correo.
+    const src = q.get("utm_source");
+    const origin = src && /^[\w-]{1,32}$/.test(src) ? `\n\nOrigen: ${src}` : "";
 
     const showError = (field: Field, text: string | null) => {
       const p = form.querySelector<HTMLElement>(`[data-error-for="${field}"]`);
@@ -199,7 +220,10 @@ const messages = JSON.stringify({
             email: data.get("email"),
             reason: data.get("reason"),
             plan: data.get("plan"),
-            message: data.get("message"),
+            message: (() => {
+              const m = String(data.get("message") ?? "").trim();
+              return m.length + origin.length <= 4000 ? m + origin : m;
+            })(),
             website: data.get("website"),
             token: data.get("cf-turnstile-response"),
             lang: form.dataset.lang,

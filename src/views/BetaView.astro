@@ -1,0 +1,197 @@
+---
+/**
+ * /beta: qué es la beta, qué gana el beta tester y el formulario en la misma página (móvil primero: se llega por QR).
+ * Mismo lenguaje que la portada (DESIGN.md): cartel sobre el agua · cinta · libro de filas sobre velo ·
+ * verbos gigantes en baldosa índigo · formulario y preguntas sobre velo.
+ * Todo "Reservar plaza" lleva aquí (config/cta.ts). ?plan= preselecciona el plan; ?utm_source= lo anota ContactForm.
+ * IA: nunca publiques la cifra del mínimo de personas ni fechas; el texto dice "un mínimo". Nunca "fundador".
+ */
+import Base from "../layouts/Base.astro";
+import TileStrip from "../components/TileStrip.astro";
+import TileMotif from "../components/TileMotif.astro";
+import ContactForm from "../components/ContactForm.astro";
+import { path, useDict, type Lang } from "../i18n";
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = useDict(lang);
+const b = t.beta;
+const faqLast = b.faq.items.length - 1;
+---
+<Base lang={lang} page="beta">
+  <!-- 1. HERO: cartel sobre el agua -->
+  <section class="container hero">
+    <p class="status mono rise" style="--i:0"><span class="dot" aria-hidden="true"></span>{b.status}</p>
+    <h1 class="rise" style="--i:1">{b.titleA} <em>{b.titleEm}</em></h1>
+    <div class="rise" style="--i:2">
+      <p class="lead">{b.sub} <strong>{b.free}</strong></p>
+      <a class="btn" href="#apuntarme">{b.cta}</a>
+    </div>
+  </section>
+  <TileStrip id="strip-beta" />
+
+  <!-- 2. QUÉ TE LLEVAS: libro de filas -->
+  <div class="veil">
+    <section class="section container gains" aria-labelledby="gains-title">
+      <h2 id="gains-title">{b.gains.title}</h2>
+      <div>
+        {b.gains.items.map((g) => (
+          <article class="row">
+            <h3>{g.title}</h3>
+            <p class="muted">{g.body}</p>
+          </article>
+        ))}
+      </div>
+    </section>
+  </div>
+
+  <!-- 3. CÓMO FUNCIONA: verbos gigantes en baldosa índigo -->
+  <section class="section steps band-indigo" aria-labelledby="steps-title">
+    <TileMotif id="motif-beta" />
+    <div class="container steps-in">
+      <h2 id="steps-title">{b.steps.title}</h2>
+      <ol class="steps-list">
+        {b.steps.items.map((s) => (
+          <li>
+            <span class="verb">{s.verb}</span>
+            <p>{s.body}</p>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <div class="veil">
+    <!-- 4. FORMULARIO en la misma página -->
+    <section class="container signup" id="apuntarme" aria-labelledby="signup-title">
+      <div class="intro">
+        <h2 id="signup-title">{b.signup.title}</h2>
+        <p class="muted">{b.signup.body}</p>
+      </div>
+      <ContactForm
+        lang={lang}
+        reason="beta"
+        copy={{ title: null, messageHelp: b.signup.messageHelp, submit: b.signup.submit, success: b.signup.success }}
+      />
+    </section>
+
+    <!-- 5. PREGUNTAS -->
+    <section class="container faq" aria-labelledby="faq-title">
+      <h2 id="faq-title">{b.faq.title}</h2>
+      <div class="faq-list">
+        {b.faq.items.map((f, i) => (
+          <details>
+            <summary>{f.q}</summary>
+            <p class="muted">
+              {f.a}
+              {i === faqLast && <> <a href={path("privacy", lang)}>{b.faq.privacyLink}</a>.</>}
+            </p>
+          </details>
+        ))}
+      </div>
+    </section>
+  </div>
+</Base>
+
+<style>
+  /* ---------- Hero ---------- */
+  .hero { padding-block: clamp(2.5rem, 7vw, 6.5rem) clamp(3rem, 6vw, 5rem); }
+  .hero h1 { max-width: 11ch; }
+  .hero h1 em {
+    font-style: normal;
+    background: linear-gradient(var(--sand), var(--sand)) 0 88% / 100% 0.14em no-repeat;
+  }
+  .hero .lead { color: var(--text); max-width: 34ch; margin-top: clamp(1.4rem, 3vw, 2.2rem); }
+  .hero .lead strong { font-weight: 600; }
+  .hero .btn { margin-top: 2rem; }
+  .status { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 1.4rem; font-size: 0.85rem; color: var(--text); }
+  .dot { width: 10px; height: 10px; background: var(--sand); outline: 1px solid var(--text); }
+
+  /* ---------- Libro de filas ---------- */
+  .gains h2 { margin-bottom: clamp(2rem, 4vw, 3.5rem); max-width: 12ch; }
+  .row {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: clamp(1rem, 4vw, 4rem);
+    align-items: baseline;
+    padding-block: clamp(1.2rem, 2.5vw, 2.2rem);
+    border-top: var(--rule);
+  }
+  .row:last-child { border-bottom: var(--rule); }
+  .row h3 { font-stretch: var(--display-width); font-weight: 800; font-size: var(--step-2); line-height: 0.95; max-width: 16ch; }
+  .row p { max-width: 46ch; }
+
+  /* ---------- Pasos ---------- */
+  .steps { position: relative; overflow: hidden; }
+  .steps-in { position: relative; }
+  .steps h2 { margin-bottom: clamp(1.5rem, 3vw, 3rem); }
+  .steps-list { list-style: none; padding: 0; }
+  .steps-list li {
+    display: grid;
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    gap: clamp(1rem, 4vw, 4rem);
+    align-items: end;
+    padding-block: clamp(0.8rem, 1.5vw, 1.4rem);
+    border-top: var(--rule);
+  }
+  .verb {
+    font-family: var(--font-display);
+    font-stretch: 68%;
+    font-weight: 800;
+    font-size: var(--step-4);
+    line-height: 0.88;
+    text-transform: uppercase;
+    overflow-wrap: anywhere;
+  }
+  .steps-list p { font-size: var(--step-1); line-height: 1.35; max-width: 30ch; }
+
+  /* ---------- Formulario ---------- */
+  .signup {
+    display: grid;
+    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+    gap: clamp(1.5rem, 5vw, 5rem);
+    align-items: start;
+    padding-block: var(--section);
+    scroll-margin-top: var(--nav-h);
+  }
+  .intro { position: sticky; top: calc(var(--nav-h) + 2rem); }
+  .intro h2 { font-size: var(--step-4); }
+  .intro p { margin-top: 1.2rem; max-width: 34ch; }
+
+  /* ---------- Preguntas ---------- */
+  .faq { padding-bottom: var(--section); }
+  .faq h2 { font-size: var(--step-3); margin-bottom: clamp(1.5rem, 3vw, 2.5rem); }
+  .faq-list { border-bottom: var(--rule); }
+  details { border-top: var(--rule); }
+  summary {
+    cursor: pointer;
+    list-style: none;
+    padding: 1.2rem 3rem 1.2rem 0;
+    font-size: var(--step-1);
+    font-weight: 600;
+    position: relative;
+    min-height: 44px;
+  }
+  summary::-webkit-details-marker { display: none; }
+  summary::after {
+    content: "+";
+    position: absolute;
+    right: 0;
+    top: 50%;
+    translate: 0 -50%;
+    font-family: var(--font-mono);
+    font-size: 1.6rem;
+    transition: rotate 200ms var(--ease);
+  }
+  details[open] summary::after { rotate: 45deg; }
+  details p { padding: 0 3rem 1.4rem 0; max-width: 60ch; }
+
+  /* ---------- Móvil ---------- */
+  @media (max-width: 919px) {
+    .signup { grid-template-columns: 1fr; }
+    .intro { position: static; }
+  }
+  @media (max-width: 767px) {
+    .row, .steps-list li { grid-template-columns: 1fr; gap: 0.6rem; }
+  }
+</style>
