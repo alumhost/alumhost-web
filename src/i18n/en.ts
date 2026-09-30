@@ -76,6 +76,15 @@ const en: Dict = {
         details: "See the full plan",
       },
     },
+    proof: {
+      label: "Already true today",
+      items: [
+        { title: "VAT included", body: "The price you see is the price you pay." },
+        { title: "In euros", body: "No international card, no invoices in dollars." },
+        { title: "A person answers", body: "No bots, no ticket queue." },
+        { title: "Price locked", body: "Join the beta and your first year does not go up." },
+      ],
+    },
     perks: {
       title: "How we work.",
       items: [

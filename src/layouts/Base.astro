@@ -6,7 +6,7 @@
 import "@fontsource-variable/archivo/wdth.css";
 import "@fontsource/ibm-plex-sans/400.css";
 import "@fontsource/ibm-plex-sans/600.css";
-import "@fontsource/ibm-plex-mono/400.css";
+import "@fontsource-variable/jetbrains-mono/wght.css";
 import "../styles/global.css";
 import Caustics from "../components/Caustics.astro";
 import Nav from "../components/Nav.astro";
@@ -35,7 +35,7 @@ const canonical = page === "notFound" ? null : new URL(path(page, lang), site).h
     <title>{meta.title}</title>
     <meta name="description" content={meta.description} />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <meta name="theme-color" content="#000000" />
+    <meta name="theme-color" content="#0b1122" />
     {canonical && <link rel="canonical" href={canonical} />}
     {page !== "notFound" &&
       langs.map((l) => <link rel="alternate" hreflang={l} href={new URL(path(page, l), site).href} />)}
@@ -58,15 +58,39 @@ const canonical = page === "notFound" ? null : new URL(path(page, lang), site).h
     <Footer lang={lang} />
 
     <script>
-      // Reflejo del cristal siguiendo al puntero (solo ratón y si se acepta movimiento). Un rAF por frame como máximo.
+      // Efectos de puntero (solo ratón y si se acepta movimiento; estilos en global.css, bajo .fx):
+      // reflejo del cristal y lente negativa de los botones siguen al puntero (--mx/--my, un rAF por frame),
+      // y las letras giratorias de los enlaces. Sin JS, con táctil o con reduced-motion: nada de esto.
       const fine = window.matchMedia("(hover: hover) and (pointer: fine)");
       const calm = window.matchMedia("(prefers-reduced-motion: reduce)");
       if (fine.matches && !calm.matches) {
+        document.documentElement.classList.add("fx");
+        document
+          .querySelectorAll<HTMLElement>(".links a, .textlink, .footer .cols ul:not(.mail) a")
+          .forEach((el) => {
+            const text = el.textContent?.trim() ?? "";
+            if (!text || el.children.length) return;
+            const sr = document.createElement("span");
+            sr.className = "sr-only";
+            sr.textContent = text;
+            const roll = document.createElement("span");
+            roll.className = "roll";
+            roll.setAttribute("aria-hidden", "true");
+            Array.from(text).forEach((c, i) => {
+              const ch = document.createElement("span");
+              ch.className = "ch";
+              ch.textContent = ch.dataset.ch = c === " " ? "\u00a0" : c;
+              ch.style.setProperty("--i", String(i));
+              roll.appendChild(ch);
+            });
+            el.replaceChildren(sr, roll);
+          });
+
         let pending: { el: HTMLElement; x: number; y: number } | null = null;
         document.addEventListener(
           "pointermove",
           (ev) => {
-            const el = (ev.target as Element | null)?.closest<HTMLElement>(".glass");
+            const el = (ev.target as Element | null)?.closest<HTMLElement>(".btn, .glass");
             if (!el) return;
             const r = el.getBoundingClientRect();
             const first = pending === null;

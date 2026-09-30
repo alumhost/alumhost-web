@@ -1,10 +1,15 @@
 /*
  * Tokens de diseño de AlumHost. TODO color, fuente y regla de la web sale de aquí. Ver DESIGN.md.
- * VARIANTE NEGRO Y BLANCO (rama design/black-white): un solo tema, siempre oscuro. Fondo negro, texto y reglas en
- * blanco, baldosas en gris casi negro y la banda de cierre en blanco. Los nombres de los tokens no cambian
- * (--indigo y --sand son ahora "baldosa oscura" y "acento blanco") para que ningún componente se toque.
- * Ladrillo (--brick) SOLO para lo tachado y los errores: es el único color que no es negro ni blanco.
- * Nombres neutros a propósito: nada regional en tokens, clases ni textos.
+ * VARIANTE NOCHE EN COLOR (rama design/dark-color): un solo tema, siempre oscuro, pero con color con oficio.
+ * Fondo azul noche (nunca negro puro), agua con luz cian, baldosa cobalto, acento ámbar para la acción y
+ * verde agua para lo que está "en marcha". Los nombres de tokens no cambian (--indigo es ahora cobalto y
+ * --sand ámbar) para que ningún componente se toque.
+ * Cada color tiene un único trabajo:
+ *   --sand  (ámbar)   acción: botones, subrayado del titular, verbos, banda de cierre
+ *   --indigo (cobalto) estructura: banda de pasos, pie, cinta de módulos
+ *   --teal  (verde agua) estado y confianza: "beta abierta", marcas de hechos, prompt de los scripts
+ *   --brick (coral)   SOLO lo tachado y los errores
+ * Nada de morado, neón ni degradados de texto. Nombres neutros: nada regional en tokens, clases ni textos.
  *
  * IA: solo hay un tema. Contrastes: scripts/contrast.py (WCAG AA).
  */
@@ -12,43 +17,46 @@
   color-scheme: dark;
 
   /* Fijos */
-  --ink: #000000;
+  --ink: #0a0f1e;
   --white: #ffffff;
-  --sand: #ffffff;
+  --sand: #f4b740;
+  --teal: #45caa9;
+  --sky: #7fb2ff;
 
   /* Color */
-  --paper: #000000;
-  --paper-2: #111111;
-  --text: #ffffff;
-  --muted: #b5b5b5;
-  --indigo: #181818;
-  --brick: #ff8a7a;
-  --link: #ffffff;
-  --focus: #ffffff;
-  --btn-bg: #ffffff;
-  --btn-fg: #000000;
-  --rule-color: #ffffff;
+  --paper: #0b1122;
+  --paper-2: #141c36;
+  --text: #eef1fa;
+  --muted: #a9b3d1;
+  --indigo: #2138ad;
+  --brick: #ff8a73;
+  --link: #f4b740;
+  --focus: #f4b740;
+  --btn-bg: #f4b740;
+  --btn-fg: #0a0f1e;
+  --rule-color: #3a4670;
+  --rule-strong: #eef1fa;
 
-  /* Agua (Caustics.astro): fondo de toda la página, ahora en grises */
-  --pool-base: #000000;
-  --pool-water: #141414;
-  --pool-light: #6b6b6b;
-  --pool-strength: 0.5;
+  /* Agua (Caustics.astro): fondo de toda la página. Noche azul con luz cian. */
+  --pool-base: #070b18;
+  --pool-water: #10245a;
+  --pool-light: #3fb6cf;
+  --pool-strength: 0.62;
   /* Velo sobre el agua en las secciones de lectura (el agua se intuye, el texto se lee) */
-  --veil: rgb(0 0 0 / 0.72);
+  --veil: rgb(11 17 34 / 0.8);
 
   /* Cristal: solo en lo que flota */
-  --glass-bg: rgb(24 24 24 / 0.55);
-  --glass-border: rgb(255 255 255 / 0.22);
-  --glass-hi: rgb(255 255 255 / 0.22);
-  --glass-shadow: 0 1px 2px rgb(0 0 0 / 0.5), 0 20px 50px -18px rgb(0 0 0 / 0.8);
+  --glass-bg: rgb(20 28 54 / 0.58);
+  --glass-border: rgb(170 190 255 / 0.2);
+  --glass-hi: rgb(190 210 255 / 0.2);
+  --glass-shadow: 0 1px 2px rgb(3 6 16 / 0.5), 0 24px 60px -20px rgb(3 8 30 / 0.9);
   --glass-blur: 18px;
   --r-glass: 16px;
 
   /* Tipografía (autoalojada con @fontsource, ver src/layouts/Base.astro) */
   --font-display: "Archivo Variable", "Archivo", ui-sans-serif, system-ui, sans-serif;
   --font-body: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", monospace;
+  --font-mono: "JetBrains Mono Variable", "JetBrains Mono", ui-monospace, "SFMono-Regular", monospace;
   --display-width: 70%; /* eje wdth de Archivo: 62 (muy condensada) a 125 */
 
   --step--1: clamp(0.875rem, 0.85rem + 0.1vw, 0.92rem);

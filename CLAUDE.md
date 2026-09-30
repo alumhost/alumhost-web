@@ -57,7 +57,7 @@ public/_headers         cabeceras de seguridad (CSP, HSTS, etc.)
    "probamos a restaurar" hasta que sea verdad (ver `docs/memoria-decisiones.md`).
 6. Ningún secreto en el repo. Claves en `wrangler secret put` o `.dev.vars` (ignorado por git).
 7. Sin frameworks de UI ni librerías de animación. HTML + CSS + TS mínimo. JS solo en islas pequeñas (`<script>` de Astro).
-   Fuentes: Archivo (display, eje de ancho), IBM Plex Sans y Plex Mono. No las sustituyas por Inter, Geist, Space Grotesk ni similares.
+   Fuentes: Archivo (display, eje de ancho), IBM Plex Sans y JetBrains Mono. No las sustituyas por Inter, Geist, Space Grotesk ni similares. IBM Plex Mono queda descartada (decisión de Alonso, 30/09/2026).
 8. El precio que se cobra NUNCA se fía del cliente: cuando exista checkout, el Worker resuelve el precio desde `plans.ts`.
 
 ## Pare y pregunte antes de

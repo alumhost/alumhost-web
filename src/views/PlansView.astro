@@ -7,6 +7,7 @@
  */
 import Base from "../layouts/Base.astro";
 import TileStrip from "../components/TileStrip.astro";
+import Icon from "../components/Icon.astro";
 import { addons, formatEur, plans } from "../config/plans";
 import { primaryCta } from "../config/cta";
 import { priceView, specLines } from "../lib/planText";
@@ -51,13 +52,13 @@ const backupPlans = plans.filter((pl) => pl.backup !== null);
                 <div class="edge" aria-hidden="true"><TileStrip id={`edge-${plan.id}`} vertical size={26} /></div>
               )}
               <div class="who">
-                {plan.featured && <p class="flag mono">{p.recommended}</p>}
+                {plan.featured && <p class="flag mono prompt">{p.recommended}</p>}
                 <h2 id={`${plan.id}-name`}>{item.name}</h2>
                 <p class="tagline muted">{item.tagline}</p>
               </div>
 
               <ul class="features">
-                {specLines(plan, lang).map((line) => <li>{line}</li>)}
+                {specLines(plan, lang).map((line) => <li><span class="tick"><Icon name="check" size="1em" /></span>{line}</li>)}
               </ul>
 
               <div class="buy">
@@ -181,13 +182,12 @@ const backupPlans = plans.filter((pl) => pl.backup !== null);
     .plan--featured { margin-inline: calc(-26px - var(--plan-gap)) calc(-1 * clamp(1.2rem, 3vw, 2.6rem)); }
   }
   .edge { align-self: stretch; margin-block: calc(-1 * clamp(1.6rem, 3vw, 2.6rem)); }
-  .flag { font-size: 0.875rem; margin-bottom: 0.7rem; display: flex; align-items: center; gap: 0.5rem; }
-  .flag::before { content: ""; width: 10px; height: 10px; background: var(--sand); outline: 1px solid var(--text); }
+  .flag { font-size: 0.875rem; margin-bottom: 0.7rem; --prompt: var(--sand); }
   .who h2 { font-size: var(--step-3); }
   .tagline { margin-top: 0.8rem; max-width: 30ch; }
   .features { list-style: none; padding: 0; display: grid; gap: 0.55rem; }
-  .features li { display: grid; grid-template-columns: 10px 1fr; gap: 0.8rem; align-items: baseline; }
-  .features li::before { content: ""; width: 8px; height: 8px; background: currentColor; translate: 0 -1px; }
+  .features li { display: grid; grid-template-columns: 1em 1fr; gap: 0.7rem; align-items: baseline; }
+  .tick { display: inline-flex; color: var(--teal); translate: 0 0.15em; }
   .buy { display: grid; gap: 1.4rem; justify-items: start; }
   .line { display: flex; align-items: baseline; gap: 0.3rem; }
   .amount {

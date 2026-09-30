@@ -21,7 +21,7 @@ const faqLast = b.faq.items.length - 1;
 <Base lang={lang} page="beta">
   <!-- 1. HERO: cartel sobre el agua -->
   <section class="container hero">
-    <p class="status mono rise" style="--i:0"><span class="dot" aria-hidden="true"></span>{b.status}</p>
+    <p class="status mono prompt prompt--live rise" style="--i:0">{b.status}</p>
     <h1 class="rise" style="--i:1">{b.titleA} <em>{b.titleEm}</em></h1>
     <div class="rise" style="--i:2">
       <p class="lead">{b.sub} <strong>{b.free}</strong></p>
@@ -104,8 +104,7 @@ const faqLast = b.faq.items.length - 1;
   .hero .lead { color: var(--text); max-width: 34ch; margin-top: clamp(1.4rem, 3vw, 2.2rem); }
   .hero .lead strong { font-weight: 600; }
   .hero .btn { margin-top: 2rem; }
-  .status { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 1.4rem; font-size: 0.875rem; color: var(--text); }
-  .dot { width: 10px; height: 10px; background: var(--sand); outline: 1px solid var(--text); }
+  .status { margin-bottom: 1.4rem; font-size: 0.875rem; color: var(--text); }
 
   /* ---------- Libro de filas ---------- */
   .gains h2 { margin-bottom: clamp(2rem, 4vw, 3.5rem); max-width: 12ch; }

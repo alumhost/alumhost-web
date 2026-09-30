@@ -36,7 +36,7 @@ Contraste medido por `scripts/contrast.py` (lo ejecuta `npm run preflight`).
 
 ## Tipografía
 Archivo variable con eje de ancho (68-78 %, peso 800) para titulares, precios y verbos. IBM Plex Sans para texto,
-IBM Plex Mono para specs, correos y scripts. Autoalojadas con @fontsource.
+JetBrains Mono (variable) para specs, correos y scripts; IBM Plex Mono descartada, no volver a usarla. Autoalojadas con @fontsource.
 
 ## Formas y patrones
 - Baldosas, botones, campos y bandas: esquinas rectas, reglas de 2 px, sin sombras. Cristal: 16 px. Nunca cápsulas.
@@ -57,6 +57,9 @@ CONTACTO velo: titular y canales | formulario   ·   PRIVACIDAD velo: titular fi
 ## Movimiento
 Tres firmas: el agua, el reflejo del puntero y la entrada del titular de cada página. Nada más se anima al hacer scroll.
 
+Variante noche en color: se añaden dos firmas de puntero, solo con ratón y sin reduced-motion (clase `.fx`):
+letras giratorias en enlaces (nav, "Ver planes", pie) y lente negativa que sigue al cursor dentro de los botones.
+
 ## Lista anti-IA (comprobar antes de dar por buena cualquier pantalla)
 - Tipografía: nada de Inter, Roboto, Geist, Space Grotesk o Bricolage por defecto.
 - Color: sin degradado morado, sin texto con degradado, sin crema+terracota, sin negro+neón.
@@ -74,3 +77,14 @@ translúcido. `--brick` (`#ff8a7a`) sigue solo para lo tachado y los errores. No
 Pendiente de revisar en pantalla (no se ha renderizado): contraste real del velo sobre el agua gris, la cinta de
 baldosas y la textura de la banda oscura (`TileMotif`), que se calculó para el índigo. El logo conserva sus colores
 de marca (crema, añil, terracota) sobre su baldosa; si se quiere monocromo, es un cambio aparte en `Mark.astro` y `public/favicon.svg`.
+
+## Variante noche en color (rama `design/dark-color`)
+Parte de la negro y blanco (un solo tema oscuro) y le devuelve el color con oficio. Solo tokens y portada.
+- Fondo azul noche `#0B1122` (nunca negro puro), agua con luz cian `#3FB6CF` sobre `#10245A`.
+- Cada color, un trabajo: ámbar `#F4B740` = acción (botones, subrayado, verbos, cierre, plan elegido);
+  cobalto `#2138AD` = estructura (banda de pasos, cinta); verde agua `#45CAA9` = estado y confianza (beta abierta,
+  prompt de scripts); azul `#7FB2FF` solo como marca secundaria; coral `#FF8A73` SOLO tachado y errores.
+- Reglas en `--rule-color` tenue (`#3A4670`); `--rule-strong` para el botón de contorno.
+- Portada reformateada: hero en dos columnas (titular + CTA | selector de cristal, todo sobre el pliegue a 1440),
+  "Lo que ya es verdad" (4 hechos ya decididos en `docs/memoria-decisiones.md`, `home.proof`) bajo el hero,
+  "Cómo trabajamos" con titular fijo a la izquierda y cada regla arrancando en su color. Pie en noche profunda.
