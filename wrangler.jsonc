@@ -20,13 +20,20 @@
     { "name": "CONTACT_LIMITER", "namespace_id": "1001", "simple": { "limit": 5, "period": 60 } }
   ],
 
-  // Variables NO secretas. Los secretos van con:  npx wrangler secret put TURNSTILE_SECRET
-  "vars": {
-    "CONTACT_FROM": "web@alumhost.dev", // TODO(dominio): remitente en un dominio con Email Routing activo
-    "CONTACT_TO": "hola@alumhost.dev"   // TODO(dominio): buzón verificado en Email Routing
-  }
+  // Dominio propio: Cloudflare crea los registros DNS y el certificado al desplegar.
+  "routes": [
+    { "pattern": "alumhost.dev", "custom_domain": true },
+    { "pattern": "www.alumhost.dev", "custom_domain": true }
+  ],
 
-  // TODO(email): cuando el dominio esté en Cloudflare con Email Routing y CONTACT_TO verificado, descomenta:
-  // ,"send_email": [{ "name": "CONTACT_MAILER", "destination_address": "hola@alumhost.dev" }]
-  // Alternativa futura (IA: elige una sola): guardar en D1, o enviar con Resend vía fetch. Ver worker/index.ts → deliver().
+  // Variables NO secretas. Secretos (no van en el repo, que es público):
+  //   npx wrangler secret put TURNSTILE_SECRET   -> secret key de Turnstile
+  //   npx wrangler secret put CONTACT_TO         -> correo personal VERIFICADO en Email Routing (destino del formulario)
+  "vars": {
+    "CONTACT_FROM": "web@alumhost.dev" // remitente en alumhost.dev (Email Routing activo)
+  },
+
+  // Envío de correo con Email Routing. Sin destination_address: puede enviar a cualquier dirección
+  // verificada en Email Routing → Destination addresses; el destino concreto es el secreto CONTACT_TO.
+  "send_email": [{ "name": "CONTACT_MAILER" }]
 }
