@@ -11,6 +11,8 @@ import Base from "../layouts/Base.astro";
 import TileStrip from "../components/TileStrip.astro";
 import TileMotif from "../components/TileMotif.astro";
 import PlanPicker from "../components/PlanPicker.astro";
+import Mark from "../components/Mark.astro";
+import Icon, { type IconName } from "../components/Icon.astro";
 import { primaryCta } from "../config/cta";
 import { path, useDict, type Lang } from "../i18n";
 
@@ -20,23 +22,36 @@ const t = useDict(lang);
 const h = t.home;
 const cta = primaryCta(lang);
 const [perkPerson, ...perkRest] = h.perks.items;
+/* Un icono por hecho, en el orden de home.proof.items: IVA, euros, persona, precio congelado */
+const proofIcons: IconName[] = ["receipt", "currency-eur", "chat-circle-text", "lock-simple"];
 ---
 <Base lang={lang} page="home">
-  <!-- 1. HERO: titular a cartel sobre el agua -->
+  <!-- 1. HERO: titular y selector lado a lado sobre el agua; debajo, los hechos que ya son verdad -->
   <section class="container hero">
-    <h1 class="rise" style="--i:0">{h.hero.titleA} <em>{h.hero.titleEm}</em></h1>
-    <div class="hero-row">
+    <div class="hero-copy">
+      <p class="status mono prompt prompt--live rise" style="--i:0">{h.hero.eyebrow}</p>
+      <h1 class="rise" style="--i:1">{h.hero.titleA} <em>{h.hero.titleEm}</em></h1>
       <div class="rise" style="--i:2">
         <p class="lead">{h.hero.sub}</p>
         <div class="ctas">
           <a class="btn" href={cta.href}>{cta.label}</a>
           <a class="textlink" href={path("plans", lang)}>{h.hero.ctaSecondary}</a>
         </div>
-        <p class="status mono"><span class="dot" aria-hidden="true"></span>{h.hero.eyebrow}</p>
       </div>
-      <div class="rise" style="--i:3">
-        <PlanPicker lang={lang} />
-      </div>
+    </div>
+    <div class="hero-side rise" style="--i:3">
+      <PlanPicker lang={lang} />
+    </div>
+    <div class="proof">
+      <p class="proof-label mono">{h.proof.label}</p>
+      <ul>
+        {h.proof.items.map((it, i) => (
+          <li>
+            <strong><span class="proof-icon"><Icon name={proofIcons[i]} size="1.25em" /></span>{it.title}</strong>
+            <span class="muted">{it.body}</span>
+          </li>
+        ))}
+      </ul>
     </div>
   </section>
   <TileStrip id="strip-hero" />
@@ -45,8 +60,10 @@ const [perkPerson, ...perkRest] = h.perks.items;
   <div class="veil">
     <section class="section container perks" aria-labelledby="perks-title">
       <h2 id="perks-title">{h.perks.title}</h2>
-      <div>
+      <div class="rows">
         <article class="row row--lead">
+          {/* El logo es literalmente "una persona con una terminal": aquí firma la promesa */}
+          <Mark size={72} class="lead-mark" />
           <h3>{perkPerson.title}</h3>
           <p>{perkPerson.body}</p>
         </article>
@@ -72,7 +89,7 @@ const [perkPerson, ...perkRest] = h.perks.items;
 
   <!-- 3. PASOS: tres verbos gigantes en baldosa índigo -->
   <section class="section steps band-indigo" aria-labelledby="steps-title">
-    <TileMotif id="motif-steps" />
+    <TileMotif id="motif-steps" opacity={0.06} />
     <div class="container steps-in">
       <h2 id="steps-title">{h.steps.title}</h2>
       <ol class="steps-list">
@@ -115,27 +132,51 @@ const [perkPerson, ...perkRest] = h.perks.items;
 
 <style>
   /* ---------- Hero ---------- */
-  .hero { padding-block: clamp(3rem, 7vw, 6.5rem) clamp(3rem, 6vw, 5rem); }
-  .hero h1 { max-width: 13ch; }
+  .hero {
+    display: grid;
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    gap: clamp(2rem, 4vw, 4.5rem);
+    align-items: end;
+    padding-block: clamp(2.5rem, 6vw, 5.5rem) clamp(2.5rem, 4vw, 3.5rem);
+  }
+  .hero h1 { font-size: var(--step-4); max-width: 11ch; margin-block: 1.2rem clamp(1.5rem, 2.5vw, 2.2rem); }
   .hero h1 em {
     font-style: normal;
-    background: linear-gradient(var(--sand), var(--sand)) 0 88% / 100% 0.14em no-repeat;
+    background: linear-gradient(var(--sand), var(--sand)) 0 90% / 100% 0.12em no-repeat;
   }
-  .hero-row {
-    display: grid;
-    grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
-    gap: clamp(2rem, 5vw, 5rem);
-    align-items: start;
-    margin-top: clamp(2rem, 4vw, 3.5rem);
-  }
-  .hero .lead { color: var(--text); max-width: 36ch; }
+  .hero .lead { color: var(--text); max-width: 38ch; }
   .ctas { display: flex; flex-wrap: wrap; align-items: center; gap: 1.5rem; margin-top: 2rem; }
-  .status { display: flex; align-items: center; gap: 0.6rem; margin-top: 2rem; font-size: 0.875rem; color: var(--text); }
-  .dot { width: 10px; height: 10px; background: var(--sand); outline: 1px solid var(--text); }
+  .status { font-size: 0.875rem; color: var(--teal); }
+
+  /* Hechos: libro mayor bajo el hero, cuatro entradas separadas por reglas, cada marca con su color */
+  .proof { grid-column: 1 / -1; border-top: var(--rule); padding-top: 1.1rem; }
+  .proof-label { font-size: 0.8rem; color: var(--muted); letter-spacing: 0.04em; text-transform: uppercase; }
+  .proof ul {
+    list-style: none;
+    padding: 0;
+    margin-top: 0.9rem;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  .proof li { display: grid; gap: 0.25rem; padding: 0.2rem 1.4rem 0.2rem 1.1rem; border-left: 1px solid var(--rule-color); }
+  .proof li:first-child { border-left: 0; padding-left: 0; }
+  .proof strong { display: flex; align-items: center; gap: 0.55rem; font-weight: 600; }
+  .proof-icon { display: inline-flex; flex: none; color: var(--mark, var(--teal)); }
+  .proof li:nth-child(2) { --mark: var(--sand); }
+  .proof li:nth-child(3) { --mark: var(--sky); }
+  .proof li:nth-child(4) { --mark: var(--white); }
+  .proof .muted { font-size: var(--step--1); line-height: 1.45; }
 
   /* ---------- Libro de filas ---------- */
-  .perks h2 { margin-bottom: clamp(2rem, 4vw, 3.5rem); max-width: 12ch; }
+  .perks {
+    display: grid;
+    grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+    gap: clamp(2rem, 5vw, 5rem);
+    align-items: start;
+  }
+  .perks h2 { position: sticky; top: calc(var(--nav-h) + 2.5rem); max-width: 8ch; }
   .row {
+    position: relative;
     display: grid;
     grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
     gap: clamp(1rem, 4vw, 4rem);
@@ -143,22 +184,38 @@ const [perkPerson, ...perkRest] = h.perks.items;
     padding-block: clamp(1.4rem, 2.5vw, 2.2rem);
     border-top: var(--rule);
   }
+  .row:first-child { padding-top: 0; border-top: 0; }
   .row:last-child { border-bottom: var(--rule); }
+  /* Cada fila lleva su color en el arranque de la regla: ámbar, verde agua, azul */
+  .row + .row::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: -2px;
+    width: 3.5rem;
+    height: 2px;
+    background: var(--accent);
+  }
+  .row:nth-child(2) { --accent: var(--sand); }
+  .row:nth-child(3) { --accent: var(--teal); }
+  .row:nth-child(4) { --accent: var(--sky); }
   .row h3 { font-stretch: var(--display-width); font-weight: 800; font-size: var(--step-2); line-height: 0.95; max-width: 14ch; }
   .row p { max-width: 46ch; }
-  .row--lead h3 { font-size: var(--step-4); }
+  .row--lead { grid-template-columns: 1fr; gap: 1.2rem; }
+  .row--lead h3 { font-size: var(--step-3); max-width: 12ch; }
+  .row--lead :global(.lead-mark) { width: clamp(3.2rem, 2.4rem + 2.5vw, 4.5rem); height: auto; }
   .row--lead p { font-size: var(--step-1); line-height: 1.4; align-self: end; }
   .scripts {
     list-style: none;
     padding: 1rem 1.2rem;
     margin-top: 1.5rem;
     background: var(--ink);
-    color: #f0f0f0;
+    color: var(--text);
     line-height: 1.9;
     max-width: 22rem;
     border: 1px solid var(--rule-color);
   }
-  .scripts li::before { content: "$ "; color: var(--sand); }
+  .scripts li::before { content: "$ "; color: var(--teal); }
 
   /* ---------- Pasos ---------- */
   .steps { position: relative; overflow: hidden; }
@@ -174,6 +231,7 @@ const [perkPerson, ...perkRest] = h.perks.items;
     border-top: var(--rule);
   }
   .verb {
+    color: var(--sand);
     font-family: var(--font-display);
     font-stretch: 68%;
     font-weight: 800;
@@ -217,11 +275,16 @@ const [perkPerson, ...perkRest] = h.perks.items;
 
   /* ---------- Móvil ---------- */
   @media (max-width: 919px) {
-    .hero-row, .closing-in { grid-template-columns: 1fr; }
+    .hero, .closing-in, .perks { grid-template-columns: 1fr; }
+    .perks h2 { position: static; max-width: 12ch; }
+    .proof ul { grid-template-columns: 1fr 1fr; row-gap: 1.2rem; }
+    .proof li:nth-child(3) { border-left: 0; padding-left: 0; }
   }
   @media (max-width: 767px) {
     .row, .steps-list li { grid-template-columns: 1fr; gap: 0.7rem; }
     .row--lead p { align-self: start; }
     .honest-list { grid-template-columns: 1fr; }
+    .proof ul { grid-template-columns: 1fr; }
+    .proof li { border-left: 0; padding-left: 0; }
   }
 </style>

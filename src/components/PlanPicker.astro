@@ -72,7 +72,7 @@ const def = plans.find((p) => p.featured)?.id ?? plans[0].id;
     transition: background-color 160ms var(--ease), color 160ms var(--ease);
   }
   .opt:hover span { background: color-mix(in srgb, var(--text) 8%, transparent); }
-  .opt input:checked + span { background: var(--text); color: var(--paper); }
+  .opt input:checked + span { background: var(--sand); color: var(--ink); }
   .opt input:focus-visible + span { outline: 3px solid var(--focus); outline-offset: -3px; }
 
   .panels { margin-top: 1.2rem; }

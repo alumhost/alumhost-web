@@ -79,6 +79,15 @@ const es = {
         details: "Ver el plan completo",
       },
     },
+    proof: {
+      label: "Lo que ya es verdad",
+      items: [
+        { title: "IVA incluido", body: "El precio que ves es el que pagas." },
+        { title: "En euros", body: "Sin tarjeta internacional ni facturas en dólares." },
+        { title: "Te responde una persona", body: "En español, sin bots ni colas de tickets." },
+        { title: "Precio congelado", body: "Si entras en la beta, el primer año no sube." },
+      ],
+    },
     perks: {
       title: "Cómo trabajamos.",
       items: [
