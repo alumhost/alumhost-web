@@ -247,6 +247,12 @@ a:focus-visible .ch { transform: rotateX(90deg); }
   text-underline-offset: 0.3em;
 }
 .textlink:hover { text-decoration-thickness: 0.28em; }
+/* Área táctil de 44px solo en pantallas táctiles: una caja invisible (::after) que sobresale del enlace.
+   No ocupa sitio en el layout, así que nada se mueve. (.more ya mide 44px por sí mismo.) */
+@media (pointer: coarse) {
+  .textlink:not(.more), .mono[href^="mailto:"] { position: relative; }
+  .textlink:not(.more)::after, .mono[href^="mailto:"]::after { content: ""; position: absolute; inset: -0.75rem -0.25rem; }
+}
 
 /* Entrada de titulares (solo cabeceras; nunca el mismo efecto en todos los bloques) */
 @media (prefers-reduced-motion: no-preference) {

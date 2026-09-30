@@ -13,6 +13,7 @@ import Nav from "../components/Nav.astro";
 import Footer from "../components/Footer.astro";
 import { fill, langs, path, useDict, type Lang, type RouteKey } from "../i18n";
 import { site as siteConfig } from "../config/site";
+import archivoWoff2 from "@fontsource-variable/archivo/files/archivo-latin-wdth-normal.woff2?url";
 
 interface Props {
   lang: Lang;
@@ -35,6 +36,7 @@ const canonical = page === "notFound" ? null : new URL(path(page, lang), site).h
     <title>{meta.title}</title>
     <meta name="description" content={meta.description} />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="preload" href={archivoWoff2} as="font" type="font/woff2" crossorigin />
     <meta name="theme-color" content="#0b1122" />
     {canonical && <link rel="canonical" href={canonical} />}
     {page !== "notFound" &&
@@ -47,6 +49,19 @@ const canonical = page === "notFound" ? null : new URL(path(page, lang), site).h
     {canonical && <meta property="og:url" content={canonical} />}
     {/* TODO(og): añadir og:image (1200x630) cuando exista la marca definitiva. */}
     {page === "notFound" && <meta name="robots" content="noindex" />}
+    {/* Datos estructurados: solo hechos de site.ts (marca, dominio, correo). Es un bloque de datos, no ejecuta JS (CSP intacta). */}
+    {page === "home" && (
+      <script
+        type="application/ld+json"
+        set:html={JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Organization",
+          name: siteConfig.name,
+          url: site.origin + "/",
+          email: siteConfig.email.hello,
+        })}
+      />
+    )}
   </head>
   <body>
     <a class="skip-link" href="#main">{t.nav.skip}</a>
