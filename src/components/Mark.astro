@@ -1,17 +1,17 @@
 ---
 /**
- * Marca geométrica provisional: cuatro baldosas 2x2 con cuartos de círculo (motivo típico de azulejo).
- * TODO(marca): sustituir por el logo definitivo. El mismo dibujo está en public/favicon.svg.
+ * Logo de AlumHost: persona con una terminal (>_) en el cuerpo (decisión 30/09/2026, idea de Blas).
+ * Colores fijos de marca (añil, terracota, crema) sobre una baldosa crema: se lee igual en modo día y noche.
+ * El mismo dibujo está en public/favicon.svg. Versiones con nombre en docs/marca/.
  */
 interface Props { size?: number }
 const { size = 28 } = Astro.props;
 ---
-<svg width={size} height={size} viewBox="0 0 32 32" aria-hidden="true" focusable="false" class="mark">
-  <rect width="32" height="32" fill="var(--indigo)" />
-  <rect x="16" width="16" height="16" fill="var(--sand)" />
-  <rect y="16" width="16" height="16" fill="var(--sand)" />
-  <path d="M0 0h16a16 16 0 0 1-16 16z" fill="var(--sand)" />
-  <path d="M32 32H16a16 16 0 0 1 16-16z" fill="var(--sand)" />
-  <path d="M16 0a16 16 0 0 1 16 16H16z" fill="var(--indigo)" />
-  <path d="M16 32a16 16 0 0 1-16-16h16z" fill="var(--indigo)" />
+<svg width={size} height={size} viewBox="-10 -2 84 84" aria-hidden="true" focusable="false" class="mark">
+  <rect x="-10" y="-2" width="84" height="84" rx="18" fill="#F4EBD9"/>
+  <circle cx="32" cy="13" r="11" fill="#1E2A5E"/>
+  <rect x="4" y="30" width="56" height="46" rx="7" fill="#1E2A5E"/>
+  <rect x="11" y="37" width="42" height="30" rx="3" fill="#B4533A"/>
+  <path d="M19 45 L27 52 L19 59" fill="none" stroke="#F4EBD9" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M31 59 H43" stroke="#F4EBD9" stroke-width="4" stroke-linecap="round"/>
 </svg>

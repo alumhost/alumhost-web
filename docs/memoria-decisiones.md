@@ -88,7 +88,7 @@ Repositorio: `alumhost/alumhost-web` (GitHub, ambos owners).
 
 Precios de estudiante sobre OVH So you Start SYS-1 32 GB (decisión 29/09/2026).
 
-- **Publish**: 15 €/año o 1,50 €/mes.
+- **Publish**: gratis con subdominio `.alumhost.dev` (decisión 30/09/2026, puerta de entrada). Dominio propio: 1,50 €/mes o 15 €/año (`addons.customDomain`). Límites y política de inactividad (confirmación anual; sin confirmar en 30 días y sin cambios en 12 meses → suspensión y borrado a los 60 días; ~100 MB) van en los Términos. La parte técnica (Caddy + despliegue) debe existir antes del lanzamiento.
 - **Mini 512 MB**: 25 €/año o 2,50 €/mes.
 - **Developer 1 vCPU 1 GB ~15 GB**: 40 €/año o 4 €/mes.
 - **Pro 2 GB**: 60 €/año o 6 €/mes (4 GB solo con un servidor mayor; vCPU y disco sin definir hasta benchmarks).

@@ -12,7 +12,7 @@ const en: Dict = {
     },
     plans: {
       title: "Plans and pricing · {name}",
-      description: "Publish, VPS Mini, VPS Developer and VPS Pro. Round prices with VAT included and 2 months free when paying yearly.",
+      description: "Free Publish, VPS Mini, VPS Developer and VPS Pro. Round prices with VAT included and 2 months free when paying yearly.",
     },
     contact: {
       title: "Contact · {name}",
@@ -43,6 +43,8 @@ const en: Dict = {
     perYear: "/yr",
     yearlySaving: "You save {amount} compared with paying {monthly} a month. VAT included.",
     monthlyNote: "Billed monthly, VAT included.",
+    free: "Free",
+    freeNote: "With a .alumhost.dev subdomain. Your own domain: {monthly}/mo or {yearly}/year.",
     from: "from {price}/mo",
   },
 
@@ -129,7 +131,7 @@ const en: Dict = {
       publish: {
         name: "Publish",
         tagline: "For your portfolio or a project website.",
-        features: ["Deploy with git push", "Automatic HTTPS", "Subdomain or your own domain", "No SSH access"],
+        features: ["Deploy with git push", "Automatic HTTPS", "Free on yourname.alumhost.dev", "Your own domain as an add-on", "No SSH access"],
       },
       mini: {
         name: "VPS Mini",

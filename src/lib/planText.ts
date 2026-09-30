@@ -2,7 +2,7 @@
  * Convierte un plan (números en plans.ts) en texto localizado.
  * Las specs numéricas salen de plans.ts; los extras no numéricos, de i18n (plans.items[id].features).
  */
-import { formatEur, yearlySaving, type Billing, type Plan } from "../config/plans";
+import { addons, formatEur, isFree, yearlySaving, type Billing, type Plan } from "../config/plans";
 import { fill, useDict, type Lang } from "../i18n";
 
 export const specLines = (plan: Plan, lang: Lang): string[] => {
@@ -26,6 +26,16 @@ export interface PriceView {
 /** Anual: se muestra el importe del año (redondo) y el ahorro. Mensual: la cuota. Siempre IVA incluido. */
 export const priceView = (plan: Plan, billing: Billing, lang: Lang): PriceView => {
   const c = useDict(lang).common;
+  if (isFree(plan)) {
+    return {
+      amount: c.free,
+      per: "",
+      note: fill(c.freeNote, {
+        monthly: formatEur(addons.customDomain.monthly, lang),
+        yearly: formatEur(addons.customDomain.yearly, lang),
+      }),
+    };
+  }
   if (billing === "yearly") {
     return {
       amount: formatEur(plan.price.yearly, lang),

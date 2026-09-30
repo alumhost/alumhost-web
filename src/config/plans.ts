@@ -3,7 +3,9 @@
  *
  * Origen: plan de negocio §1.1 y §2bis del documento de estado (29/09/2026), ver docs/memoria-decisiones.md.
  * - Precios en CÉNTIMOS y CON IVA incluido (PVP), que es lo que se publica. El neto se calcula con netOf().
- * - Anual = 10 mensualidades en los VPS ("2 meses gratis"). Publish igual: 15 €/año frente a 1,50 €/mes.
+ * - Anual = 10 mensualidades en los VPS ("2 meses gratis").
+ * - Publish es GRATIS con subdominio .alumhost.dev (decisión 30/09/2026, puerta de entrada). Solo se cobra el
+ *   dominio propio (addons.customDomain). Precio 0 = la web muestra "Gratis". Política de inactividad en los Términos.
  * - Precios redondos a propósito: la evidencia reciente no encuentra efecto fiable de los ,99 en la compra
  *   y lo redondo encaja con la promesa de "sin letra pequeña". No los cambies a ,99 sin datos propios.
  * - PROVISIONALES hasta los benchmarks en Hetzner. Los textos están en src/i18n/*.ts bajo `plans.items[id]`.
@@ -33,7 +35,7 @@ export interface Plan {
 export const plans: Plan[] = [
   {
     id: "publish",
-    price: { yearly: 1500, monthly: 150 },
+    price: { yearly: 0, monthly: 0 }, // gratis con subdominio; dominio propio = addons.customDomain
     specs: { vcpu: null, ramMb: null, diskGb: null, ssh: false },
     backup: null, // el repositorio del cliente es la copia
     featured: false,
@@ -65,6 +67,7 @@ export const plans: Plan[] = [
 
 /** Add-ons independientes del backup (PVP con IVA). */
 export const addons = {
+  customDomain: { monthly: 150, yearly: 1500, availableOn: ["publish"] as PlanId[] }, // dominio propio en Publish
   dedicatedIpv4: { monthly: 300, availableOn: ["pro"] as PlanId[] }, // IP adicional de OVH: 1,50 €/mes sin IVA
 };
 
@@ -80,8 +83,11 @@ export const netOf = (cents: number): number => Math.round(cents / (1 + VAT_RATE
 /** Lo que se ahorra al año pagando anual frente a 12 mensualidades. */
 export const yearlySaving = (plan: Plan): number => plan.price.monthly * 12 - plan.price.yearly;
 
-/** Plan más barato al mes (para "desde X €/mes"). */
-export const cheapestMonthly = (): number => Math.min(...plans.map((p) => p.price.monthly));
+/** Plan de pago más barato al mes (para "desde X €/mes"; los gratuitos no cuentan). */
+export const cheapestMonthly = (): number => Math.min(...plans.filter((p) => p.price.monthly > 0).map((p) => p.price.monthly));
+
+/** true si el plan es gratuito (Publish con subdominio). */
+export const isFree = (plan: Plan): boolean => plan.price.monthly === 0 && plan.price.yearly === 0;
 
 /** 1800 -> "18 €", 450 -> "4,50 €" (es) / "€18", "€4.50" (en). Sin decimales si el importe es redondo. */
 export const formatEur = (cents: number, lang: "es" | "en"): string =>

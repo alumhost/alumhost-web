@@ -15,7 +15,7 @@ const es = {
     },
     plans: {
       title: "Planes y precios · {name}",
-      description: "Publish, VPS Mini, VPS Developer y VPS Pro. Precios redondos con IVA incluido y 2 meses gratis pagando al año.",
+      description: "Publish gratis, VPS Mini, VPS Developer y VPS Pro. Precios redondos con IVA incluido y 2 meses gratis pagando al año.",
     },
     contact: {
       title: "Contacto · {name}",
@@ -46,6 +46,8 @@ const es = {
     perYear: "/año",
     yearlySaving: "Ahorras {amount} frente a pagar {monthly} al mes. IVA incluido.",
     monthlyNote: "Pago mensual, IVA incluido.",
+    free: "Gratis",
+    freeNote: "Con subdominio .alumhost.dev. Tu propio dominio: {monthly}/mes o {yearly}/año.",
     from: "desde {price}/mes",
   },
 
@@ -132,7 +134,7 @@ const es = {
       publish: {
         name: "Publish",
         tagline: "Para tu portfolio o la web de un proyecto.",
-        features: ["Deploy con git push", "HTTPS automático", "Subdominio o tu propio dominio", "Sin acceso SSH"],
+        features: ["Deploy con git push", "HTTPS automático", "Gratis en tunombre.alumhost.dev", "Tu propio dominio como extra", "Sin acceso SSH"],
       },
       mini: {
         name: "VPS Mini",
