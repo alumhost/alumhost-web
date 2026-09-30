@@ -20,6 +20,9 @@ const messages = JSON.stringify({
   sending: p.form.sending,
   submit: p.form.submit,
 });
+// "Condiciones completas: {terms} y {aup}." con los dos enlaces dentro.
+const [linksA, linksRest] = p.form.acceptLinks.split("{terms}");
+const [linksB, linksC] = linksRest.split("{aup}");
 ---
 <Base lang={lang} page="publish">
   <div class="veil">
@@ -56,8 +59,9 @@ const messages = JSON.stringify({
           </div>
 
           <div class="field check">
-            <input id="pf-accept" name="accept" type="checkbox" aria-describedby="pf-accept-err" />
+            <input id="pf-accept" name="accept" type="checkbox" aria-describedby="pf-accept-help pf-accept-err" />
             <label for="pf-accept">{p.form.accept}</label>
+            <p class="help" id="pf-accept-help">{linksA}<a class="textlink" href={path("terms", lang)}>{t.footer.terms}</a>{linksB}<a class="textlink" href={path("aup", lang)}>{t.footer.aup}</a>{linksC}</p>
             <p class="error" id="pf-accept-err" data-error-for="accept" hidden></p>
           </div>
 

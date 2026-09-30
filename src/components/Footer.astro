@@ -2,7 +2,7 @@
 /**
  * Pie: baldosa índigo opaca rematada arriba por la cinta de módulos. Los enlaces externos (estado, devlog, repo)
  * solo aparecen si están definidos en site.links.
- * TODO(legal): añadir Términos y DPA cuando existan las páginas (nada de enlaces muertos). Privacidad ya existe.
+ * Términos, Uso aceptable y Privacidad son borradores de la beta (revisión del PAE pendiente). TODO(legal): DPA.
  */
 import TileStrip from "./TileStrip.astro";
 import Mark from "./Mark.astro";
@@ -30,6 +30,8 @@ const external = [
         <li><a href={path("plans", lang)}>{t.nav.plans}</a></li>
         <li><a href={path("beta", lang)}>{t.footer.beta}</a></li>
         <li><a href={path("contact", lang)}>{t.nav.contact}</a></li>
+        <li><a href={path("terms", lang)}>{t.footer.terms}</a></li>
+        <li><a href={path("aup", lang)}>{t.footer.aup}</a></li>
         <li><a href={path("privacy", lang)}>{t.footer.privacy}</a></li>
         {external.map((l) => <li><a href={l.href} rel="noopener">{l.label}</a></li>)}
       </ul>

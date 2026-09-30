@@ -35,6 +35,8 @@ const es = {
       description:
         "Apúntate gratis a la beta: VPS y webs estáticas para estudiantes, con soporte en español. No pagas nada por adelantado.",
     },
+    terms: { title: "Términos · {name}", description: "Condiciones de AlumHost: Publish gratis, planes de pago, desistimiento, reembolsos y suspensión." },
+    aup: { title: "Uso aceptable · {name}", description: "Qué no se puede hacer en AlumHost y cómo avisar de un abuso." },
     notFound: { title: "Página no encontrada · {name}", description: "Esta página no existe." },
   },
 
@@ -267,7 +269,7 @@ const es = {
   // TODO(legal): borrador. Revisarlo con un tercero (PAE o abogado) antes de producción y completar el titular legal.
   privacy: {
     title: "Privacidad.",
-    updated: "Última actualización: 29 de septiembre de 2026.",
+    updated: "Última actualización: 30 de septiembre de 2026.",
     sections: [
       {
         h: "Quién trata tus datos",
@@ -275,19 +277,19 @@ const es = {
       },
       {
         h: "Qué datos recogemos",
-        p: "Los que escribes en el formulario de contacto: nombre, correo, motivo, plan y mensaje. Por seguridad también se procesa tu dirección IP, solo para frenar el spam y limitar envíos.",
+        p: "Del formulario de contacto y de la beta: nombre, correo, motivo, plan y mensaje. De Publish: el nombre de tu web, tu correo de la universidad, los archivos que subes y, si publicas desde GitHub, el repositorio y el commit. Del enlace mágico guardamos solo una huella cifrada (hash), nunca el enlace. Por seguridad se procesa tu dirección IP para frenar el spam y limitar envíos, sin guardarla en nuestra base de datos.",
       },
       {
         h: "Para qué",
-        p: "Para responderte y, si lo pides, gestionar tu plaza en la beta. La base legal es tu consentimiento al enviar el formulario y, si vas a contratar, la aplicación de medidas precontractuales.",
+        p: "Para responderte, gestionar tu plaza en la beta y prestar Publish: enviarte el enlace para publicar, servir tu web y avisarte de lo que afecte a ella (por ejemplo, la confirmación anual de inactividad). La base legal es tu consentimiento al enviar el formulario y, en Publish y en los planes, la ejecución del servicio que pides.",
       },
       {
         h: "Con quién los compartimos",
-        p: "Con los proveedores que hacen funcionar la web: Cloudflare (alojamiento, verificación antispam y reenvío de correo), Google (nuestra bandeja de correo) y Brevo (el envío de nuestras respuestas). Pueden tratarlos fuera del Espacio Económico Europeo con las garantías que exige el RGPD. No vendemos tus datos ni los usamos para publicidad.",
+        p: "Con los proveedores que hacen funcionar la web: Cloudflare (alojamiento, base de datos de Publish en la Unión Europea, verificación antispam y reenvío de correo), Brevo (envío del enlace de Publish y de nuestras respuestas), Google (nuestra bandeja de correo) y GitHub (solo si publicas desde un repositorio público). Pueden tratar datos fuera del Espacio Económico Europeo con las garantías que exige el RGPD. No vendemos tus datos ni los usamos para publicidad.",
       },
       {
         h: "Cuánto tiempo",
-        p: "Hasta resolver tu consulta y, como mucho, doce meses. Si te haces cliente, el tiempo que marque la ley.",
+        p: "Consultas: hasta resolverlas y, como mucho, doce meses. Publish: mientras tengas la web; si la borras, la borramos con sus archivos al momento, y los enlaces caducan a las 24 horas. Si te haces cliente de pago, el tiempo que marque la ley para facturas y contratos.",
       },
       {
         h: "Tus derechos",
@@ -295,7 +297,121 @@ const es = {
       },
       {
         h: "Cookies",
-        p: "No usamos cookies de analítica ni de publicidad.",
+        p: "No usamos cookies de analítica ni de publicidad. La página de Publish guarda el enlace en el almacenamiento de tu pestaña (sessionStorage), que se borra al cerrarla.",
+      },
+    ],
+  },
+
+  // Términos y política de uso aceptable. BORRADOR para revisar con el PAE o un abogado (tarea l-03).
+  // TODO(legal): cuando haya alta, añadir NIF y domicilio del prestador (LSSI art. 10) y cerrar los días de gracia (d-08).
+  terms: {
+    title: "Términos.",
+    updated: "Última actualización: 30 de septiembre de 2026. Borrador de la beta.",
+    sections: [
+      {
+        h: "Quién presta el servicio",
+        p: [
+          "AlumHost lo prestan {controller}. Puedes escribirnos a {email} para cualquier cosa y a {abuse} para avisar de un abuso.",
+          "Estamos en beta: el servicio funciona, pero puede cambiar y todavía no hay compromiso de disponibilidad (SLA). Hacemos lo posible por que todo vaya bien y te avisamos de cualquier incidencia.",
+        ],
+      },
+      {
+        h: "Publish gratis",
+        p: [
+          "Publish aloja webs estáticas (HTML, CSS, JavaScript, imágenes) en tunombre.alumhost.dev. Es gratis y sirve para aprender y enseñar tus proyectos.",
+          "Solo pueden usarlo personas con correo de las universidades admitidas. Una web por persona, con los límites que indica la página de Publish (hoy 20 MB, 1.000 archivos y 5 MB por archivo).",
+          "Lo que publicas es tuyo y eres responsable de ello: tienes que tener derecho a usar todo lo que subes (textos, imágenes, código) y cumplir la política de uso aceptable.",
+          "Inactividad: una vez al año te enviamos un correo para confirmar que sigues usando la web. Si no lo confirmas en 30 días y no la has actualizado en los últimos 12 meses, la suspendemos, y si pasan otros 60 días sin noticias la borramos y el nombre queda libre.",
+          "Puedes borrar tu web cuando quieras desde el enlace que te llega al correo.",
+        ],
+      },
+      {
+        h: "Planes de pago",
+        p: [
+          "Los precios que ves en la web incluyen el IVA. Se pagan por adelantado, por mes o por año, y se renuevan solos hasta que canceles.",
+          "Puedes cancelar cuando quieras: el servicio sigue hasta el final del periodo pagado y no se renueva. No devolvemos la parte no usada de un periodo, salvo en el desistimiento y en los fallos graves nuestros que se explican abajo.",
+          "Si un pago falla te avisamos por correo y tienes 7 días de margen para arreglarlo. Pasado ese plazo suspendemos el servidor; antes de borrarlo guardamos una copia durante 14 días más por si vuelves.",
+        ],
+      },
+      {
+        h: "Derecho de desistimiento (14 días)",
+        p: [
+          "Si eres consumidor en la Unión Europea, tienes 14 días desde la contratación para desistir sin dar explicaciones, escribiendo a {email}.",
+          "Como el servidor se entrega al momento, al contratar te pedimos que aceptes expresamente que empiece antes de que acaben esos 14 días. Si desistes, te devolvemos lo pagado menos la parte proporcional a los días que lo hayas tenido en marcha, en un plazo máximo de 14 días y por el mismo medio de pago.",
+        ],
+      },
+      {
+        h: "Reembolsos por fallos nuestros",
+        p: [
+          "Si el servicio deja de funcionar por causa nuestra durante más de 72 horas seguidas en un mes, puedes pedirnos la devolución de ese mes. No cubre las caídas causadas por tu propio software, por un abuso ni por proveedores fuera de nuestro control.",
+        ],
+      },
+      {
+        h: "Copias de seguridad",
+        p: [
+          "Salvo que contrates el extra de copias, eres tú quien guarda copia de tus datos. En Publish, tu copia es tu propio repositorio o carpeta.",
+        ],
+      },
+      {
+        h: "Suspensión y retirada",
+        p: [
+          "Podemos suspender una web o un servidor sin aviso previo si hay un abuso grave (phishing, malware, ataques, contenido ilegal) o nos lo pide una autoridad. En los demás casos te avisamos antes y te damos un plazo para corregirlo.",
+          "Mientras un servicio está suspendido por abuso conservamos su contenido el tiempo necesario para atender reclamaciones.",
+        ],
+      },
+      {
+        h: "Responsabilidad",
+        p: [
+          "Respondemos de los daños que causemos por dolo o negligencia grave. En lo demás, nuestra responsabilidad se limita a lo que nos hayas pagado en los últimos 12 meses (en Publish, que es gratis, no hay importe). Esto no limita ningún derecho que la ley te reconozca como consumidor.",
+        ],
+      },
+      {
+        h: "Cambios en estos términos",
+        p: [
+          "Si los cambiamos de forma importante te avisamos por correo con 30 días de antelación. Si no estás de acuerdo, puedes cancelar antes de que entren en vigor.",
+        ],
+      },
+      {
+        h: "Ley aplicable",
+        p: [
+          "Se aplica la ley española. Si eres consumidor, puedes reclamar ante los tribunales de tu domicilio.",
+        ],
+      },
+    ],
+  },
+
+  aup: {
+    title: "Uso aceptable.",
+    updated: "Última actualización: 30 de septiembre de 2026. Borrador de la beta.",
+    sections: [
+      {
+        h: "La idea",
+        p: [
+          "AlumHost es para aprender, construir y enseñar proyectos. Compartimos máquinas y dominio con otros estudiantes, así que lo que haga uno afecta a todos. Esta política dice lo que no se puede hacer en Publish ni en los servidores.",
+        ],
+      },
+      {
+        h: "No se permite",
+        p: [
+          "Nada ilegal, ni enlazar a ello: contenido que infrinja derechos de autor o marcas, material de abuso sexual infantil, apología del terrorismo, incitación al odio o acoso.",
+          "Nada que engañe o suplante: phishing, páginas que imiten el acceso de una universidad, un banco u otro servicio, estafas o tiendas falsas.",
+          "Nada que ataque: malware, escaneos de redes ajenas, ataques de denegación de servicio, fuerza bruta, proxies abiertos o reenviadores usados para abusar.",
+          "Nada de correo masivo: spam, listas compradas ni envíos no solicitados. El puerto 25 de salida está cerrado y los puertos de envío se abren solo a petición en los planes que lo permiten.",
+          "Nada que agote la máquina compartida: minado de criptomonedas o cargas que usen toda la CPU o el disco de forma continua.",
+          "Nada que trate datos personales de otras personas sin base legal, como formularios que recojan contraseñas o datos de terceros.",
+        ],
+      },
+      {
+        h: "Qué hacemos si pasa",
+        p: [
+          "En los casos graves suspendemos al momento y, si toca, avisamos a las autoridades. En los demás, te escribimos, te damos un plazo para corregirlo y, si no se corrige, suspendemos o damos de baja el servicio.",
+        ],
+      },
+      {
+        h: "Avisar de un abuso",
+        p: [
+          "Si ves algo alojado en AlumHost que incumple esta política, escríbenos a {abuse} con la dirección exacta y lo que has visto. Lo revisamos lo antes posible.",
+        ],
       },
     ],
   },
@@ -316,6 +432,7 @@ const es = {
       nameHelp: "Minúsculas, números y guiones (2-30). Quedará como tunombre.alumhost.dev.",
       email: "Tu correo de la universidad",
       emailHelp: "Por ahora, solo Universidad de Sevilla: @us.es o @alum.us.es.",
+      acceptLinks: "Condiciones completas: {terms} y {aup}.",
       accept: "No voy a publicar nada ilegal, engañoso ni que suplante a nadie. Sé que si lo hago, AlumHost retira la web.",
       submit: "Enviarme el enlace",
       sending: "Enviando…",
@@ -418,6 +535,7 @@ const es = {
     },
     signup: {
       title: "Apúntate.",
+      message: "¿Qué quieres montar?",
       body: "Te escribimos cuando haya fecha. Hasta entonces no te mandamos nada más.",
       messageHelp:
         "Qué quieres montar y cuánta RAM crees que necesitas. Si no lo sabes, cuéntanos el proyecto y te orientamos. Mínimo 10 caracteres.",
@@ -448,6 +566,8 @@ const es = {
     devlog: "Devlog",
     repo: "Código abierto",
     privacy: "Privacidad",
+    terms: "Términos",
+    aup: "Uso aceptable",
     beta: "Beta",
     rights: "© {year} {name}",
   },

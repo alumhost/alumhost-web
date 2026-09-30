@@ -21,7 +21,7 @@ interface Props {
   /** Motivo fijo: oculta el selector de motivo y envía este valor. */
   reason?: Reason;
   /** Textos que cambian respecto a /contacto. title: null = sin título dentro del formulario. */
-  copy?: { title?: string | null; messageHelp?: string; submit?: string; success?: string };
+  copy?: { title?: string | null; message?: string; messageHelp?: string; submit?: string; success?: string };
 }
 const { lang, reason: fixedReason, copy = {} } = Astro.props;
 const t = useDict(lang);
