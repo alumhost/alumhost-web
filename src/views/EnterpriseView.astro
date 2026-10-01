@@ -1,0 +1,219 @@
+---
+/**
+ * Plan Enterprise: webs y servidores para negocios y asociaciones. Mismo diseño que PlansView (filas tipo libro de
+ * cuentas, el recomendado flota en cristal con canto de módulos), con cuota mensual + pago único por hacer la web.
+ * Precios (PVP con IVA) solo de config/enterprise.ts; textos en i18n enterprise.*.
+ */
+import Base from "../layouts/Base.astro";
+import TileStrip from "../components/TileStrip.astro";
+import Icon from "../components/Icon.astro";
+import { enterprisePlans } from "../config/enterprise";
+import { formatEur } from "../config/plans";
+import { contactHref, fill, useDict, type Lang } from "../i18n";
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = useDict(lang);
+const e = t.enterprise;
+const quote = contactHref(lang, { reason: "business" });
+---
+<Base lang={lang} page="enterprise">
+  <div class="plans-page">
+    <header class="container head">
+      <h1 class="rise" style="--i:0">{e.header.title}</h1>
+      <div class="head-row rise" style="--i:1">
+        <p class="lead">{e.header.sub}</p>
+      </div>
+    </header>
+
+    <div class="veil">
+      <section class="container rows" aria-label={t.nav.enterprise}>
+        {enterprisePlans.map((plan) => {
+          const item = e.items[plan.id];
+          return (
+            <article id={plan.id} class:list={["plan", { "plan--featured glass": plan.featured }]} aria-labelledby={`${plan.id}-name`}>
+              {plan.featured && (
+                <div class="edge" aria-hidden="true"><TileStrip id={`edge-${plan.id}`} vertical size={26} /></div>
+              )}
+              <div class="who">
+                {plan.featured && <p class="flag mono prompt">{e.recommended}</p>}
+                <h2 id={`${plan.id}-name`}>{item.name}</h2>
+                <p class="tagline muted">{item.tagline}</p>
+              </div>
+
+              <ul class="features">
+                {item.features.map((line) => <li><span class="tick"><Icon name="check" size="1em" /></span>{line}</li>)}
+              </ul>
+
+              <div class="buy">
+                <div class="price">
+                  <p class="line"><span class="amount">{formatEur(plan.monthly, lang)}</span><span class="per">{e.per}</span></p>
+                  <p class="note muted">{plan.setup === null ? e.setupCustom : fill(e.setup, { price: formatEur(plan.setup, lang) })}</p>
+                </div>
+                <a class:list={["btn", { "btn--outline": !plan.featured }]} href={quote}>{e.cta}</a>
+              </div>
+            </article>
+          );
+        })}
+
+        <div class="custom">
+          <h2>{e.custom.title}</h2>
+          <p class="muted">{e.custom.body}</p>
+          <a class="textlink" href={quote}>{e.custom.cta}</a>
+        </div>
+      </section>
+
+      <section class="section container extras" aria-labelledby="how-title">
+        <h2 id="how-title">{e.how.title}</h2>
+        <div class="extras-grid">
+          {e.how.steps.map((s) => (
+            <div class="extra">
+              <h3>{s.h}</h3>
+              <p class="muted">{s.p}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section class="container faq" aria-labelledby="faq-title">
+        <h2 id="faq-title">{e.faq.title}</h2>
+        <div class="faq-list">
+          {e.faq.items.map((f) => (
+            <details>
+              <summary>{f.q}</summary>
+              <p class="muted">{f.a}</p>
+            </details>
+          ))}
+        </div>
+        <div class="final">
+          <h2>{e.final.title}</h2>
+          <p class="muted">{e.final.body}</p>
+          <a class="btn" href={quote}>{e.final.cta}</a>
+        </div>
+      </section>
+    </div>
+  </div>
+</Base>
+
+<style>
+  .head { padding-block: clamp(3rem, 6vw, 5.5rem) clamp(2rem, 4vw, 3.5rem); }
+  .head h1 { font-size: var(--step-4); max-width: 13ch; }
+  .head .lead { color: var(--text); }
+  .head-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    justify-content: space-between;
+    gap: 1.5rem 3rem;
+    margin-top: clamp(1.5rem, 3vw, 2.5rem);
+  }
+
+  /* Filas de plan */
+  .rows { padding-top: clamp(2rem, 4vw, 3.5rem); }
+  .rows { --plan-gap: clamp(1.2rem, 3vw, 3rem); }
+  .plan {
+    display: grid;
+    grid-template-columns: minmax(0, 4fr) minmax(0, 4fr) minmax(0, 4fr);
+    gap: var(--plan-gap);
+    align-items: start;
+    padding-block: clamp(1.6rem, 3vw, 2.6rem);
+    border-top: var(--rule);
+    scroll-margin-top: calc(var(--nav-h) + 2rem);
+  }
+  .plan--featured {
+    grid-template-columns: 26px minmax(0, 4fr) minmax(0, 4fr) minmax(0, 4fr);
+    padding: clamp(1.6rem, 3vw, 2.6rem) clamp(1.2rem, 3vw, 2.6rem) clamp(1.6rem, 3vw, 2.6rem) 0;
+    margin-block: 1rem;
+    overflow: hidden;
+    border-top: 0;
+  }
+  .plan--featured + .plan { border-top-color: transparent; }
+  /* En escritorio el cristal se sale por los lados para que las columnas de texto sigan alineadas con las otras filas */
+  @media (min-width: 920px) {
+    .plan--featured { margin-inline: calc(-26px - var(--plan-gap)) calc(-1 * clamp(1.2rem, 3vw, 2.6rem)); }
+  }
+  .edge { align-self: stretch; margin-block: calc(-1 * clamp(1.6rem, 3vw, 2.6rem)); }
+  .flag { font-size: 0.875rem; margin-bottom: 0.7rem; --prompt: var(--sand); }
+  .who h2 { font-size: var(--step-3); }
+  .tagline { margin-top: 0.8rem; max-width: 30ch; }
+  .features { list-style: none; padding: 0; display: grid; gap: 0.55rem; }
+  .features li { display: grid; grid-template-columns: 1em 1fr; gap: 0.7rem; align-items: baseline; }
+  .tick { display: inline-flex; color: var(--teal); translate: 0 0.15em; }
+  .buy { display: grid; gap: 1.4rem; justify-items: start; }
+  .line { display: flex; align-items: baseline; gap: 0.3rem; }
+  .amount {
+    font-family: var(--font-display);
+    font-stretch: 68%;
+    font-weight: 800;
+    font-size: var(--step-4);
+    line-height: 0.85;
+    font-variant-numeric: tabular-nums;
+  }
+  .per { color: var(--muted); font-weight: 600; }
+  .note { font-size: var(--step--1); margin-top: 0.5rem; max-width: 34ch; }
+
+  .custom {
+    display: grid;
+    grid-template-columns: minmax(0, 4fr) minmax(0, 5fr) minmax(0, 3fr);
+    gap: clamp(1.2rem, 3vw, 3rem);
+    align-items: baseline;
+    padding-block: 1.8rem;
+    border-top: var(--rule);
+    border-bottom: var(--rule);
+  }
+  .custom h2 { font-size: var(--step-2); }
+
+  /* Extras */
+  .extras h2, .faq h2, .final h2 { font-size: var(--step-3); margin-bottom: clamp(1.5rem, 3vw, 2.5rem); }
+  .extras-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: clamp(2rem, 5vw, 5rem); }
+  .extra { border-top: var(--rule); padding-top: 1.2rem; }
+  .extra h3 { font-size: var(--step-2); font-stretch: var(--display-width); font-weight: 800; margin-bottom: 0.8rem; }
+  .backup-lines { list-style: none; padding: 0; display: grid; gap: 0.3rem; margin-bottom: 0.8rem; font-weight: 600; }
+
+  .final { margin-top: clamp(3rem, 6vw, 5rem); display: grid; gap: 1rem; justify-items: start; }
+  .final h2 { margin-bottom: 0; }
+
+  /* Preguntas */
+  .faq { padding-bottom: var(--section); }
+  .faq-list { border-bottom: var(--rule); }
+  details { border-top: var(--rule); }
+  summary {
+    cursor: pointer;
+    list-style: none;
+    padding: 1.2rem 3rem 1.2rem 0;
+    font-size: var(--step-1);
+    font-weight: 600;
+    position: relative;
+    min-height: 44px;
+  }
+  summary::-webkit-details-marker { display: none; }
+  summary::after {
+    content: "+";
+    position: absolute;
+    right: 0;
+    top: 50%;
+    translate: 0 -50%;
+    font-family: var(--font-mono);
+    font-size: 1.6rem;
+    transition: rotate 200ms var(--ease);
+  }
+  details[open] summary::after { rotate: 45deg; }
+  details p { padding: 0 3rem 1.4rem 0; max-width: 60ch; }
+
+  @media (max-width: 919px) {
+    .extras-grid { grid-template-columns: 1fr 1fr; }
+    .plan { grid-template-columns: 1fr 1fr; }
+    .plan .buy { grid-column: 1 / -1; }
+    .plan--featured { grid-template-columns: 22px 1fr 1fr; }
+    .plan--featured .edge { grid-row: span 2; }
+    .plan--featured .buy { grid-column: 2 / -1; }
+    .custom { grid-template-columns: 1fr; gap: 0.8rem; }
+  }
+  @media (max-width: 639px) {
+    .plan { grid-template-columns: 1fr; }
+    .plan--featured { grid-template-columns: 22px 1fr; }
+    .plan--featured > :not(.edge) { grid-column: 2; }
+    .plan--featured .edge { grid-row: span 3; }
+    .extras-grid { grid-template-columns: 1fr; }
+  }
+</style>
