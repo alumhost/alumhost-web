@@ -13,3 +13,7 @@
 # Recursos con hash en el nombre: caché larga.
 /_astro/*
   Cache-Control: public, max-age=31536000, immutable
+
+# Vídeo de la portada: no lleva hash en el nombre, caché de un día.
+/video/*
+  Cache-Control: public, max-age=86400
