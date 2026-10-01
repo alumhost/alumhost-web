@@ -48,7 +48,7 @@ const canonical = page === "notFound" ? null : new URL(path(page, lang), site).h
     <meta property="og:locale" content={lang === "es" ? "es_ES" : "en_GB"} />
     {canonical && <meta property="og:url" content={canonical} />}
     {/* TODO(og): añadir og:image (1200x630) cuando exista la marca definitiva. */}
-    {page === "notFound" && <meta name="robots" content="noindex" />}
+    {(page === "notFound" || page === "publishUpload") && <meta name="robots" content="noindex" />}
     {/* Datos estructurados: solo hechos de site.ts (marca, dominio, correo). Es un bloque de datos, no ejecuta JS (CSP intacta). */}
     {page === "home" && (
       <script
