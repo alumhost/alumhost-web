@@ -10,6 +10,9 @@ export default defineConfig({
   build: { format: "directory", inlineStylesheets: "auto" },
   devToolbar: { enabled: false },
 
+  // Fuentes siempre como archivo: Vite inlinaba el subset cirílico de JetBrains Mono como data: y la CSP (font-src 'self') lo bloqueaba.
+  vite: { build: { assetsInlineLimit: 0 } },
+
   // CSP nativa de Astro: añade <meta http-equiv="content-security-policy"> con hashes de cada script/estilo
   // en línea que genera el build. Lo que una <meta> no puede expresar (frame-ancestors) va en public/_headers.
   // IA: si añades un tercero (p. ej. Stripe.js), añádelo aquí, en scriptDirective y en directives.
