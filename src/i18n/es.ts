@@ -37,11 +37,13 @@ const es = {
     },
     terms: { title: "Términos · {name}", description: "Condiciones de AlumHost: Publish gratis, planes de pago, desistimiento, reembolsos y suspensión." },
     aup: { title: "Uso aceptable · {name}", description: "Qué no se puede hacer en AlumHost y cómo avisar de un abuso." },
+    enterprise: { title: "Enterprise · {name}", description: "Webs y servidores para negocios y asociaciones: la hacemos, la alojamos y la mantenemos. Sin permanencia." },
     notFound: { title: "Página no encontrada · {name}", description: "Esta página no existe." },
   },
 
   nav: {
     plans: "Planes",
+    enterprise: "Enterprise",
     contact: "Contacto",
     cta: "Reservar plaza",
     menu: "Menú",
@@ -134,6 +136,65 @@ const es = {
     closing: {
       title: "La beta es pequeña a propósito.",
       body: "Pocas plazas, trato directo y condiciones de beta. Reserva la tuya y te escribimos.",
+    },
+  },
+
+  // Plan Enterprise (/enterprise/): webs y servidores para negocios. Precios en config/enterprise.ts.
+  enterprise: {
+    header: {
+      title: "Tu web hecha, alojada y cuidada.",
+      sub: "Para negocios y asociaciones. La hacemos nosotros, la mantenemos al día y nos escribes por correo cuando necesites un cambio. Sin permanencia, factura con IVA cada mes.",
+    },
+    recommended: "El más pedido",
+    per: "/mes",
+    setup: "Hacer la web: {price} una vez",
+    setupCustom: "Puesta en marcha: según proyecto",
+    cta: "Pide presupuesto",
+    items: {
+      presence: {
+        name: "Presencia",
+        tagline: "Para que te encuentren en Google y en el móvil.",
+        features: ["Web de una página: quiénes sois, horario, mapa y contacto", "Dominio propio y HTTPS", "Copias de seguridad", "1 cambio pequeño al mes"],
+      },
+      business: {
+        name: "Negocio",
+        tagline: "Lo que necesita casi cualquier negocio de barrio.",
+        features: ["Hasta 5 páginas: servicios, carta o precios, galería", "Formulario de contacto o reservas", "Aviso legal y privacidad incluidos", "Cambios pequeños cuando los necesites", "Soporte por correo en horario laboral"],
+      },
+      managed: {
+        name: "Servidor gestionado",
+        tagline: "Para una aplicación, una tienda o algo a medida.",
+        features: ["Servidor propio para tu aplicación", "Lo montamos, actualizamos y vigilamos", "Copias diarias", "Contrato de encargado de datos (RGPD)"],
+      },
+    },
+    custom: {
+      title: "¿Necesitas otra cosa?",
+      body: "Tienda online, intranet, migrar una web que ya tienes. Cuéntanos y te damos un precio cerrado.",
+      cta: "Pedir presupuesto a medida",
+    },
+    how: {
+      title: "Cómo funciona",
+      steps: [
+        { h: "1. Hablamos", p: "Nos escribes o hacemos una videollamada de 15 minutos. Nos cuentas qué necesitas." },
+        { h: "2. Presupuesto", p: "Precio cerrado por escrito. Si te encaja, lo aceptas." },
+        { h: "3. Web en 1 a 2 semanas", p: "Te la enseñamos antes de publicarla y la ajustamos contigo." },
+        { h: "4. Nos encargamos", p: "Cada mes la web sigue al día. Tú solo escribes si quieres un cambio." },
+      ],
+    },
+    faq: {
+      title: "Preguntas",
+      items: [
+        { q: "¿Hay permanencia?", a: "No. Te das de baja cuando quieras y te llevas los archivos de tu web." },
+        { q: "¿El dominio es mío?", a: "Sí, siempre a tu nombre. Nosotros solo lo gestionamos mientras estés con nosotros." },
+        { q: "¿Hay contrato y factura?", a: "Presupuesto aceptado por escrito, condiciones de servicio de una página y factura con IVA cada mes." },
+        { q: "¿Y la protección de datos?", a: "Si tu web recoge datos (formularios, reservas), firmamos el contrato de encargado del tratamiento que pide el RGPD y los datos se guardan en la Unión Europea." },
+        { q: "¿Quiénes sois?", a: "Dos ingenieros de la Universidad de Sevilla. Llevamos AlumHost, el alojamiento para estudiantes, y aplicamos la misma infraestructura y seguridad a negocios." },
+      ],
+    },
+    final: {
+      title: "Pide tu presupuesto",
+      body: "Te respondemos en un día laborable. Sin compromiso.",
+      cta: "Escribirnos",
     },
   },
 
@@ -242,6 +303,7 @@ const es = {
       reasons: {
         beta: "Reservar plaza en la beta",
         plans: "Pregunta sobre los planes",
+        business: "Web o servidor para mi negocio",
         custom: "Necesito algo a medida",
         support: "Ayuda con mi servicio",
         other: "Otra cosa",

@@ -34,11 +34,13 @@ const en: Dict = {
     },
     terms: { title: "Terms · {name}", description: "AlumHost terms: free Publish, paid plans, withdrawal, refunds and suspension." },
     aup: { title: "Acceptable use · {name}", description: "What is not allowed on AlumHost and how to report abuse." },
+    enterprise: { title: "Enterprise · {name}", description: "Websites and servers for businesses and associations: we build, host and maintain them. No lock-in." },
     notFound: { title: "Page not found · {name}", description: "This page does not exist." },
   },
 
   nav: {
     plans: "Plans",
+    enterprise: "Enterprise",
     contact: "Contact",
     cta: "Reserve a spot",
     menu: "Menu",
@@ -131,6 +133,64 @@ const en: Dict = {
     closing: {
       title: "The beta is small on purpose.",
       body: "Few spots, direct contact and beta conditions. Reserve yours and we will write back.",
+    },
+  },
+
+  enterprise: {
+    header: {
+      title: "Your website built, hosted and looked after.",
+      sub: "For businesses and associations. We build it, keep it up to date and you email us whenever you need a change. No lock-in, VAT invoice every month.",
+    },
+    recommended: "Most popular",
+    per: "/month",
+    setup: "Building the site: {price} once",
+    setupCustom: "Setup: depends on the project",
+    cta: "Ask for a quote",
+    items: {
+      presence: {
+        name: "Presence",
+        tagline: "So people find you on Google and on their phone.",
+        features: ["One-page site: who you are, opening hours, map and contact", "Your own domain and HTTPS", "Backups", "1 small change per month"],
+      },
+      business: {
+        name: "Business",
+        tagline: "What almost any local business needs.",
+        features: ["Up to 5 pages: services, menu or prices, gallery", "Contact or booking form", "Legal notice and privacy included", "Small changes whenever you need them", "Email support during business hours"],
+      },
+      managed: {
+        name: "Managed server",
+        tagline: "For an application, a shop or something custom.",
+        features: ["Your own server for your application", "We set it up, update it and monitor it", "Daily backups", "Data processing agreement (GDPR)"],
+      },
+    },
+    custom: {
+      title: "Need something else?",
+      body: "Online shop, intranet, moving a site you already have. Tell us and we will give you a fixed price.",
+      cta: "Ask for a custom quote",
+    },
+    how: {
+      title: "How it works",
+      steps: [
+        { h: "1. We talk", p: "You write to us or we have a 15 minute video call. You tell us what you need." },
+        { h: "2. Quote", p: "A fixed price in writing. If it works for you, you accept it." },
+        { h: "3. Site in 1 to 2 weeks", p: "We show it to you before publishing and adjust it with you." },
+        { h: "4. We take care of it", p: "Every month the site stays up to date. You only write if you want a change." },
+      ],
+    },
+    faq: {
+      title: "Questions",
+      items: [
+        { q: "Is there a minimum term?", a: "No. Cancel whenever you want and take your site's files with you." },
+        { q: "Is the domain mine?", a: "Yes, always in your name. We only manage it while you are with us." },
+        { q: "Is there a contract and an invoice?", a: "A quote accepted in writing, one-page service terms and a VAT invoice every month." },
+        { q: "What about data protection?", a: "If your site collects data (forms, bookings), we sign the data processing agreement required by the GDPR and the data stays in the European Union." },
+        { q: "Who are you?", a: "Two engineers from the University of Seville. We run AlumHost, hosting for students, and apply the same infrastructure and security to businesses." },
+      ],
+    },
+    final: {
+      title: "Ask for your quote",
+      body: "We reply within one working day. No commitment.",
+      cta: "Write to us",
     },
   },
 
@@ -239,6 +299,7 @@ const en: Dict = {
       reasons: {
         beta: "Reserve a beta spot",
         plans: "Question about plans",
+        business: "A website or server for my business",
         custom: "I need something custom",
         support: "Help with my service",
         other: "Something else",

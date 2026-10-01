@@ -24,7 +24,7 @@ export interface Env extends PublishEnv {
   ALLOW_LOG_ONLY?: string; // "1" solo en local (.dev.vars): acepta sin enviar, registra en consola
 }
 
-const REASONS = ["beta", "plans", "custom", "support", "other"] as const;
+const REASONS = ["beta", "plans", "business", "custom", "support", "other"] as const;
 const PLANS = ["", "publish", "mini", "developer", "pro"] as const;
 // Sin comas, punto y coma ni <>": una sola dirección (antes "a@b.com,c@d.com" pasaba y el Reply-To tenía dos).
 const EMAIL = /^[^\s@,;<>"]+@[^\s@,;<>"]+\.[^\s@,;<>"]{2,}$/;
