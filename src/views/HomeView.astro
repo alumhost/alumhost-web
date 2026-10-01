@@ -3,6 +3,7 @@
  * Portada. "Módulos sobre el agua": cada bloque usa un tratamiento distinto a propósito (no hay plantilla repetida).
  * 1 hero directamente sobre el agua (titular a cartel + selector de cristal) · cinta de módulos
  * · 2 cómo trabajamos: libro de filas sobre velo · 3 pasos: verbos gigantes en baldosa índigo con textura
+ * · 1b vídeo explicativo (motion graphics) en marco opaco sobre velo
  * · 4 lo que NO prometemos, tachado, sobre velo · 5 cierre en baldosa arena.
  * Textos: i18n home.*. CTA: primaryCta() (depende de site.salesMode).
  * IA: los pasos no llevan números porque el orden ya lo da la lectura; no los añadas.
@@ -55,6 +56,31 @@ const proofIcons: IconName[] = ["receipt", "currency-eur", "chat-circle-text", "
     </div>
   </section>
   <TileStrip id="strip-hero" />
+
+  <!-- 1b. VÍDEO: no se reproduce solo (lleva sonido y pesa); preload="none" para no gastar datos hasta el clic -->
+  <div class="veil">
+    <section class="section container film" aria-labelledby="film-title">
+      <div class="film-copy">
+        <h2 id="film-title">{h.film.title}</h2>
+        <p class="muted">{h.film.body}</p>
+      </div>
+      <figure class="film-frame">
+        <video
+          controls
+          playsinline
+          preload="none"
+          poster="/video/alumhost-poster.jpg"
+          width="1920"
+          height="1080"
+          aria-label={h.film.label}
+        >
+          <source src="/video/alumhost.webm" type="video/webm" />
+          <source src="/video/alumhost.mp4" type="video/mp4" />
+          <p>{h.film.fallback} <a href="/video/alumhost.mp4" download>{h.film.download}</a></p>
+        </video>
+      </figure>
+    </section>
+  </div>
 
   <!-- 2. CÓMO TRABAJAMOS: libro de filas -->
   <div class="veil">
@@ -167,6 +193,19 @@ const proofIcons: IconName[] = ["receipt", "currency-eur", "chat-circle-text", "
   .proof li:nth-child(4) { --mark: var(--white); }
   .proof .muted { font-size: var(--step--1); line-height: 1.45; }
 
+  /* ---------- Vídeo ---------- */
+  .film {
+    display: grid;
+    grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+    gap: clamp(2rem, 5vw, 5rem);
+    align-items: end;
+  }
+  .film h2 { max-width: 9ch; margin-bottom: 1.2rem; }
+  .film-copy p { max-width: 32ch; }
+  /* Marco opaco y recto (baldosa, no cristal): el vídeo no flota */
+  .film-frame { margin: 0; background: var(--ink); border: var(--rule); }
+  .film-frame video { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; background: var(--ink); }
+
   /* ---------- Libro de filas ---------- */
   .perks {
     display: grid;
@@ -275,7 +314,7 @@ const proofIcons: IconName[] = ["receipt", "currency-eur", "chat-circle-text", "
 
   /* ---------- Móvil ---------- */
   @media (max-width: 919px) {
-    .hero, .closing-in, .perks { grid-template-columns: 1fr; }
+    .hero, .closing-in, .perks, .film { grid-template-columns: 1fr; }
     .perks h2 { position: static; max-width: 12ch; }
     .proof ul { grid-template-columns: 1fr 1fr; row-gap: 1.2rem; }
     .proof li:nth-child(3) { border-left: 0; padding-left: 0; }

@@ -89,6 +89,13 @@ const en: Dict = {
         { title: "Price locked", body: "Join the beta and your first year does not go up." },
       ],
     },
+    film: {
+      title: "AlumHost in 78 seconds.",
+      body: "What it is, how we isolate each server and what every plan includes, in one short video. Sound on.",
+      label: "Video: what AlumHost is",
+      fallback: "Your browser cannot play this video. You can download it:",
+      download: "download the video (MP4)",
+    },
     perks: {
       title: "How we work.",
       items: [

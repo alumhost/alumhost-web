@@ -92,6 +92,13 @@ const es = {
         { title: "Precio congelado", body: "Si entras en la beta, el primer año no sube." },
       ],
     },
+    film: {
+      title: "AlumHost en 78 segundos.",
+      body: "Qué es, cómo aislamos cada servidor y qué incluye cada plan, contado en un vídeo corto. Tiene sonido.",
+      label: "Vídeo: qué es AlumHost",
+      fallback: "Tu navegador no reproduce el vídeo. Puedes descargarlo:",
+      download: "descargar el vídeo (MP4)",
+    },
     perks: {
       title: "Cómo trabajamos.",
       items: [
