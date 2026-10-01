@@ -12,6 +12,9 @@
 
 * { margin: 0; }
 
+/* El atributo hidden manda siempre: sin esto, cualquier clase con display (grid, flex) lo anula y el elemento se sigue viendo. */
+[hidden] { display: none !important; }
+
 html {
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
