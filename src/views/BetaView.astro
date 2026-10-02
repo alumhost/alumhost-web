@@ -67,6 +67,13 @@ const faqLast = b.faq.items.length - 1;
       <div class="intro">
         <h2 id="signup-title">{b.signup.title}</h2>
         <p class="muted">{b.signup.body}</p>
+        <div class="refs">
+          <h3>{b.referrals.title}</h3>
+          <p class="muted">{b.referrals.body}</p>
+          <ul>
+            {b.referrals.items.map((i) => <li>{i}</li>)}
+          </ul>
+        </div>
       </div>
       <ContactForm
         lang={lang}
@@ -156,6 +163,11 @@ const faqLast = b.faq.items.length - 1;
   .intro { position: sticky; top: calc(var(--nav-h) + 2rem); }
   .intro h2 { font-size: var(--step-4); }
   .intro p { margin-top: 1.2rem; max-width: 34ch; }
+  .refs { margin-top: 2rem; padding-top: 1.4rem; border-top: var(--rule); }
+  .refs h3 { font-size: var(--step-1); }
+  .refs p { margin-top: 0.6rem; }
+  .refs ul { list-style: none; margin: 1rem 0 0; padding: 0; display: grid; gap: 0.7rem; max-width: 34ch; }
+  .refs li { padding-left: 0.9rem; border-left: 4px solid var(--sand); }
 
   /* ---------- Preguntas ---------- */
   .faq { padding-bottom: var(--section); }

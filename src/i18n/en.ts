@@ -302,6 +302,8 @@ const en: Dict = {
       name: "Name",
       email: "Email",
       emailHelp: "The one you check every day. We will reply there.",
+      referral: "Referral ID (optional)",
+      referralHelp: "If someone gave you an ID, enter it here. If you do not have one, leave it empty.",
       reason: "Reason",
       reasons: {
         beta: "Reserve a beta spot",
@@ -596,6 +598,14 @@ const en: Dict = {
         { verb: "Sign up", body: "Fill in the form below. It is free and you pay nothing upfront." },
         { verb: "Decide", body: "Once we reach the minimum we email you. Then you decide whether to go ahead." },
         { verb: "Start", body: "Your first month starts the day we give you access to your server, not before." },
+      ],
+    },
+    referrals: {
+      title: "If we gave you an ID, share it.",
+      body: "We hand out the IDs ourselves. When someone signs up with yours, we check it and confirm it by hand.",
+      items: [
+        "1 confirmed referral: you appear on the beta wall (coming soon) and get priority.",
+        "2 or more confirmed referrals: one more month of frozen price for each referral.",
       ],
     },
     signup: {

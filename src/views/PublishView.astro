@@ -204,7 +204,7 @@ const [linksB, linksC] = linksRest.split("{aup}");
       const check = (f: Field, bad: boolean) => { showError(f, bad ? msg[f] : null); if (bad && !first) first = f; };
       check("name", !NAME.test(name));
       check("university", !domain());
-      check("email", domain() !== "" && (user.includes("@") || !EMAIL.test(email) || email.length > 254));
+      check("email", user === "" || (domain() !== "" && (user.includes("@") || !EMAIL.test(email) || email.length > 254)));
       if (user.includes("@")) showError("email", msg.emailLocal);
       check("accept", !accept);
       check("turnstile", token.length === 0);

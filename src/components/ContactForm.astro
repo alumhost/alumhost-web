@@ -9,6 +9,8 @@
  *   ayuda del mensaje, botón y mensaje de éxito. Sin props se comporta como siempre (/contacto).
  * - Si la URL trae ?utm_source= (enlaces cortos de los QR, public/_redirects), se añade "Origen: ..." al final del
  *   mensaje. Así sabemos el canal sin tocar el Worker ni añadir campos.
+ * - Campo opcional "ID de referido": solo con motivo "beta" (siempre visible en /beta; en /contacto aparece al elegir
+ *   ese motivo). No se valida contra una lista: llega en el asunto y el cuerpo del correo y se cuenta a mano.
  * IA: si añades un campo, añádelo también a la validación de worker/index.ts (mismos límites).
  */
 import { plans } from "../config/plans";
@@ -72,6 +74,14 @@ const messages = JSON.stringify({
       </select>
     </div>
   </div>
+
+  {(!fixedReason || fixedReason === "beta") && (
+    <div class="field" data-referral hidden={fixedReason !== "beta"}>
+      <label for="cf-referral">{f.referral}</label>
+      <input id="cf-referral" name="referral" type="text" maxlength="32" autocomplete="off" autocapitalize="none" spellcheck="false" aria-describedby="cf-referral-help" />
+      <p class="help" id="cf-referral-help">{f.referralHelp}</p>
+    </div>
+  )}
 
   <div class="field">
     <label for="cf-message">{f.message}</label>
@@ -172,6 +182,19 @@ const messages = JSON.stringify({
     const src = q.get("utm_source");
     const origin = src && /^[\w-]{1,32}$/.test(src) ? `\n\nOrigen: ${src}` : "";
 
+    // ID de referido: solo con motivo "beta". Se limpia al escribir y solo se envía si el motivo es beta.
+    const refField = form.querySelector<HTMLElement>("[data-referral]");
+    const refInput = form.querySelector<HTMLInputElement>("#cf-referral");
+    const syncReferral = () => {
+      if (refField) refField.hidden = new FormData(form).get("reason") !== "beta";
+    };
+    form.addEventListener("change", syncReferral);
+    refInput?.addEventListener("input", () => {
+      const v = refInput.value.replace(/[^\w-]/g, "");
+      if (v !== refInput.value) refInput.value = v;
+    });
+    syncReferral();
+
     const showError = (field: Field, text: string | null) => {
       const p = form.querySelector<HTMLElement>(`[data-error-for="${field}"]`);
       const input = form.elements.namedItem(field) as HTMLElement | null;
@@ -220,6 +243,7 @@ const messages = JSON.stringify({
             email: data.get("email"),
             reason: data.get("reason"),
             plan: data.get("plan"),
+            referral: data.get("reason") === "beta" ? String(data.get("referral") ?? "").trim() : "",
             message: (() => {
               const m = String(data.get("message") ?? "").trim();
               return m.length + origin.length <= 4000 ? m + origin : m;

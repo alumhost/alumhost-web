@@ -182,5 +182,26 @@ const huge = new ReadableStream({ start(c) { c.enqueue(new TextEncoder().encode(
 const rc3 = await worker.fetch(new Request(O + "/api/contact", { method: "POST", headers: { origin: O, "content-type": "application/json" }, body: huge, duplex: "half" }), cenv, ctx);
 ok("contacto: cuerpo chunked de 20 KB → 413", rc3.status === 413, String(rc3.status));
 
+// 15. ID de referido: solo con motivo beta, en asunto y cuerpo; sin ID todo queda como antes
+const decf = (m) => ({ subject: m.raw.match(/^Subject: (.*)$/m)?.[1] ?? "", body: Buffer.from(m.raw.split("\r\n\r\n").slice(1).join("").replace(/\r\n/g, ""), "base64").toString() });
+const basef = { name: "Ana", email: "ana@alum.us.es", plan: "", message: "quiero montar una web", token: "t", lang: "es" };
+sent.length = 0;
+const rf1 = await contact({ ...basef, reason: "beta", referral: "MARTA-7_k" });
+const df1 = decf(sent[0] ?? { raw: "" });
+ok("referido: con ID válido → 200, asunto [beta][ref:ID] y línea en el cuerpo", rf1.status === 200 && df1.subject === "[beta][ref:MARTA-7_k] Ana" && df1.body.includes("Referido por: MARTA-7_k"), df1.subject);
+sent.length = 0;
+await contact({ ...basef, reason: "beta" });
+const df2 = decf(sent[0] ?? { raw: "" });
+ok("referido: sin ID el correo es idéntico al de antes", df2.subject === "[beta] Ana" && !df2.body.includes("Referido"), df2.subject);
+sent.length = 0;
+const rf3 = await contact({ ...basef, reason: "support", referral: "MARTA" });
+const df3 = decf(sent[0] ?? { raw: "" });
+ok("referido: con otro motivo se ignora", rf3.status === 200 && df3.subject === "[support] Ana" && !df3.body.includes("Referido"), df3.subject);
+const badf = ["a b", "x\r\nBcc: evil@x.com", "<script>", "a".repeat(33), "ñandú"];
+const rfb = await Promise.all(badf.map((referral) => contact({ ...basef, reason: "beta", referral })));
+ok("referido: caracteres raros o >32 → 400 y no se envía nada", rfb.every((r) => r.status === 400) && sent.length === 1, rfb.map((r) => r.status).join(","));
+const rf5 = await contact({ ...basef, reason: "beta", referral: 123 });
+ok("referido: valor no texto se trata como vacío (200)", rf5.status === 200);
+
 console.log(fails ? `\n${fails} FALLOS` : "\nTodo OK");
 process.exit(fails ? 1 : 0);

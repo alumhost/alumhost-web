@@ -306,6 +306,8 @@ const es = {
       name: "Nombre",
       email: "Correo",
       emailHelp: "El que uses a diario. Te responderemos ahí.",
+      referral: "ID de referido (opcional)",
+      referralHelp: "Si alguien te dio un ID, escríbelo aquí. Si no tienes, déjalo vacío.",
       reason: "Motivo",
       reasons: {
         beta: "Reservar plaza en la beta",
@@ -604,6 +606,14 @@ const es = {
         { verb: "Apúntate", body: "Rellenas el formulario de abajo. Es gratis y no pagas nada por adelantado." },
         { verb: "Decide", body: "Cuando lleguemos al mínimo te avisamos por correo. Entonces decides si sigues." },
         { verb: "Arranca", body: "Tu primer mes empieza el día que te damos acceso a tu servidor, no antes." },
+      ],
+    },
+    referrals: {
+      title: "Si te dimos un ID, compártelo.",
+      body: "Repartimos los IDs nosotros. Cuando alguien se apunte con el tuyo, lo comprobamos y lo confirmamos a mano.",
+      items: [
+        "1 referido confirmado: apareces en el muro de la beta (próximamente) y tienes prioridad.",
+        "2 o más referidos confirmados: un mes más de precio congelado por cada referido.",
       ],
     },
     signup: {

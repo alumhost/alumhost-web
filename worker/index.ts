@@ -34,6 +34,8 @@ interface ContactInput {
   email: string;
   reason: (typeof REASONS)[number];
   plan: (typeof PLANS)[number];
+  /** ID de referido (solo con motivo "beta"). Sin validar contra ninguna lista: lo comprobamos a mano al contar. */
+  referral: string;
   message: string;
   lang: "es" | "en";
 }
@@ -53,7 +55,10 @@ function parseContact(raw: unknown): ContactInput | null {
   if (!EMAIL.test(email) || email.length > 254) return null;
   if (message.length < 10 || message.length > 4000) return null;
   if (!REASONS.includes(reason) || !PLANS.includes(plan)) return null;
-  return { name, email, reason, plan, message, lang };
+  // Solo cuenta en la beta; con otro motivo se ignora. Misma forma que el cliente: letras, números, _ y -.
+  const referral = reason === "beta" ? str(r.referral) : "";
+  if (referral && !/^[A-Za-z0-9_-]{1,32}$/.test(referral)) return null;
+  return { name, email, reason, plan, referral, message, lang };
 }
 
 /** Quita saltos de línea para que nada del usuario pueda inyectar cabeceras de correo. */
@@ -83,12 +88,13 @@ async function deliver(input: ContactInput, env: Env): Promise<boolean> {
     console.error("[contact] CONTACT_MAILER no configurado");
     return false;
   }
-  const subject = headerSafe(`[${input.reason}] ${input.name}${input.plan ? ` (${input.plan})` : ""}`);
+  const subject = headerSafe(`[${input.reason}]${input.referral ? `[ref:${input.referral}]` : ""} ${input.name}${input.plan ? ` (${input.plan})` : ""}`);
   const bodyText = [
     `Nombre: ${input.name}`,
     `Correo: ${input.email}`,
     `Motivo: ${input.reason}`,
     `Plan: ${input.plan || "sin decidir"}`,
+    ...(input.referral ? [`Referido por: ${input.referral}`] : []),
     `Idioma: ${input.lang}`,
     "",
     input.message,
