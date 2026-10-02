@@ -17,10 +17,11 @@
  */
 import { LIMITS, chunksOf, cleanPath, validName } from "./publish-rules";
 import { json, readJson, readLimited, verifyTurnstile } from "./turnstile";
+import { universities } from "../src/config/universities";
 
 export interface PublishEnv {
   PUBLISH_DB?: D1Database;
-  PUBLISH_EMAIL_DOMAINS?: string; // "us.es,alum.us.es"
+  PUBLISH_EMAIL_DOMAINS?: string; // opcional: anula src/config/universities.ts, p. ej. "a.es,b.es"
   PUBLISH_FROM?: string; // "hola@alumhost.dev" (dominio verificado en Brevo)
   BREVO_API_KEY?: string; // wrangler secret put BREVO_API_KEY
   TURNSTILE_SECRET?: string;
@@ -117,7 +118,10 @@ async function request(req: Request, env: Env): Promise<Response> {
   if (!validName(name)) return json({ ok: false, error: "name" }, 400);
   const m = EMAIL.exec(email);
   if (!m || email.length > 254 || email.split("@")[0].includes("+")) return json({ ok: false, error: "email" }, 400); // sin alias +: evita saltarse "un sitio por correo"
-  const allowed = (env.PUBLISH_EMAIL_DOMAINS ?? "").split(",").map((d) => d.trim().toLowerCase()).filter(Boolean);
+  // Lista en src/config/universities.ts. PUBLISH_EMAIL_DOMAINS ("a.es,b.es") la sustituye si se define (pruebas).
+  const allowed = env.PUBLISH_EMAIL_DOMAINS
+    ? env.PUBLISH_EMAIL_DOMAINS.split(",").map((d) => d.trim().toLowerCase()).filter(Boolean)
+    : universities.map((u) => u.domain.toLowerCase());
   if (!allowed.includes(m[1])) return json({ ok: false, error: "email_domain" }, 400);
   if (raw.accept !== true) return json({ ok: false, error: "accept" }, 400);
 
