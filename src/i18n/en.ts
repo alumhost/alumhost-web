@@ -604,8 +604,8 @@ const en: Dict = {
       title: "If we gave you an ID, share it.",
       body: "We hand out the IDs ourselves. When someone signs up with yours, we check it and confirm it by hand.",
       items: [
-        "1 confirmed referral: you appear on the beta wall (coming soon) and get priority.",
-        "2 or more confirmed referrals: one more month of frozen price for each referral.",
+        "1 confirmed referral: you appear on the beta wall (coming soon) and get priority if places are limited.",
+        "2 or more confirmed referrals: one more month of frozen price for each referral, counting the first one too.",
       ],
     },
     signup: {

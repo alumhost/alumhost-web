@@ -612,8 +612,8 @@ const es = {
       title: "Si te dimos un ID, compártelo.",
       body: "Repartimos los IDs nosotros. Cuando alguien se apunte con el tuyo, lo comprobamos y lo confirmamos a mano.",
       items: [
-        "1 referido confirmado: apareces en el muro de la beta (próximamente) y tienes prioridad.",
-        "2 o más referidos confirmados: un mes más de precio congelado por cada referido.",
+        "1 referido confirmado: apareces en el muro de la beta (próximamente) y tienes prioridad si las plazas son limitadas.",
+        "2 o más referidos confirmados: un mes más de precio congelado por cada referido, contando también el primero.",
       ],
     },
     signup: {
