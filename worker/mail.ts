@@ -11,10 +11,10 @@ export interface MailEnv {
   ALLOW_LOG_ONLY?: string; // "1" solo en local: no envía, registra en consola
 }
 
-export interface Mail { subject: string; text: string }
+export interface Mail { subject: string; text: string; html?: string }
 
 /**
- * Envía un correo de texto plano. `tag` aparece en Brevo → Transactional → Logs para filtrar por tipo de correo.
+ * Envía un correo (HTML con su versión de texto; ver worker/mail-layout.ts). `tag` aparece en Brevo → Transactional → Logs para filtrar por tipo de correo.
  * Devuelve false si no se pudo entregar a Brevo (nunca lanza).
  */
 export async function sendMail(env: MailEnv, to: string, mail: Mail, tag: string): Promise<boolean> {
@@ -36,6 +36,7 @@ export async function sendMail(env: MailEnv, to: string, mail: Mail, tag: string
         to: [{ email: to }],
         subject: mail.subject,
         textContent: mail.text,
+        ...(mail.html ? { htmlContent: mail.html } : {}),
         tags: [tag],
       }),
     });
