@@ -22,9 +22,14 @@ DRY_RUN=1 scripts/autodeploy/autodeploy.sh   # prueba: hace fetch, comprueba mig
 rm -rf ~/.local/state/alumhost-autodeploy     # olvida la prueba, para que el primer ciclo real despliegue
 bash scripts/autodeploy/install.sh            # timer de systemd de usuario, activo desde ya
 ```
-Credenciales: vale la sesión de `npx wrangler login` que ya hay en esa máquina. Si caduca, mejor un token:
-crea uno en Cloudflare (My Profile → API Tokens) con *Workers Scripts: Edit*, *Workers Routes: Edit*, *D1: Edit* y
-*Zone: Read* para alumhost.dev, y ponlo en `~/.config/alumhost-autodeploy.env` (`CLOUDFLARE_API_TOKEN=` y `CLOUDFLARE_ACCOUNT_ID=`).
+Credenciales: systemd no lee `~/.bashrc`, así que el token de API de Cloudflare con el que ya se despliega desde esa
+máquina hay que copiarlo a `~/.config/alumhost-autodeploy.env` (lo crea `install.sh` con permisos 600):
+```
+CLOUDFLARE_API_TOKEN=...
+CLOUDFLARE_ACCOUNT_ID=...
+```
+El token necesita *Workers Scripts: Edit*, *Workers Routes: Edit*, *D1: Edit* y *Zone: Read* para alumhost.dev.
+Hazlo antes de `install.sh` o justo después (el siguiente ciclo ya lo usa).
 
 ## Día a día
 ```bash
