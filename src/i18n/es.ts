@@ -545,6 +545,9 @@ const es = {
       deleteConfirm: "¿Seguro? Se borra la web y todos sus archivos, y el nombre queda libre.",
       deleted: "Tu web se ha borrado.",
       update: "Para actualizarla más adelante, pide un enlace nuevo con el mismo nombre y correo, y vuelve a publicar.",
+      confirmLead: "Confirma que sigues usando tu web y la mantenemos publicada. Si estaba suspendida, vuelve a publicarse al momento.",
+      confirmButton: "Mantener mi web",
+      confirmed: "Hecho. {url} sigue publicada. Te volveremos a preguntar dentro de un año.",
       errors: {
         nothing: "Elige primero un archivo, una carpeta o un repositorio.",
         no_index: "Falta el index.html.",

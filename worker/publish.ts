@@ -9,6 +9,7 @@
  *      POST /api/publish/deploy/fetch {d, p}                   → o lo trae de GitHub (raw) en el servidor
  *   5. POST /api/publish/deploy/finish {d}                      → comprueba que está todo y activa la versión
  *      POST /api/publish/delete                                 → borra el sitio
+ *      POST /api/publish/confirm {c}                            → confirmación anual (enlace del correo, sin sesión)
  *
  * Datos: todo en D1 (migrations/0001_publish.sql); los archivos, en la tabla blobs en trozos de 1 MB. Sin R2 (pide tarjeta).
  * Los sitios los sirve OTRO Worker (sites/), sin secretos ni acceso de escritura.
@@ -17,12 +18,12 @@
  */
 import { LIMITS, chunksOf, cleanPath, validName } from "./publish-rules";
 import { json, readJson, readLimited, verifyTurnstile } from "./turnstile";
+import { sendMail, type MailEnv } from "./mail";
+import * as T from "./mail-templates";
 
-export interface PublishEnv {
+export interface PublishEnv extends MailEnv {
   PUBLISH_DB?: D1Database;
   PUBLISH_EMAIL_DOMAINS?: string; // "us.es,alum.us.es"
-  PUBLISH_FROM?: string; // "hola@alumhost.dev" (dominio verificado en Brevo)
-  BREVO_API_KEY?: string; // wrangler secret put BREVO_API_KEY
   TURNSTILE_SECRET?: string;
   CONTACT_LIMITER?: RateLimit;
   PUBLISH_LIMITER?: RateLimit; // binding ratelimits: peticiones autenticadas por sitio
@@ -30,10 +31,12 @@ export interface PublishEnv {
 }
 
 /** Origen fijo de los enlaces mágicos: nunca se construye con el Host de la petición (salvo en local). */
-const PUBLIC_ORIGIN = "https://alumhost.dev";
+export const PUBLIC_ORIGIN = "https://alumhost.dev";
+/** Página donde se pide el enlace mágico (la enlazan los correos). */
+export const requestPage = (lang: "es" | "en") => `${PUBLIC_ORIGIN}${lang === "es" ? "/publicar/" : "/en/publish/"}`;
 
 type Env = PublishEnv & { PUBLISH_DB: D1Database };
-interface Session { name: string; email: string; status: string | null }
+interface Session { name: string; email: string; status: string | null; lang: "es" | "en" }
 interface Manifest { files: Record<string, number>; github?: { repo: string; sha: string; dir: string } }
 
 const EMAIL = /^[^\s@]+@([^\s@]+\.[^\s@]{2,})$/;
@@ -41,10 +44,10 @@ const REPO = /^[A-Za-z0-9-]{1,39}\/[A-Za-z0-9._-]{1,100}$/;
 /** El nombre del repo no puede ser "." ni ".." (la regex los deja pasar). */
 const repoOk = (r: string) => REPO.test(r) && !/^\.{1,2}$/.test(r.split("/")[1]);
 const SHA = /^[0-9a-f]{40}$/;
-const now = () => Math.floor(Date.now() / 1000);
+export const now = () => Math.floor(Date.now() / 1000);
 
-const b64url = (bytes: Uint8Array) => btoa(String.fromCharCode(...bytes)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
-const sha256 = async (s: string) => {
+export const b64url = (bytes: Uint8Array) => btoa(String.fromCharCode(...bytes)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+export const sha256 = async (s: string) => {
   const d = new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s)));
   return [...d].map((b) => b.toString(16).padStart(2, "0")).join("");
 };
@@ -52,33 +55,8 @@ const newId = () => b64url(crypto.getRandomValues(new Uint8Array(12)));
 
 // ---------------------------------------------------------------- correo
 
-async function sendMagicLink(env: Env, to: string, name: string, link: string, lang: "es" | "en"): Promise<boolean> {
-  const es = lang === "es";
-  const subject = es ? `Tu enlace para publicar ${name}.alumhost.dev` : `Your link to publish ${name}.alumhost.dev`;
-  const text = es
-    ? `Hola:\n\nPara subir o actualizar tu web ${name}.alumhost.dev, abre este enlace (vale 24 horas):\n\n${link}\n\nSi no lo has pedido tú, ignora este correo.\n\nAlumHost`
-    : `Hi,\n\nTo upload or update your site ${name}.alumhost.dev, open this link (valid for 24 hours):\n\n${link}\n\nIf you did not ask for it, ignore this email.\n\nAlumHost`;
-  if (!env.BREVO_API_KEY) {
-    if (env.ALLOW_LOG_ONLY === "1") {
-      console.log("[publish] (solo log) enlace mágico", to, link);
-      return true;
-    }
-    console.error("[publish] BREVO_API_KEY no configurado");
-    return false;
-  }
-  const res = await fetch("https://api.brevo.com/v3/smtp/email", {
-    method: "POST",
-    headers: { "api-key": env.BREVO_API_KEY, "content-type": "application/json", accept: "application/json" },
-    body: JSON.stringify({
-      sender: { name: "AlumHost", email: env.PUBLISH_FROM ?? "hola@alumhost.dev" },
-      to: [{ email: to }],
-      subject,
-      textContent: text,
-    }),
-  });
-  if (!res.ok) console.error("[publish] Brevo respondió", res.status, (await res.text()).slice(0, 300));
-  return res.ok;
-}
+const sendMagicLink = (env: Env, to: string, name: string, link: string, lang: "es" | "en") =>
+  sendMail(env, to, T.magicLink(lang, name, link), "publish-link");
 
 // ---------------------------------------------------------------- sesión (enlace mágico)
 
@@ -87,15 +65,15 @@ async function session(req: Request, env: Env): Promise<Session | null> {
   const t = auth.startsWith("Bearer ") ? auth.slice(7).trim() : "";
   if (!/^[A-Za-z0-9_-]{20,100}$/.test(t)) return null;
   const row = await env.PUBLISH_DB.prepare(
-    "SELECT t.name, t.email, t.expires_at, s.email AS owner, s.status FROM tokens t LEFT JOIN sites s ON s.name = t.name WHERE t.hash = ?",
+    "SELECT t.name, t.email, t.lang, t.expires_at, s.email AS owner, s.status FROM tokens t LEFT JOIN sites s ON s.name = t.name WHERE t.hash = ?",
   )
     .bind(await sha256(t))
-    .first<{ name: string; email: string; expires_at: number; owner: string | null; status: string | null }>();
+    .first<{ name: string; email: string; lang: string; expires_at: number; owner: string | null; status: string | null }>();
   if (!row || row.expires_at < now()) return null;
   // Dos personas pueden pedir enlace para un nombre libre. En cuanto una publica, el token de la otra deja de valer
   // (antes podía borrar o ver el sitio ajeno durante 24 h).
   if (row.owner !== null && row.owner !== row.email) return null;
-  return { name: row.name, email: row.email, status: row.status };
+  return { name: row.name, email: row.email, status: row.status, lang: row.lang === "en" ? "en" : "es" };
 }
 
 // ---------------------------------------------------------------- 1. pedir enlace
@@ -118,7 +96,6 @@ async function request(req: Request, env: Env): Promise<Response> {
   const m = EMAIL.exec(email);
   if (!m || email.length > 254 || email.split("@")[0].includes("+")) return json({ ok: false, error: "email" }, 400); // sin alias +: evita saltarse "un sitio por correo"
   const allowed = (env.PUBLISH_EMAIL_DOMAINS ?? "").split(",").map((d) => d.trim().toLowerCase()).filter(Boolean);
-  if (!allowed.includes(m[1])) return json({ ok: false, error: "email_domain" }, 400);
   if (raw.accept !== true) return json({ ok: false, error: "accept" }, 400);
 
   if (!env.TURNSTILE_SECRET) return json({ ok: false, error: "server" }, 500);
@@ -128,8 +105,11 @@ async function request(req: Request, env: Env): Promise<Response> {
 
   const db = env.PUBLISH_DB;
   const site = await db.prepare("SELECT email, status FROM sites WHERE name = ?").bind(name).first<{ email: string; status: string }>();
+  // Correo de fuera de la lista: solo si ya es el de este sitio (el equipo lo cambió a mano al graduarse; ver docs/correos.md).
+  if (!allowed.includes(m[1]) && site?.email !== email) return json({ ok: false, error: "email_domain" }, 400);
   if (site && site.email !== email) return json({ ok: false, error: "name_taken" }, 409);
-  if (site && site.status !== "active") return json({ ok: false, error: "suspended" }, 403);
+  // Suspendido por abuso: no. Suspendido por inactividad ('inactive'): sí, abrir el enlace lo reactiva (ver info).
+  if (site && site.status === "suspended") return json({ ok: false, error: "suspended" }, 403);
   if (!site) {
     const other = await db.prepare("SELECT name FROM sites WHERE email = ? LIMIT 1").bind(email).first<{ name: string }>();
     if (other) return json({ ok: false, error: "one_site" }, 409); // sin decir cuál: aquí el correo aún no está verificado
@@ -142,8 +122,8 @@ async function request(req: Request, env: Env): Promise<Response> {
   const token = b64url(crypto.getRandomValues(new Uint8Array(32)));
   await db.batch([
     db.prepare("DELETE FROM tokens WHERE expires_at < ?").bind(now()),
-    db.prepare("INSERT INTO tokens (hash, name, email, created_at, expires_at) VALUES (?, ?, ?, ?, ?)")
-      .bind(await sha256(token), name, email, now(), now() + LIMITS.tokenHours * 3600),
+    db.prepare("INSERT INTO tokens (hash, name, email, lang, created_at, expires_at) VALUES (?, ?, ?, ?, ?, ?)")
+      .bind(await sha256(token), name, email, lang, now(), now() + LIMITS.tokenHours * 3600),
   ]);
   const origin = env.ALLOW_LOG_ONLY === "1" ? new URL(req.url).origin : PUBLIC_ORIGIN;
   const link = `${origin}${lang === "es" ? "/publicar/subir/" : "/en/publish/upload/"}#t=${token}`;
@@ -153,7 +133,19 @@ async function request(req: Request, env: Env): Promise<Response> {
 
 // ---------------------------------------------------------------- 2. sesión
 
+/** Abrir el enlace mágico cuenta como confirmación anual y saca al sitio de la suspensión por inactividad. */
+const markConfirmed = (env: Env, name: string, email: string) =>
+  env.PUBLISH_DB.batch([
+    env.PUBLISH_DB.prepare(
+      `UPDATE sites SET confirmed_at = ?, notice_at = NULL, reminders = 0, inactive_at = NULL, status = 'active'
+       WHERE name = ? AND email = ? AND status IN ('active', 'inactive')`,
+    ).bind(now(), name, email),
+    env.PUBLISH_DB.prepare("DELETE FROM confirms WHERE name = ?").bind(name),
+  ]);
+
 async function info(s: Session, env: Env): Promise<Response> {
+  if (s.status === "inactive") console.log("[publish] reactivado al abrir el enlace", s.name);
+  if (s.status !== null) await markConfirmed(env, s.name, s.email);
   const site = await env.PUBLISH_DB.prepare("SELECT version, source, files, bytes, updated_at FROM sites WHERE name = ?")
     .bind(s.name)
     .first<{ version: string | null; source: string | null; files: number; bytes: number; updated_at: number }>();
@@ -309,15 +301,16 @@ async function finish(req: Request, s: Session, env: Env, ctx: ExecutionContext)
   const files = Object.keys(dep.manifest.files).length;
   const bytes = Object.values(dep.manifest.files).reduce((a, b) => a + b, 0);
   const db = env.PUBLISH_DB;
+  const first = s.status === null; // aún no había sitio: es su primera publicación
   // Atómico: el upsert solo toca el sitio si es de este correo y está activo. Si otra persona ha publicado el nombre
   // entre medias (dos enlaces para un nombre libre), no cambia nada y respondemos 409.
   const [up] = await db.batch([
     db.prepare(
-      `INSERT INTO sites (name, email, version, source, files, bytes, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      `INSERT INTO sites (name, email, version, source, files, bytes, lang, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
        ON CONFLICT(name) DO UPDATE SET version = excluded.version, source = excluded.source, files = excluded.files,
-       bytes = excluded.bytes, updated_at = excluded.updated_at
+       bytes = excluded.bytes, lang = excluded.lang, updated_at = excluded.updated_at, notice_at = NULL, reminders = 0
        WHERE sites.email = excluded.email AND sites.status = 'active'`,
-    ).bind(s.name, s.email, dep.version, dep.source, files, bytes, now(), now()),
+    ).bind(s.name, s.email, dep.version, dep.source, files, bytes, s.lang, now(), now()),
     db.prepare("DELETE FROM deploys WHERE id = ?").bind(dep.id),
   ]);
   if ((up.meta.changes ?? 0) !== 1) {
@@ -334,6 +327,7 @@ async function finish(req: Request, s: Session, env: Env, ctx: ExecutionContext)
       .catch((e) => console.error("[publish] limpieza", e)),
   );
   console.log("[publish] publicado", s.name, dep.version, files, bytes, dep.source);
+  if (first) ctx.waitUntil(sendMail(env, s.email, T.published(s.lang, s.name, requestPage(s.lang)), "publish-live"));
   return json({ ok: true, url: `https://${s.name}.alumhost.dev` });
 }
 
@@ -345,9 +339,32 @@ async function remove(s: Session, env: Env): Promise<Response> {
     db.prepare("DELETE FROM blobs WHERE site = ? AND NOT EXISTS (SELECT 1 FROM sites WHERE name = ?)").bind(s.name, s.name),
     db.prepare("DELETE FROM deploys WHERE name = ? AND email = ?").bind(s.name, s.email),
     db.prepare("DELETE FROM tokens WHERE name = ? AND email = ?").bind(s.name, s.email),
+    db.prepare("DELETE FROM confirms WHERE name = ? AND email = ?").bind(s.name, s.email),
   ]);
   console.log("[publish] borrado", s.name);
   return json({ ok: true });
+}
+
+// ---------------------------------------------------------------- confirmación anual
+
+/** El enlace de los avisos anuales: solo confirma (no da acceso al sitio). Se pulsa en la página, nunca con un GET. */
+async function confirm(req: Request, env: Env): Promise<Response> {
+  if (env.CONTACT_LIMITER) {
+    const { success } = await env.CONTACT_LIMITER.limit({ key: `confirm:${req.headers.get("cf-connecting-ip") ?? "unknown"}` });
+    if (!success) return json({ ok: false, error: "rate_limited" }, 429);
+  }
+  const raw = await readJson(req, 1024);
+  if (typeof raw === "string") return json({ ok: false, error: "validation" }, 400);
+  const c = typeof raw.c === "string" ? raw.c : "";
+  if (!/^[A-Za-z0-9_-]{20,100}$/.test(c)) return json({ ok: false, error: "session" }, 401);
+  const row = await env.PUBLISH_DB.prepare("SELECT name, email, expires_at FROM confirms WHERE hash = ?")
+    .bind(await sha256(c))
+    .first<{ name: string; email: string; expires_at: number }>();
+  if (!row || row.expires_at < now()) return json({ ok: false, error: "session" }, 401);
+  const [up] = await markConfirmed(env, row.name, row.email);
+  if ((up.meta.changes ?? 0) !== 1) return json({ ok: false, error: "session" }, 401);
+  console.log("[publish] confirmado", row.name);
+  return json({ ok: true, name: row.name, url: `https://${row.name}.alumhost.dev` });
 }
 
 // ---------------------------------------------------------------- router
@@ -362,9 +379,11 @@ export async function handlePublish(req: Request, penv: PublishEnv, ctx: Executi
 
   try {
     if (route === "POST /api/publish/request") return await request(req, env);
+    if (route === "POST /api/publish/confirm") return await confirm(req, env);
     const s = await session(req, env);
     if (!s) return json({ ok: false, error: "session" }, 401);
     // Un sitio suspendido (abuso) no puede desplegar ni borrarse: se conservan las pruebas. Ver su estado sí.
+    // Uno inactivo se reactiva al ver su estado (POST /session, lo primero que hace la página del enlace).
     if (s.status !== null && s.status !== "active" && route !== "POST /api/publish/session") {
       return json({ ok: false, error: "suspended" }, 403);
     }

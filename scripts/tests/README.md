@@ -15,4 +15,6 @@ sed -i -E 's#from "(\./[a-z-]+)"#from "\1.ts"#; s#from "(\.\./worker/[a-z-]+)"#f
 (cd $T && node --experimental-strip-types run.mjs)
 ```
 
-Si la rama tiene migraciones de Stripe, el script solo carga 0001 y 0002 (las de Publish).
+Si la rama tiene migraciones de Stripe, el script solo carga 0001, 0002 y 0003 (las de Publish y los correos).
+También cubre los correos automáticos: acuse del formulario, "tu web ya está publicada", el ciclo anual entero
+(aviso, recordatorios, suspensión, confirmación, borrado) y el aviso de graduación (ver `docs/correos.md`).
