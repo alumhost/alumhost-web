@@ -3,6 +3,8 @@
  * Publish gratis, paso 2: se llega desde el enlace mágico (…/publicar/subir/#t=TOKEN).
  * El token va en el fragmento (#), que el navegador no envía a ningún servidor ni pone en el Referer; al cargar,
  * se guarda en sessionStorage y se quita de la barra de direcciones.
+ * Con #c=TOKEN (enlace del aviso anual) solo se confirma la web, y hay que pulsar el botón: así los antivirus que abren
+ * los enlaces de los correos no la confirman por su cuenta.
  * El navegador hace el trabajo pesado (descomprimir el .zip, leer la carpeta, listar el repo en la API de GitHub) y
  * sube archivo a archivo (en trozos de 1 MB) a worker/publish.ts, que solo valida y guarda. Así cabe en el plan gratuito.
  */
@@ -27,6 +29,17 @@ const messages = JSON.stringify({ ...u, errors: u.errors, tabs: undefined });
       <div data-state="expired" hidden>
         <p class="lead">{u.expired}</p>
         <p><a class="btn" href={path("publish", lang)}>{u.askNew}</a></p>
+      </div>
+
+      <div data-state="confirm" hidden>
+        <p class="lead">{u.confirmLead}</p>
+        <p><button class="btn" type="button" data-confirm>{u.confirmButton}</button></p>
+        <p class="error" data-confirm-error role="alert" hidden>{u.errors.server}</p>
+      </div>
+
+      <div data-state="confirmed" tabindex="-1" role="status" hidden>
+        <p class="lead" data-confirmed-text></p>
+        <p><a class="btn" data-confirmed-link href="#">{u.view}</a></p>
       </div>
 
       <div data-state="ready" hidden>
@@ -138,13 +151,37 @@ const messages = JSON.stringify({ ...u, errors: u.errors, tabs: undefined });
     const m = JSON.parse(root.dataset.messages ?? "{}") as Msg;
     const lang = root.dataset.lang === "en" ? "en" : "es";
     const $ = <T extends HTMLElement>(sel: string) => root.querySelector<T>(sel)!;
-    const show = (state: "loading" | "expired" | "ready") =>
+    const show = (state: "loading" | "expired" | "ready" | "confirm" | "confirmed") =>
       root.querySelectorAll<HTMLElement>("[data-state]").forEach((el) => (el.hidden = el.dataset.state !== state));
     const fillIn = (s: string, v: Record<string, string | number>) => s.replace(/\{(\w+)\}/g, (_, k: string) => String(v[k] ?? ""));
     const fmtSize = (b: number) => (b < 1024 * 1024 ? `${Math.max(1, Math.round(b / 1024))} KB` : `${(b / 1024 / 1024).toFixed(1)} MB`);
 
+    // Confirmación anual (#c=): no abre sesión, solo confirma al pulsar el botón.
+    const confirmToken = new URLSearchParams(location.hash.slice(1)).get("c");
+    if (confirmToken) history.replaceState(null, "", location.pathname);
+    const confirmSite = async () => {
+      const button = $<HTMLButtonElement>("[data-confirm]");
+      button.disabled = true;
+      $("[data-confirm-error]").hidden = true;
+      try {
+        const res = await fetch("/api/publish/confirm", {
+          method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ c: confirmToken }),
+        });
+        const body = (await res.json().catch(() => ({}))) as { ok?: boolean; url?: string };
+        if (res.status === 401) return show("expired");
+        if (!res.ok || !body.ok || !body.url) throw new Error("server");
+        $("[data-confirmed-text]").textContent = fillIn(m.confirmed, { url: body.url.replace("https://", "") });
+        $<HTMLAnchorElement>("[data-confirmed-link]").href = body.url;
+        show("confirmed");
+        $("[data-state=confirmed]").focus();
+      } catch {
+        $("[data-confirm-error]").hidden = false;
+        button.disabled = false;
+      }
+    };
+
     // Token: del fragmento a sessionStorage, y fuera de la barra de direcciones.
-    const hashToken = new URLSearchParams(location.hash.slice(1)).get("t");
+    const hashToken = confirmToken ? null : new URLSearchParams(location.hash.slice(1)).get("t");
     if (hashToken) {
       try { sessionStorage.setItem("publish-token", hashToken); } catch { /* modo privado: seguimos en memoria */ }
       history.replaceState(null, "", location.pathname);
@@ -337,6 +374,9 @@ const messages = JSON.stringify({ ...u, errors: u.errors, tabs: undefined });
       }
     });
 
-    load();
+    if (confirmToken) {
+      $("[data-confirm]").addEventListener("click", confirmSite);
+      show("confirm");
+    } else load();
   }
 </script>

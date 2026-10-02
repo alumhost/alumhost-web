@@ -4,6 +4,7 @@
  * Endpoints:
  *   POST /api/contact     formulario de contacto / reserva de beta
  *   /api/publish/*        Publish gratis: alta con enlace mágico y despliegue de webs estáticas (worker/publish.ts)
+ *   scheduled (cron)      correos programados de Publish: confirmación anual y graduación (worker/publish-lifecycle.ts)
  *
  * Futuro (NO implementado, ver CLAUDE.md "pare y pregunte"):
  *   POST /api/checkout     crea una Stripe Checkout Session. Precio resuelto AQUÍ desde src/config/plans.ts.
@@ -13,6 +14,9 @@
 import { EmailMessage } from "cloudflare:email";
 import { json, readJson, verifyTurnstile } from "./turnstile";
 import { handlePublish, type PublishEnv } from "./publish";
+import { runPublishLifecycle } from "./publish-lifecycle";
+import { sendMail } from "./mail";
+import { contactAck } from "./mail-templates";
 
 export interface Env extends PublishEnv {
   ASSETS: Fetcher;
@@ -126,7 +130,23 @@ async function deliver(input: ContactInput, env: Env): Promise<boolean> {
   return results.some((r) => r.status === "fulfilled");
 }
 
-async function handleContact(req: Request, env: Env): Promise<Response> {
+/**
+ * Acuse al usuario. No lleva nada de lo que escribió (ni el nombre): así el formulario no sirve para mandar texto
+ * a terceros. Como mucho uno al día por correo, para que nadie lo use para llenar el buzón de otra persona.
+ */
+async function acknowledge(input: ContactInput, env: Env): Promise<void> {
+  const email = input.email.toLowerCase();
+  if (env.PUBLISH_DB) {
+    const day = new Date().toISOString().slice(0, 10);
+    const first = await env.PUBLISH_DB.prepare("INSERT OR IGNORE INTO mail_log (email, kind, ref, sent_at) VALUES (?, 'contact-ack', ?, ?)")
+      .bind(email, day, Math.floor(Date.now() / 1000))
+      .run();
+    if ((first.meta.changes ?? 0) === 0) return;
+  }
+  await sendMail(env, email, contactAck(input.lang, input.reason), `contact-${input.reason}`);
+}
+
+async function handleContact(req: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
   if (req.method !== "POST") return json({ ok: false, error: "method" }, 405);
   if (!(req.headers.get("content-type") ?? "").includes("application/json")) return json({ ok: false, error: "type" }, 415);
 
@@ -160,6 +180,7 @@ async function handleContact(req: Request, env: Env): Promise<Response> {
 
   try {
     const sent = await deliver(input, env);
+    if (sent) ctx.waitUntil(acknowledge(input, env));
     return sent ? json({ ok: true }) : json({ ok: false, error: "server" }, 503);
   } catch (err) {
     console.error("[contact] fallo al entregar", err);
@@ -170,9 +191,13 @@ async function handleContact(req: Request, env: Env): Promise<Response> {
 export default {
   async fetch(req, env, ctx): Promise<Response> {
     const url = new URL(req.url);
-    if (url.pathname === "/api/contact") return handleContact(req, env);
+    if (url.pathname === "/api/contact") return handleContact(req, env, ctx);
     if (url.pathname.startsWith("/api/publish/")) return handlePublish(req, env, ctx);
     if (url.pathname.startsWith("/api/")) return json({ ok: false, error: "not_found" }, 404);
     return env.ASSETS.fetch(req);
+  },
+  async scheduled(controller, env, ctx) {
+    if (!env.PUBLISH_DB) return;
+    ctx.waitUntil(runPublishLifecycle({ ...env, PUBLISH_DB: env.PUBLISH_DB }, new Date(controller.scheduledTime)));
   },
 } satisfies ExportedHandler<Env>;
