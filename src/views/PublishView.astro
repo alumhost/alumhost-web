@@ -6,6 +6,7 @@
  */
 import Base from "../layouts/Base.astro";
 import { site } from "../config/site";
+import { universities } from "../config/universities";
 import { fill, path, useDict, type Lang } from "../i18n";
 
 interface Props { lang: Lang }
@@ -52,8 +53,21 @@ const [linksB, linksC] = linksRest.split("{aup}");
           </div>
 
           <div class="field">
+            <label for="pf-uni">{p.form.university}</label>
+            <select id="pf-uni" name="university" required aria-describedby="pf-uni-err">
+              <option value="">{p.form.universityPlaceholder}</option>
+              {universities.map((u) => <option value={u.id} data-domain={u.domain}>{u.name}</option>)}
+            </select>
+            <p class="error" id="pf-uni-err" data-error-for="university" hidden></p>
+          </div>
+
+          <div class="field">
             <label for="pf-email">{p.form.email}</label>
-            <input id="pf-email" name="email" type="email" autocomplete="email" required maxlength="254" aria-describedby="pf-email-help pf-email-err" />
+            <div class="suffix">
+              <input id="pf-email" name="email" type="text" inputmode="email" autocomplete="username" autocapitalize="none" spellcheck="false"
+                required maxlength="64" aria-describedby="pf-email-help pf-email-err" />
+              <span class="mono" data-domain-label aria-hidden="true">@</span>
+            </div>
             <p class="help" id="pf-email-help">{p.form.emailHelp}</p>
             <p class="error" id="pf-email-err" data-error-for="email" hidden></p>
           </div>
@@ -113,7 +127,7 @@ const [linksB, linksC] = linksRest.split("{aup}");
   .form-title { font-size: var(--step-2); }
   .field { display: grid; gap: 0.4rem; align-content: start; }
   label { font-weight: 600; font-size: 0.95rem; }
-  input[type="text"], input[type="email"] {
+  input[type="text"], input[type="email"], select {
     width: 100%; min-height: 52px; padding: 0.7rem 0.9rem; border-radius: 0; border: 2px solid var(--text); background: var(--paper); color: var(--text);
   }
   .suffix { display: flex; align-items: stretch; }
@@ -122,6 +136,7 @@ const [linksB, linksC] = linksRest.split("{aup}");
   .check { grid-template-columns: auto 1fr; column-gap: 0.7rem; align-items: start; }
   .check input { width: 1.3rem; height: 1.3rem; margin-top: 0.15rem; accent-color: var(--indigo); }
   .check label { font-weight: 400; }
+  .check .help { grid-column: 1 / -1; }
   .check .error { grid-column: 1 / -1; }
   [aria-invalid="true"] { border-color: var(--brick); box-shadow: inset 0 -4px 0 var(--brick); }
   .help { font-size: var(--step--1); color: var(--muted); }
@@ -139,7 +154,7 @@ const [linksB, linksC] = linksRest.split("{aup}");
 </style>
 
 <script>
-  type Field = "name" | "email" | "accept" | "turnstile" | "form";
+  type Field = "name" | "university" | "email" | "accept" | "turnstile" | "form";
   const form = document.querySelector<HTMLFormElement>("[data-publish-form]");
 
   if (form) {
@@ -149,6 +164,19 @@ const [linksB, linksC] = linksRest.split("{aup}");
     const NAME = /^[a-z0-9](?:[a-z0-9-]{0,28}[a-z0-9])$/;
     const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
     const nameInput = form.elements.namedItem("name") as HTMLInputElement;
+    const uni = document.getElementById("pf-uni") as unknown as HTMLSelectElement;
+    const emailInput = form.querySelector<HTMLInputElement>("#pf-email")!;
+    const domainLabel = form.querySelector<HTMLElement>("[data-domain-label]")!;
+    const domain = () => uni.selectedOptions[0]?.dataset.domain ?? "";
+    const syncDomain = () => { domainLabel.textContent = domain() ? `@${domain()}` : "@"; };
+    uni.addEventListener("change", () => { syncDomain(); showError("university", null); });
+    // Minúsculas; si pegan la dirección entera de la universidad elegida, nos quedamos con el usuario.
+    emailInput.addEventListener("input", () => {
+      const v = emailInput.value.trim().toLowerCase();
+      const at = v.indexOf("@");
+      emailInput.value = at >= 0 && domain() && v.slice(at + 1) === domain() ? v.slice(0, at) : v;
+    });
+    syncDomain();
 
     // Minúsculas al escribir: "Mi-Web" → "mi-web"
     nameInput.addEventListener("input", () => {
@@ -168,13 +196,16 @@ const [linksB, linksC] = linksRest.split("{aup}");
       showError("form", null);
       const data = new FormData(form);
       const name = String(data.get("name") ?? "").trim();
-      const email = String(data.get("email") ?? "").trim();
+      const user = String(data.get("email") ?? "").trim().toLowerCase();
+      const email = domain() ? `${user}@${domain()}` : "";
       const accept = data.get("accept") === "on";
       const token = String(data.get("cf-turnstile-response") ?? "");
       let first: Field | null = null;
       const check = (f: Field, bad: boolean) => { showError(f, bad ? msg[f] : null); if (bad && !first) first = f; };
       check("name", !NAME.test(name));
-      check("email", !EMAIL.test(email));
+      check("university", !domain());
+      check("email", domain() !== "" && (user.includes("@") || !EMAIL.test(email) || email.length > 254));
+      if (user.includes("@")) showError("email", msg.emailLocal);
       check("accept", !accept);
       check("turnstile", token.length === 0);
       if (first) { (form.elements.namedItem(first) as HTMLElement | null)?.focus(); return; }

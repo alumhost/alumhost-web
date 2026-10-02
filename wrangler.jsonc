@@ -35,7 +35,6 @@
   //   npx wrangler secret put CONTACT_TO         -> correos VERIFICADOS en Email Routing, separados por comas (destino del formulario)
   "vars": {
     "CONTACT_FROM": "web@alumhost.dev", // remitente en alumhost.dev (Email Routing activo)
-    "PUBLISH_EMAIL_DOMAINS": "us.es,alum.us.es", // correos que pueden publicar gratis (decisión v-04: primero la US)
     "MAIL_FROM": "hola@alumhost.dev", // remitente de los correos a clientes (dominio verificado en Brevo)
     "MAIL_REPLY_TO": "soporte@alumhost.dev" // las respuestas de los clientes van aquí
   },

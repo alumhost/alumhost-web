@@ -18,12 +18,13 @@
  */
 import { LIMITS, chunksOf, cleanPath, validName } from "./publish-rules";
 import { json, readJson, readLimited, verifyTurnstile } from "./turnstile";
+import { universities } from "../src/config/universities";
 import { sendMail, type MailEnv } from "./mail";
 import * as T from "./mail-templates";
 
 export interface PublishEnv extends MailEnv {
   PUBLISH_DB?: D1Database;
-  PUBLISH_EMAIL_DOMAINS?: string; // "us.es,alum.us.es"
+  PUBLISH_EMAIL_DOMAINS?: string; // opcional: anula src/config/universities.ts, p. ej. "a.es,b.es"
   TURNSTILE_SECRET?: string;
   CONTACT_LIMITER?: RateLimit;
   PUBLISH_LIMITER?: RateLimit; // binding ratelimits: peticiones autenticadas por sitio
@@ -95,7 +96,11 @@ async function request(req: Request, env: Env): Promise<Response> {
   if (!validName(name)) return json({ ok: false, error: "name" }, 400);
   const m = EMAIL.exec(email);
   if (!m || email.length > 254 || email.split("@")[0].includes("+")) return json({ ok: false, error: "email" }, 400); // sin alias +: evita saltarse "un sitio por correo"
-  const allowed = (env.PUBLISH_EMAIL_DOMAINS ?? "").split(",").map((d) => d.trim().toLowerCase()).filter(Boolean);
+  // Lista en src/config/universities.ts. PUBLISH_EMAIL_DOMAINS ("a.es,b.es") la sustituye si se define (pruebas).
+  // El dominio se comprueba más abajo, con el sitio a mano (un correo cambiado tras graduarse puede no ser de la lista).
+  const allowed = env.PUBLISH_EMAIL_DOMAINS
+    ? env.PUBLISH_EMAIL_DOMAINS.split(",").map((d) => d.trim().toLowerCase()).filter(Boolean)
+    : universities.map((u) => u.domain.toLowerCase());
   if (raw.accept !== true) return json({ ok: false, error: "accept" }, 400);
 
   if (!env.TURNSTILE_SECRET) return json({ ok: false, error: "server" }, 500);

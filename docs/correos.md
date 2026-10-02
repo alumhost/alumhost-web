@@ -26,7 +26,9 @@ para mandar texto a terceros desde nuestro dominio.
 
 ## Desplegar
 
-Orden: primero la migración, después el Worker (el código nuevo usa las columnas nuevas).
+El despliegue automático de `main` (`scripts/autodeploy/`) aplica la migración `0003_correos.sql` (solo añade) y
+después despliega, así que no hay que hacer nada a mano. Si se despliega a mano, el orden es: primero la migración y
+después el Worker (el código nuevo usa las columnas nuevas).
 
 ```bash
 npx wrangler d1 migrations apply alumhost-publish --remote
