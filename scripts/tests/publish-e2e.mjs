@@ -3,7 +3,7 @@ import { readFileSync } from "node:fs";
 
 // ---------- D1 sobre SQLite real (misma sintaxis SQL que D1)
 const sql = new DatabaseSync(":memory:");
-for (const f of ["migrations/0001_publish.sql", "migrations/0002_publish_hardening.sql"]) sql.exec(readFileSync(f, "utf8"));
+for (const f of ["migrations/0001_publish.sql", "migrations/0002_publish_hardening.sql", "migrations/0003_correos.sql"]) sql.exec(readFileSync(f, "utf8"));
 const norm = (v) => (v instanceof ArrayBuffer ? new Uint8Array(v) : v);
 class Stmt {
   constructor(q, a = []) { this.q = q; this.a = a; }
@@ -181,6 +181,76 @@ ok("contacto: correo con coma rechazado (400)", rc2.status === 400);
 const huge = new ReadableStream({ start(c) { c.enqueue(new TextEncoder().encode("{" + " ".repeat(20000) + "}")); c.close(); } });
 const rc3 = await worker.fetch(new Request(O + "/api/contact", { method: "POST", headers: { origin: O, "content-type": "application/json" }, body: huge, duplex: "half" }), cenv, ctx);
 ok("contacto: cuerpo chunked de 20 KB → 413", rc3.status === 413, String(rc3.status));
+
+
+// 15. Correos automáticos
+const { runPublishLifecycle } = await import("./worker/publish-lifecycle.ts");
+const mailsTo = (to, tag) => mails.filter((m) => m.to[0].email === to && (!tag || m.tags?.[0] === tag));
+// 15a. Acuse del formulario: al usuario, sin su texto, uno al día
+const aenv = { ...cenv, PUBLISH_DB: D1, BREVO_API_KEY: "k" };
+const ack = (email, name = "Spam http://malo.example") => worker.fetch(new Request(O + "/api/contact", { method: "POST", headers: { origin: O, "content-type": "application/json" }, body: JSON.stringify({ name, email, reason: "beta", plan: "", message: "compra ya en http://malo.example", token: "t", lang: "es" }) }), aenv, ctx).then(async (r) => { await flush(); return r; });
+await ack("eva@gmail.com");
+const ackMail = mailsTo("eva@gmail.com", "contact-beta");
+ok("acuse: llega al usuario por Brevo con Reply-To soporte", ackMail.length === 1 && ackMail[0].replyTo.email === "soporte@alumhost.dev");
+ok("acuse: no incluye nada de lo que escribió", ackMail.length === 1 && !JSON.stringify(ackMail[0]).includes("malo.example"));
+await ack("EVA@gmail.com");
+ok("acuse: como mucho uno al día por correo", mailsTo("eva@gmail.com").length === 1);
+// 15b. "Tu web ya está publicada" solo la primera vez
+const Gi = await askLink("gina", "gina@us.es");
+await deploy(Gi.token, { "index.html": "<h1>Gina</h1>" });
+ok("publicada: correo al primer despliegue", mailsTo("gina@us.es", "publish-live").length === 1);
+await deploy(Gi.token, { "index.html": "<h1>Gina 2</h1>" });
+ok("publicada: no se repite al actualizar", mailsTo("gina@us.es", "publish-live").length === 1);
+ok("publicada: guarda el idioma del enlace", sql.prepare("SELECT lang FROM sites WHERE name='gina'").get().lang === "es");
+// 15c. Ciclo anual
+const DAY = 86400, T0 = Math.floor(Date.now() / 1000);
+const runAt = (days) => runPublishLifecycle({ PUBLISH_DB: D1, BREVO_API_KEY: "k" }, new Date((T0 + days * DAY) * 1000));
+const st8 = () => sql.prepare("SELECT status, notice_at, reminders FROM sites WHERE name='gina'").get();
+await runAt(300);
+ok("anual: nada antes de un año", mailsTo("gina@us.es", "publish-annual").length === 0);
+await runAt(366);
+const annual = mailsTo("gina@us.es", "publish-annual");
+ok("anual: aviso al pasar un año sin noticias", annual.length === 1 && st8().notice_at !== null);
+await runAt(367);
+ok("anual: no se repite al día siguiente", mailsTo("gina@us.es", "publish-annual").length === 1 && mailsTo("gina@us.es").length === 3);
+await runAt(366 + 15); await runAt(366 + 25);
+ok("anual: dos recordatorios (días 15 y 25)", mailsTo("gina@us.es", "publish-reminder").length === 2);
+await runAt(366 + 31);
+ok("anual: suspendida a los 30 días sin confirmar", st8().status === "inactive" && mailsTo("gina@us.es", "publish-inactive").length === 1);
+ok("anual: la suspendida no se sirve", (await visit("gina")).status === 404);
+// confirmar con el enlace del primer aviso (vale hasta el borrado)
+const cTok = annual[0].textContent.match(/#c=([A-Za-z0-9_-]+)/)[1];
+ok("anual: el enlace de confirmación no abre sesión", (await call("POST", "/api/publish/session", { token: cTok, body: "{}" })).status === 401);
+const cf = await call("POST", "/api/publish/confirm", { body: JSON.stringify({ c: cTok }) });
+ok("anual: confirmar reactiva la web", cf.status === 200 && st8().status === "active" && st8().notice_at === null && (await visit("gina")).text.includes("Gina 2"));
+ok("anual: el enlace ya usado no vale otra vez", (await call("POST", "/api/publish/confirm", { body: JSON.stringify({ c: cTok }) })).status === 401);
+// sin confirmar nunca: suspensión, último aviso y borrado
+sql.prepare("UPDATE sites SET confirmed_at = ?, updated_at = ? WHERE name='gina'").run(T0 - 400 * DAY, T0 - 400 * DAY);
+for (const d of [0, 15, 25, 30]) await runAt(d);
+ok("borrado: suspendida otra vez", st8().status === "inactive");
+await runAt(30 + 53);
+ok("borrado: último aviso 7 días antes", mailsTo("gina@us.es", "publish-delete-soon").length === 1);
+await runAt(30 + 60);
+ok("borrado: a los 60 días se borra con sus archivos", !sql.prepare("SELECT 1 FROM sites WHERE name='gina'").get() && blobCount("gina") === 0 && mailsTo("gina@us.es", "publish-deleted").length === 1);
+// abrir un enlace mágico también reactiva una suspendida
+const Hu = await askLink("hugo", "hugo@us.es");
+await deploy(Hu.token, { "index.html": "<h1>Hugo</h1>" });
+sql.prepare("UPDATE sites SET status='inactive', inactive_at=? WHERE name='hugo'").run(T0);
+const H2 = await askLink("hugo", "hugo@us.es");
+ok("inactiva: se puede pedir enlace", !!H2.token);
+await call("POST", "/api/publish/session", { token: H2.token, body: "{}" });
+ok("inactiva: abrir el enlace la reactiva", sql.prepare("SELECT status FROM sites WHERE name='hugo'").get().status === "active");
+sql.prepare("UPDATE sites SET status='suspended' WHERE name='hugo'").run();
+ok("abuso: una suspendida por abuso sigue sin poder pedir enlace", (await askLink("hugo", "hugo@us.es")).r.status === 403);
+sql.prepare("UPDATE sites SET status='active' WHERE name='hugo'").run();
+// 15d. Graduación y correo cambiado a mano
+const may = new Date(Date.UTC(new Date().getUTCFullYear() + 1, 4, 10));
+await runPublishLifecycle({ PUBLISH_DB: D1, BREVO_API_KEY: "k" }, may);
+await runPublishLifecycle({ PUBLISH_DB: D1, BREVO_API_KEY: "k" }, new Date(may.getTime() + DAY * 1000));
+ok("graduación: una vez al año en mayo", mailsTo("hugo@us.es", "publish-graduation").length === 1);
+ok("fuera de la lista: un correo cualquiera no puede pedir enlace", (await askLink("nuevo", "hugo@gmail.com")).r.status === 400);
+sql.prepare("UPDATE sites SET email='hugo@gmail.com' WHERE name='hugo'").run();
+ok("fuera de la lista: sí puede si el equipo lo puso en su sitio", !!(await askLink("hugo", "hugo@gmail.com")).token);
 
 console.log(fails ? `\n${fails} FALLOS` : "\nTodo OK");
 process.exit(fails ? 1 : 0);

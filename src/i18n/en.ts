@@ -542,6 +542,9 @@ const en: Dict = {
       deleteConfirm: "Sure? The site and all its files are deleted, and the name becomes free.",
       deleted: "Your site has been deleted.",
       update: "To update it later, ask for a new link with the same name and email, and publish again.",
+      confirmLead: "Confirm that you still use your site and we will keep it online. If it was suspended, it goes back online right away.",
+      confirmButton: "Keep my site",
+      confirmed: "Done. {url} stays online. We will ask again in a year.",
       errors: {
         nothing: "First choose a file, a folder or a repository.",
         no_index: "index.html is missing.",

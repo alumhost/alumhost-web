@@ -35,8 +35,12 @@
   //   npx wrangler secret put CONTACT_TO         -> correos VERIFICADOS en Email Routing, separados por comas (destino del formulario)
   "vars": {
     "CONTACT_FROM": "web@alumhost.dev", // remitente en alumhost.dev (Email Routing activo)
-    "PUBLISH_FROM": "hola@alumhost.dev" // remitente del enlace mágico (dominio verificado en Brevo)
+    "MAIL_FROM": "hola@alumhost.dev", // remitente de los correos a clientes (dominio verificado en Brevo)
+    "MAIL_REPLY_TO": "soporte@alumhost.dev" // las respuestas de los clientes van aquí
   },
+
+  // Correos programados de Publish (worker/publish-lifecycle.ts): una vez al día, a las 8:00 UTC.
+  "triggers": { "crons": ["0 8 * * *"] },
 
   // Envío de correo con Email Routing. Sin destination_address: puede enviar a cualquier dirección
   // verificada en Email Routing → Destination addresses; el destino concreto es el secreto CONTACT_TO.
@@ -45,7 +49,7 @@
   // Publish gratis (worker/publish.ts). Misma D1 que el Worker que sirve los sitios (sites/wrangler.jsonc).
   // Base de datos D1 "alumhost-publish" creada el 30/09/2026 con jurisdicción UE (RGPD); el id va abajo y en sites/wrangler.jsonc.
   // Tablas:          npx wrangler d1 migrations apply alumhost-publish --remote
-  // Secreto:        npx wrangler secret put BREVO_API_KEY   (clave API de Brevo, para el correo del enlace mágico)
+  // Secreto:        npx wrangler secret put BREVO_API_KEY   (clave API de Brevo, para todos los correos a clientes)
   "d1_databases": [
     { "binding": "PUBLISH_DB", "database_name": "alumhost-publish", "database_id": "34c625b4-5465-4883-9611-0ed7111ce381", "migrations_dir": "migrations" }
   ]

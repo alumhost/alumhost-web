@@ -33,7 +33,8 @@ src/styles/global.css   reset, base, utilidades glass, animaciones
 src/components/         Nav, Footer, PlanPicker, Caustics (agua), TileStrip y TileMotif (patrones), ContactForm, ...
 src/views/              contenido de cada página, parametrizado por idioma
 src/pages/              rutas finas que solo llaman a una view con `lang`
-worker/index.ts         Worker: /api/contact (Turnstile + entrega), resto lo sirve Static Assets
+worker/index.ts         Worker: /api/contact (Turnstile + entrega), cron diario; resto lo sirve Static Assets
+worker/mail*.ts         correos a clientes por Brevo y sus textos (ver docs/correos.md)
 public/_headers         cabeceras de seguridad (CSP, HSTS, etc.)
 ```
 
