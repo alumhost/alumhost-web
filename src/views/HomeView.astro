@@ -1,121 +1,67 @@
 ---
 /**
- * Portada. "Módulos sobre el agua": cada bloque usa un tratamiento distinto a propósito (no hay plantilla repetida).
- * 1 hero directamente sobre el agua (titular a cartel + selector de cristal) · cinta de módulos
- * · 2 cómo trabajamos: libro de filas sobre velo · 3 pasos: verbos gigantes en baldosa índigo con textura
- * · 1b vídeo explicativo (motion graphics) en marco opaco sobre velo
- * · 4 lo que NO prometemos, tachado, sobre velo · 5 cierre en baldosa arena.
- * Textos: i18n home.*. CTA: primaryCta() (depende de site.salesMode).
- * IA: los pasos no llevan números porque el orden ya lo da la lectura; no los añadas.
+ * Portada de WingIT: consultoría de webs y sistemas para negocios de Reina Mercedes. "Cal y añil": pared
+ * encalada, azulejo añil y albero. Cada bloque usa un tratamiento distinto a propósito (no hay plantilla repetida):
+ * 1 hero: titular a cartel + placa de calle de azulejo · zócalo (cinta de módulos)
+ * · 2 para quién: libro de filas por tipo de negocio · 3 pasos: verbos gigantes en banda añil con textura
+ * · 4 precios: lista con puntos guía, como la pizarra de un bar · 5 lo que no vas a tener, tachado
+ * · 6 quiénes somos + preguntas · 7 cierre en banda albero.
+ * Textos: i18n home.*. Los precios salen de i18n a propósito (son dos y no hay checkout): no afirmes el IVA.
  */
 import Base from "../layouts/Base.astro";
 import TileStrip from "../components/TileStrip.astro";
 import TileMotif from "../components/TileMotif.astro";
-import PlanPicker from "../components/PlanPicker.astro";
-import Mark from "../components/Mark.astro";
-import Icon, { type IconName } from "../components/Icon.astro";
-import { primaryCta } from "../config/cta";
-import { path, useDict, type Lang } from "../i18n";
+import { site } from "../config/site";
+import { contactHref, fill, useDict, type Lang } from "../i18n";
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const t = useDict(lang);
 const h = t.home;
-const cta = primaryCta(lang);
-const [perkPerson, ...perkRest] = h.perks.items;
-/* Un icono por hecho, en el orden de home.proof.items: IVA, euros, persona, precio congelado */
-const proofIcons: IconName[] = ["receipt", "currency-eur", "chat-circle-text", "lock-simple"];
+const visit = contactHref(lang, { reason: "business" });
+const later = contactHref(lang, { reason: "custom" });
+const p = h.prices;
 ---
 <Base lang={lang} page="home">
-  <!-- 1. HERO: titular y selector lado a lado sobre el agua; debajo, los hechos que ya son verdad -->
+  <!-- 1. HERO: titular a la izquierda; a la derecha, una placa de calle de azulejo (el toque de Sevilla) -->
   <section class="container hero">
     <div class="hero-copy">
-      <p class="status mono prompt prompt--live rise" style="--i:0">{h.hero.eyebrow}</p>
+      <p class="eyebrow rise" style="--i:0">{h.hero.eyebrow}</p>
       <h1 class="rise" style="--i:1">{h.hero.titleA} <em>{h.hero.titleEm}</em></h1>
       <div class="rise" style="--i:2">
         <p class="lead">{h.hero.sub}</p>
         <div class="ctas">
-          <a class="btn" href={cta.href}>{cta.label}</a>
-          <a class="textlink" href={path("plans", lang)}>{h.hero.ctaSecondary}</a>
+          <a class="btn" href={visit}>{h.hero.cta}</a>
+          <a class="textlink" href="#precios">{h.hero.ctaSecondary}</a>
         </div>
       </div>
     </div>
-    <div class="hero-side rise" style="--i:3">
-      <PlanPicker lang={lang} />
-    </div>
-    <div class="proof">
-      <p class="proof-label mono">{h.proof.label}</p>
-      <ul>
-        {h.proof.items.map((it, i) => (
-          <li>
-            <strong><span class="proof-icon"><Icon name={proofIcons[i]} size="1.25em" /></span>{it.title}</strong>
-            <span class="muted">{it.body}</span>
-          </li>
-        ))}
-      </ul>
-    </div>
+    <figure class="plaque rise" style="--i:3" aria-label={`${h.hero.plaque.top} ${h.hero.plaque.name}`}>
+      <div class="plaque-in">
+        <span class="plaque-top">{h.hero.plaque.top}</span>
+        <span class="plaque-name">{h.hero.plaque.name}</span>
+        <span class="plaque-bottom">{fill(h.hero.plaque.bottom, { name: site.name })}</span>
+      </div>
+    </figure>
   </section>
   <TileStrip id="strip-hero" />
 
-  <!-- 1b. VÍDEO: no se reproduce solo (lleva sonido y pesa); preload="none" para no gastar datos hasta el clic -->
-  <div class="veil">
-    <section class="section container film" aria-labelledby="film-title">
-      <div class="film-copy">
-        <h2 id="film-title">{h.film.title}</h2>
-        <p class="muted">{h.film.body}</p>
-      </div>
-      <figure class="film-frame">
-        <video
-          controls
-          playsinline
-          preload="none"
-          poster="/video/alumhost-poster.jpg"
-          width="1920"
-          height="1080"
-          aria-label={h.film.label}
-        >
-          <source src="/video/alumhost.webm" type="video/webm" />
-          <source src="/video/alumhost.mp4" type="video/mp4" />
-          <p>{h.film.fallback} <a href="/video/alumhost.mp4" download>{h.film.download}</a></p>
-        </video>
-      </figure>
-    </section>
-  </div>
-
-  <!-- 2. CÓMO TRABAJAMOS: libro de filas -->
-  <div class="veil">
-    <section class="section container perks" aria-labelledby="perks-title">
-      <h2 id="perks-title">{h.perks.title}</h2>
-      <div class="rows">
-        <article class="row row--lead">
-          {/* El logo es literalmente "una persona con una terminal": aquí firma la promesa */}
-          <Mark size={72} class="lead-mark" />
-          <h3>{perkPerson.title}</h3>
-          <p>{perkPerson.body}</p>
+  <!-- 2. PARA QUIÉN: libro de filas, una por tipo de negocio -->
+  <section class="section container sectors" id="servicios" aria-labelledby="sectors-title">
+    <h2 id="sectors-title">{h.sectors.title}</h2>
+    <div class="rows">
+      {h.sectors.items.map((s) => (
+        <article class="row">
+          <h3>{s.name}</h3>
+          <p class="muted">{s.body}</p>
         </article>
-        {perkRest.map((p, i) => (
-          <article class="row">
-            <h3>{p.title}</h3>
-            <div>
-              <p class="muted">{p.body}</p>
-              {i === perkRest.length - 1 && (
-                /* Nombres reales de los scripts del plan (§6). No inventar flags ni salidas. */
-                <ul class="scripts mono" aria-label="Scripts">
-                  <li>./create-vps</li>
-                  <li>./destroy-vps</li>
-                  <li>./quarantine-vps</li>
-                </ul>
-              )}
-            </div>
-          </article>
-        ))}
-      </div>
-    </section>
-  </div>
+      ))}
+    </div>
+  </section>
 
-  <!-- 3. PASOS: tres verbos gigantes en baldosa índigo -->
+  <!-- 3. PASOS: verbos gigantes en banda añil -->
   <section class="section steps band-indigo" aria-labelledby="steps-title">
-    <TileMotif id="motif-steps" opacity={0.06} />
+    <TileMotif id="motif-steps" opacity={0.07} />
     <div class="container steps-in">
       <h2 id="steps-title">{h.steps.title}</h2>
       <ol class="steps-list">
@@ -129,28 +75,78 @@ const proofIcons: IconName[] = ["receipt", "currency-eur", "chat-circle-text", "
     </div>
   </section>
 
-  <!-- 4. LO QUE NO PROMETEMOS: lo negado va tachado -->
-  <div class="veil">
-    <section class="section container honest" aria-labelledby="honest-title">
-      <h2 id="honest-title">{h.honest.title}</h2>
-      <ul class="honest-list">
-        {h.honest.items.map((it) => (
-          <li>
-            <p class="denied"><s>{it.title}</s></p>
-            <p class="muted">{it.body}</p>
-          </li>
-        ))}
-      </ul>
-    </section>
-  </div>
+  <!-- 4. PRECIOS: lista con puntos guía (como una pizarra de bar), no tarjetas -->
+  <section class="section container prices" id="precios" aria-labelledby="prices-title">
+    <div class="prices-head">
+      <h2 id="prices-title">{p.title}</h2>
+      <p class="lead">{p.sub}</p>
+    </div>
+    <div class="board">
+      {[p.web, p.care].map((item) => (
+        <article class="entry">
+          <p class="line">
+            <span class="item">{item.name}</span>
+            <span class="dots" aria-hidden="true"></span>
+            <span class="amount">{item.price}{"per" in item && <small>{item.per}</small>}</span>
+          </p>
+          <p class="note">{item.note}</p>
+          <ul class="features">
+            {item.features.map((f) => <li>{f}</li>)}
+          </ul>
+          {"extra" in item && <p class="muted extra">{item.extra}</p>}
+        </article>
+      ))}
+      <article class="entry entry--later">
+        <h3>{p.later.name}</h3>
+        <p class="muted">{p.later.body}</p>
+        <a class="textlink" href={later}>{p.later.cta}</a>
+      </article>
+    </div>
+  </section>
 
-  <!-- 5. CIERRE en baldosa arena -->
+  <!-- 5. LO QUE NO VAS A TENER: lo negado va tachado -->
+  <section class="section container honest" aria-labelledby="honest-title">
+    <h2 id="honest-title">{h.honest.title}</h2>
+    <ul class="honest-list">
+      {h.honest.items.map((it) => (
+        <li>
+          <p class="denied"><s>{it.title}</s></p>
+          <p class="muted">{it.body}</p>
+        </li>
+      ))}
+    </ul>
+  </section>
+
+  <!-- 6. QUIÉNES SOMOS + PREGUNTAS -->
+  <section class="section container about" id="nosotros" aria-labelledby="team-title">
+    <div class="team">
+      <h2 id="team-title">{h.team.title}</h2>
+      <p class="names" aria-hidden="true">{h.team.names[0]} <span>{h.team.and}</span> {h.team.names[1]}</p>
+      <p class="lead">
+        <span class="sr-only">{h.team.names[0]} {h.team.and} {h.team.names[1]}. </span>{fill(h.team.body, { name: site.name })}
+      </p>
+    </div>
+    <div class="faq">
+      <h2 class="faq-title">{h.faq.title}</h2>
+      {h.faq.items.map((f) => (
+        <details>
+          <summary>{f.q}</summary>
+          <p class="muted">{f.a}</p>
+        </details>
+      ))}
+    </div>
+  </section>
+
+  <!-- 7. CIERRE en banda albero -->
   <section class="band-sand closing" aria-labelledby="closing-title">
     <div class="container closing-in">
       <h2 id="closing-title">{h.closing.title}</h2>
       <div>
         <p class="lead">{h.closing.body}</p>
-        <a class="btn" href={cta.href}>{cta.label}</a>
+        <div class="ctas">
+          <a class="btn" href={visit}>{h.hero.cta}</a>
+          {site.links.whatsapp && <a class="textlink" href={site.links.whatsapp} rel="noopener">{h.closing.whatsapp}</a>}
+        </div>
       </div>
     </div>
   </section>
@@ -162,99 +158,84 @@ const proofIcons: IconName[] = ["receipt", "currency-eur", "chat-circle-text", "
     display: grid;
     grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
     gap: clamp(2rem, 4vw, 4.5rem);
-    align-items: end;
-    padding-block: clamp(2.5rem, 6vw, 5.5rem) clamp(2.5rem, 4vw, 3.5rem);
+    align-items: center;
+    padding-block: clamp(2.5rem, 6vw, 5.5rem) clamp(3rem, 5vw, 4.5rem);
   }
-  .hero h1 { font-size: var(--step-4); max-width: 11ch; margin-block: 1.2rem clamp(1.5rem, 2.5vw, 2.2rem); }
+  .eyebrow { font-weight: 600; color: var(--teal); letter-spacing: 0.04em; text-transform: uppercase; font-size: var(--step--1); }
+  .hero h1 { font-size: var(--step-4); max-width: 12ch; margin-block: 1rem clamp(1.5rem, 2.5vw, 2.2rem); }
   .hero h1 em {
     font-style: normal;
-    background: linear-gradient(var(--sand), var(--sand)) 0 90% / 100% 0.12em no-repeat;
+    color: var(--indigo);
+    background: linear-gradient(var(--sand), var(--sand)) 0 92% / 100% 0.14em no-repeat;
   }
-  .hero .lead { color: var(--text); max-width: 38ch; }
+  .hero .lead { color: var(--text); max-width: 40ch; }
   .ctas { display: flex; flex-wrap: wrap; align-items: center; gap: 1.5rem; margin-top: 2rem; }
-  .status { font-size: 0.875rem; color: var(--teal); }
 
-  /* Hechos: libro mayor bajo el hero, cuatro entradas separadas por reglas, cada marca con su color */
-  .proof { grid-column: 1 / -1; border-top: var(--rule); padding-top: 1.1rem; }
-  .proof-label { font-size: 0.8rem; color: var(--muted); letter-spacing: 0.04em; text-transform: uppercase; }
-  .proof ul {
-    list-style: none;
-    padding: 0;
-    margin-top: 0.9rem;
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+  /* Placa de calle: azulejos blancos con juntas, marco de albero y cenefa añil, letras añil a cartel.
+     Es la única pieza figurativa de la página; la cinta de debajo hace de zócalo. */
+  .plaque {
+    margin: 0;
+    justify-self: end;
+    width: min(100%, 30rem);
+    padding: 10px;
+    background: var(--sand);
+    border: 2px solid var(--indigo);
+    rotate: -1.5deg;
   }
-  .proof li { display: grid; gap: 0.25rem; padding: 0.2rem 1.4rem 0.2rem 1.1rem; border-left: 1px solid var(--rule-color); }
-  .proof li:first-child { border-left: 0; padding-left: 0; }
-  .proof strong { display: flex; align-items: center; gap: 0.55rem; font-weight: 600; }
-  .proof-icon { display: inline-flex; flex: none; color: var(--mark, var(--teal)); }
-  .proof li:nth-child(2) { --mark: var(--sand); }
-  .proof li:nth-child(3) { --mark: var(--sky); }
-  .proof li:nth-child(4) { --mark: var(--white); }
-  .proof .muted { font-size: var(--step--1); line-height: 1.45; }
-
-  /* ---------- Vídeo ---------- */
-  .film {
+  .plaque-in {
     display: grid;
-    grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
-    gap: clamp(2rem, 5vw, 5rem);
-    align-items: end;
+    justify-items: center;
+    gap: 0.35rem;
+    padding: clamp(1.4rem, 3vw, 2.4rem) 1rem;
+    border: 4px solid var(--indigo);
+    outline: 2px solid var(--white);
+    outline-offset: -9px;
+    color: var(--indigo);
+    text-align: center;
+    background-color: var(--white);
+    /* Juntas de los azulejos: cuadrícula fina de 25 % */
+    background-image:
+      linear-gradient(90deg, transparent calc(25% - 1px), var(--rule-color) calc(25% - 1px), var(--rule-color) 25%, transparent 25%),
+      linear-gradient(transparent calc(50% - 1px), var(--rule-color) calc(50% - 1px), var(--rule-color) 50%, transparent 50%);
+    background-size: 25% 100%, 100% 50%;
   }
-  .film h2 { max-width: 9ch; margin-bottom: 1.2rem; }
-  .film-copy p { max-width: 32ch; }
-  /* Marco opaco y recto (baldosa, no cristal): el vídeo no flota */
-  .film-frame { margin: 0; background: var(--ink); border: var(--rule); }
-  .film-frame video { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; background: var(--ink); }
+  .plaque-top, .plaque-bottom { font-weight: 600; font-size: var(--step--1); letter-spacing: 0.08em; text-transform: uppercase; }
+  .plaque-name {
+    font-family: var(--font-display);
+    font-stretch: 78%;
+    font-weight: 800;
+    font-size: clamp(2.1rem, 1.4rem + 2.6vw, 3.6rem);
+    line-height: 0.95;
+    text-transform: uppercase;
+  }
+  .plaque-bottom { color: var(--text); background: var(--white); padding: 0 0.4rem; }
 
-  /* ---------- Libro de filas ---------- */
-  .perks {
+  /* ---------- Para quién: libro de filas ---------- */
+  .sectors {
     display: grid;
     grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
     gap: clamp(2rem, 5vw, 5rem);
     align-items: start;
   }
-  .perks h2 { position: sticky; top: calc(var(--nav-h) + 2.5rem); max-width: 8ch; }
+  .sectors h2 { position: sticky; top: calc(var(--nav-h) + 2.5rem); max-width: 9ch; }
   .row {
     position: relative;
     display: grid;
     grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
     gap: clamp(1rem, 4vw, 4rem);
-    align-items: start;
+    align-items: baseline;
     padding-block: clamp(1.4rem, 2.5vw, 2.2rem);
     border-top: var(--rule);
   }
-  .row:first-child { padding-top: 0; border-top: 0; }
   .row:last-child { border-bottom: var(--rule); }
-  /* Cada fila lleva su color en el arranque de la regla: ámbar, verde agua, azul */
-  .row + .row::before {
-    content: "";
-    position: absolute;
-    left: 0;
-    top: -2px;
-    width: 3.5rem;
-    height: 2px;
-    background: var(--accent);
-  }
+  /* Cada fila arranca su regla con un color de azulejo */
+  .row::before { content: ""; position: absolute; left: 0; top: -2px; width: 3.5rem; height: 2px; background: var(--accent); }
+  .row:nth-child(1) { --accent: var(--indigo); }
   .row:nth-child(2) { --accent: var(--sand); }
   .row:nth-child(3) { --accent: var(--teal); }
-  .row:nth-child(4) { --accent: var(--sky); }
-  .row h3 { font-stretch: var(--display-width); font-weight: 800; font-size: var(--step-2); line-height: 0.95; max-width: 14ch; }
-  .row p { max-width: 46ch; }
-  .row--lead { grid-template-columns: 1fr; gap: 1.2rem; }
-  .row--lead h3 { font-size: var(--step-3); max-width: 12ch; }
-  .row--lead :global(.lead-mark) { width: clamp(3.2rem, 2.4rem + 2.5vw, 4.5rem); height: auto; }
-  .row--lead p { font-size: var(--step-1); line-height: 1.4; align-self: end; }
-  .scripts {
-    list-style: none;
-    padding: 1rem 1.2rem;
-    margin-top: 1.5rem;
-    background: var(--ink);
-    color: var(--text);
-    line-height: 1.9;
-    max-width: 22rem;
-    border: 1px solid var(--rule-color);
-  }
-  .scripts li::before { content: "$ "; color: var(--teal); }
+  .row:nth-child(4) { --accent: var(--brick); }
+  .row h3 { font-stretch: var(--display-width); font-weight: 800; font-size: var(--step-2); line-height: 0.95; }
+  .row p { max-width: 44ch; }
 
   /* ---------- Pasos ---------- */
   .steps { position: relative; overflow: hidden; }
@@ -277,11 +258,46 @@ const proofIcons: IconName[] = ["receipt", "currency-eur", "chat-circle-text", "
     font-size: var(--step-4);
     line-height: 0.88;
     text-transform: uppercase;
+    overflow-wrap: anywhere;
   }
-  .steps-list p { font-size: var(--step-1); line-height: 1.35; max-width: 30ch; }
+  .steps-list p { font-size: var(--step-1); line-height: 1.35; max-width: 32ch; }
 
-  /* ---------- Lo que no prometemos ---------- */
-  .honest h2 { margin-bottom: clamp(2rem, 4vw, 3.5rem); max-width: 14ch; }
+  /* ---------- Precios: pizarra ---------- */
+  .prices {
+    display: grid;
+    grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+    gap: clamp(2rem, 5vw, 5rem);
+    align-items: start;
+  }
+  .prices-head h2 { max-width: 8ch; margin-bottom: 1.2rem; }
+  .board { display: grid; gap: clamp(2rem, 4vw, 3rem); }
+  .entry { border-top: 4px solid var(--indigo); padding-top: 1.2rem; }
+  .line { display: flex; align-items: baseline; gap: 0.8rem; }
+  .item, .amount {
+    font-family: var(--font-display);
+    font-stretch: var(--display-width);
+    font-weight: 800;
+    font-size: var(--step-3);
+    line-height: 1;
+  }
+  .amount { color: var(--indigo); white-space: nowrap; }
+  .amount small { font-size: 0.4em; font-stretch: 85%; margin-left: 0.1em; color: var(--muted); }
+  .dots { flex: 1; min-width: 1.5rem; border-bottom: 4px dotted var(--rule-strong); translate: 0 -0.35em; opacity: 0.45; }
+  .note { margin-top: 0.8rem; font-size: var(--step-1); line-height: 1.4; }
+  .features { list-style: none; padding: 0; margin-top: 1rem; display: flex; flex-wrap: wrap; gap: 0.5rem 1.6rem; }
+  .features li { padding-left: 1.1rem; position: relative; }
+  /* Viñeta: rombo de azulejo */
+  .features li::before {
+    content: ""; position: absolute; left: 0; top: 0.62em; width: 0.45rem; height: 0.45rem;
+    background: var(--sand); rotate: 45deg; outline: 1px solid var(--indigo);
+  }
+  .extra { margin-top: 0.9rem; font-size: var(--step--1); }
+  .entry--later { border-top: 2px dashed var(--rule-strong); display: grid; gap: 0.8rem; justify-items: start; }
+  .entry--later h3 { font-size: var(--step-2); font-stretch: var(--display-width); font-weight: 800; }
+  .entry--later p { max-width: 52ch; }
+
+  /* ---------- Lo que no vas a tener ---------- */
+  .honest h2 { margin-bottom: clamp(2rem, 4vw, 3.5rem); max-width: 16ch; }
   .honest-list {
     list-style: none;
     padding: 0;
@@ -294,12 +310,50 @@ const proofIcons: IconName[] = ["receipt", "currency-eur", "chat-circle-text", "
     font-family: var(--font-display);
     font-stretch: var(--display-width);
     font-weight: 800;
-    font-size: var(--step-3);
-    line-height: 0.95;
+    font-size: var(--step-2);
+    line-height: 0.98;
     margin-bottom: 0.8rem;
   }
   .denied s { text-decoration-color: var(--brick); text-decoration-thickness: 0.09em; }
-  .honest-list .muted { max-width: 38ch; }
+  .honest-list .muted { max-width: 40ch; }
+
+  /* ---------- Quiénes somos + preguntas ---------- */
+  .about {
+    display: grid;
+    grid-template-columns: minmax(0, 6fr) minmax(0, 6fr);
+    gap: clamp(2.5rem, 6vw, 6rem);
+    align-items: start;
+    border-top: var(--rule);
+  }
+  .names {
+    margin-block: 1.4rem 1.2rem;
+    font-family: var(--font-display);
+    font-stretch: 68%;
+    font-weight: 800;
+    font-size: var(--step-4);
+    line-height: 0.9;
+    color: var(--indigo);
+  }
+  .names span { color: var(--muted); font-stretch: 100%; font-weight: 400; font-size: 0.4em; }
+  .faq-title { font-size: var(--step-2); margin-bottom: 1rem; }
+  details { border-top: var(--rule); }
+  details:last-child { border-bottom: var(--rule); }
+  summary {
+    cursor: pointer;
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-block: 1rem;
+    min-height: 44px;
+    font-weight: 600;
+    font-size: var(--step-1);
+    line-height: 1.3;
+  }
+  summary::-webkit-details-marker { display: none; }
+  summary::after { content: "+"; font-family: var(--font-display); font-weight: 800; color: var(--indigo); }
+  details[open] summary::after { content: "−"; }
+  details p { padding-bottom: 1.2rem; max-width: 52ch; }
 
   /* ---------- Cierre ---------- */
   .closing { padding-block: var(--section); }
@@ -310,20 +364,17 @@ const proofIcons: IconName[] = ["receipt", "currency-eur", "chat-circle-text", "
     align-items: end;
   }
   .closing h2 { font-size: var(--step-4); }
-  .closing .lead { margin-bottom: 1.6rem; }
+  .closing .ctas { margin-top: 1.6rem; }
 
   /* ---------- Móvil ---------- */
   @media (max-width: 919px) {
-    .hero, .closing-in, .perks, .film { grid-template-columns: 1fr; }
-    .perks h2 { position: static; max-width: 12ch; }
-    .proof ul { grid-template-columns: 1fr 1fr; row-gap: 1.2rem; }
-    .proof li:nth-child(3) { border-left: 0; padding-left: 0; }
+    .hero, .closing-in, .sectors, .prices, .about { grid-template-columns: 1fr; }
+    .sectors h2 { position: static; max-width: 14ch; }
+    .plaque { justify-self: start; }
   }
   @media (max-width: 767px) {
     .row, .steps-list li { grid-template-columns: 1fr; gap: 0.7rem; }
-    .row--lead p { align-self: start; }
     .honest-list { grid-template-columns: 1fr; }
-    .proof ul { grid-template-columns: 1fr; }
-    .proof li { border-left: 0; padding-left: 0; }
+    .item, .amount { font-size: var(--step-2); }
   }
 </style>

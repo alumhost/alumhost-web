@@ -1,56 +1,53 @@
 /*
- * Tokens de diseño de AlumHost. TODO color, fuente y regla de la web sale de aquí. Ver DESIGN.md.
- * VARIANTE NOCHE EN COLOR (rama design/dark-color): un solo tema, siempre oscuro, pero con color con oficio.
- * Fondo azul noche (nunca negro puro), agua con luz cian, baldosa cobalto, acento ámbar para la acción y
- * verde agua para lo que está "en marcha". Los nombres de tokens no cambian (--indigo es ahora cobalto y
- * --sand ámbar) para que ningún componente se toque.
+ * Tokens de diseño de WingIT. TODO color, fuente y regla de la web sale de aquí. Ver DESIGN.md.
+ * v4 "CAL Y AÑIL" (consultoría de barrio, Reina Mercedes): un solo tema claro. Pared encalada, azulejo añil
+ * y albero. Los nombres de tokens no cambian (--indigo es el añil y --sand el albero) para no tocar componentes.
  * Cada color tiene un único trabajo:
- *   --sand  (ámbar)   acción: botones, subrayado del titular, verbos, banda de cierre
- *   --indigo (cobalto) estructura: banda de pasos, pie, cinta de módulos
- *   --teal  (verde agua) estado y confianza: "beta abierta", marcas de hechos, prompt de los scripts
- *   --brick (coral)   SOLO lo tachado y los errores
- * Nada de morado, neón ni degradados de texto. Nombres neutros: nada regional en tokens, clases ni textos.
+ *   --indigo (añil)   estructura y acción: botones, enlaces, banda de pasos, pie, azulejos
+ *   --sand  (albero)  acento: subrayado del titular, verbos sobre añil, banda de cierre, marco de la placa
+ *   --teal  (verde de azulejo) estado: etiquetas pequeñas
+ *   --brick (almagra) SOLO lo tachado y los errores
+ * Nada de morado, neón ni degradados de texto.
  *
  * IA: solo hay un tema. Contrastes: scripts/contrast.py (WCAG AA).
  */
 :root {
-  color-scheme: dark;
+  color-scheme: light;
 
   /* Fijos */
-  --ink: #0a0f1e;
+  --ink: #0e1533;
   --white: #ffffff;
-  --sand: #f4b740;
-  --teal: #45caa9;
-  --sky: #7fb2ff;
+  --sand: #e3a92f;
+  --teal: #1d6656;
+  --sky: #2f5bc7;
 
   /* Color */
-  --paper: #0b1122;
-  --paper-2: #141c36;
-  --text: #eef1fa;
-  --muted: #a9b3d1;
-  --indigo: #2138ad;
-  --brick: #ff8a73;
-  --link: #f4b740;
-  --focus: #f4b740;
-  --btn-bg: #f4b740;
-  --btn-fg: #0a0f1e;
-  --rule-color: #3a4670;
-  --rule-strong: #eef1fa;
+  --paper: #f7f5f0;
+  --paper-2: #edeae2;
+  --text: #111a3a;
+  --muted: #474e6b;
+  --indigo: #1c3a8c;
+  --brick: #a3271c;
+  --link: #1c3a8c;
+  --focus: #1c3a8c;
+  --btn-bg: #1c3a8c;
+  --btn-fg: #ffffff;
+  --rule-color: #cfcabd;
+  --rule-strong: #111a3a;
 
-  /* Agua (Caustics.astro): fondo de toda la página. Noche azul con luz cian. */
-  --pool-base: #070b18;
-  --pool-water: #10245a;
-  --pool-light: #3fb6cf;
-  --pool-strength: 0.62;
-  /* Velo sobre el agua en las secciones de lectura (el agua se intuye, el texto se lee) */
-  --veil: rgb(11 17 34 / 0.8);
+  /* Sin agua en v4: el fondo es la pared. Se mantienen para scripts/contrast.py y Caustics.astro (sin uso). */
+  --pool-base: #f7f5f0;
+  --pool-water: #edeae2;
+  --pool-light: #ffffff;
+  --pool-strength: 0;
+  --veil: transparent;
 
-  /* Cristal: solo en lo que flota */
-  --glass-bg: rgb(20 28 54 / 0.58);
-  --glass-border: rgb(170 190 255 / 0.2);
-  --glass-hi: rgb(190 210 255 / 0.2);
-  --glass-shadow: 0 1px 2px rgb(3 6 16 / 0.5), 0 24px 60px -20px rgb(3 8 30 / 0.9);
-  --glass-blur: 18px;
+  /* Cristal: solo en lo que flota (la barra de navegación). Sobre la pared se lee como papel. */
+  --glass-bg: rgb(247 245 240 / 0.9);
+  --glass-border: rgb(17 26 58 / 0.14);
+  --glass-hi: rgb(255 255 255 / 0.7);
+  --glass-shadow: 0 1px 2px rgb(17 26 58 / 0.06), 0 18px 40px -24px rgb(17 26 58 / 0.35);
+  --glass-blur: 12px;
   --r-glass: 16px;
 
   /* Tipografía (autoalojada con @fontsource, ver src/layouts/Base.astro) */

@@ -1,7 +1,7 @@
 ---
 /**
- * Pie: baldosa índigo opaca rematada arriba por la cinta de módulos. Los enlaces externos (estado, devlog, repo)
- * solo aparecen si están definidos en site.links.
+ * Pie: banda añil rematada arriba por la cinta de módulos (el zócalo). Los enlaces externos (estado, devlog, repo,
+ * WhatsApp) solo aparecen si están definidos en site.links. Las páginas del hosting antiguo ya no se enlazan aquí.
  * Términos, Uso aceptable y Privacidad son borradores de la beta (revisión del PAE pendiente). TODO(legal): DPA.
  */
 import TileStrip from "./TileStrip.astro";
@@ -16,6 +16,7 @@ const external = [
   { href: site.links.status, label: t.footer.status },
   { href: site.links.devlog, label: t.footer.devlog },
   { href: site.links.repo, label: t.footer.repo },
+  { href: site.links.whatsapp, label: t.contact.channels.whatsappLabel },
 ].filter((l): l is { href: string; label: string } => Boolean(l.href));
 ---
 <TileStrip id="strip-footer" />
@@ -27,19 +28,15 @@ const external = [
     </div>
     <nav class="cols" aria-label={t.footer.tagline}>
       <ul>
-        <li><a href={path("plans", lang)}>{t.nav.plans}</a></li>
-        <li><a href={path("enterprise", lang)}>{t.nav.enterprise}</a></li>
-        <li><a href={path("beta", lang)}>{t.footer.beta}</a></li>
+        <li><a href={`${path("home", lang)}#servicios`}>{t.nav.services}</a></li>
+        <li><a href={`${path("home", lang)}#precios`}>{t.nav.prices}</a></li>
+        <li><a href={`${path("home", lang)}#nosotros`}>{t.nav.about}</a></li>
         <li><a href={path("contact", lang)}>{t.nav.contact}</a></li>
-        <li><a href={path("terms", lang)}>{t.footer.terms}</a></li>
-        <li><a href={path("aup", lang)}>{t.footer.aup}</a></li>
         <li><a href={path("privacy", lang)}>{t.footer.privacy}</a></li>
         {external.map((l) => <li><a href={l.href} rel="noopener">{l.label}</a></li>)}
       </ul>
       <ul class="mail">
         <li><a href={`mailto:${site.email.hello}`}>{site.email.hello}</a></li>
-        <li><span class="label">{t.contact.channels.supportLabel}</span><a href={`mailto:${site.email.support}`}>{site.email.support}</a></li>
-        <li><span class="label">{t.contact.channels.abuseLabel}</span><a href={`mailto:${site.email.abuse}`}>{site.email.abuse}</a></li>
       </ul>
     </nav>
   </div>
@@ -49,8 +46,7 @@ const external = [
 </footer>
 
 <style>
-  /* Pie en noche profunda: la banda cobalto ya está en los pasos y el cierre es ámbar; aquí descansa el color */
-  .footer { background: var(--pool-base); padding-block: clamp(3rem, 6vw, 5rem) 2rem; font-size: var(--step--1); }
+  .footer { padding-block: clamp(3rem, 6vw, 5rem) 2rem; font-size: var(--step--1); }
   .top { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 3rem; align-items: end; }
   .word {
     font-family: var(--font-display);

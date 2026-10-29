@@ -13,7 +13,8 @@
 export type SalesMode = "waitlist" | "deposit" | "checkout";
 
 export const site = {
-  name: "AlumHost",
+  name: "WingIT",
+  // TODO(dominio): WingIT aún no tiene dominio propio; mientras, se sirve y se recibe correo en alumhost.dev.
   domain: "alumhost.dev",
   salesMode: "waitlist" as SalesMode,
 
@@ -33,6 +34,8 @@ export const site = {
     status: null as string | null,
     devlog: null as string | null,
     repo: null as string | null,
+    /** WhatsApp del negocio en formato wa.me (p. ej. "https://wa.me/34600000000"). TODO: número real. */
+    whatsapp: null as string | null,
   },
 
   /**
@@ -43,7 +46,7 @@ export const site = {
   legal: {
     // Beta sin actividad económica: nombres de los responsables. NIF/DNI NO se publica hasta el alta (aviso legal LSSI);
     // el repo es público y el historial de Git es permanente.
-    controller: "Alonso Carballar Barrientos y Blas Cosano Molina, responsables de AlumHost",
+    controller: "Alonso Carballar Barrientos y Blas Cosano Molina, responsables de WingIT",
   },
 
   turnstileSiteKey: "0x4AAAAAAFKBNs44FuYDq8eS",

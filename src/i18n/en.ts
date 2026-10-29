@@ -6,9 +6,9 @@ import type { Dict } from "./es";
 const en: Dict = {
   meta: {
     home: {
-      title: "{name} · VPS and websites for students, with human support",
+      title: "{name} · Websites for businesses in Reina Mercedes, Seville",
       description:
-        "Boutique hosting for students and developers: static sites and SSH-ready VPS, VAT included, with a 1:1 onboarding call.",
+        "Websites and systems for bars, hair salons, academies and shops in Reina Mercedes. In-person help, WhatsApp support and clear prices: a website for 849 € and maintenance for 30 €/month.",
     },
     plans: {
       title: "Plans and pricing · {name}",
@@ -16,7 +16,7 @@ const en: Dict = {
     },
     contact: {
       title: "Contact · {name}",
-      description: "Reserve a spot in the private beta or ask us anything. A real person replies.",
+      description: "Tell us what business you run and we will arrange a visit. We reply ourselves.",
     },
     privacy: {
       title: "Privacy · {name}",
@@ -42,6 +42,10 @@ const en: Dict = {
     plans: "Plans",
     enterprise: "Enterprise",
     contact: "Contact",
+    services: "Services",
+    prices: "Prices",
+    about: "About us",
+    ctaVisit: "Ask for a visit",
     cta: "Reserve a spot",
     menu: "Menu",
     close: "Close",
@@ -64,82 +68,92 @@ const en: Dict = {
 
   home: {
     hero: {
-      eyebrow: "Private beta open",
-      titleA: "Your server, set up",
-      titleEm: "with you.",
-      sub: "VPS and static sites for students and developers. We do your first setup together, 1:1.",
-      ctaSecondary: "See plans",
-      picker: {
-        legend: "What are you shipping?",
-        options: {
-          publish: "A static website",
-          mini: "A small VPS",
-          developer: "A VPS",
-          pro: "A bigger VPS",
-        },
-        details: "See the full plan",
-      },
+      eyebrow: "Reina Mercedes, Seville",
+      titleA: "Your business website,",
+      titleEm: "made in the neighbourhood.",
+      sub: "Websites and systems for bars, hair salons, academies and shops. We come to your place, explain it without jargon and, if something breaks, you message us on WhatsApp.",
+      cta: "Ask for a visit",
+      ctaSecondary: "See prices",
+      plaque: { top: "Barrio de", name: "Reina Mercedes", bottom: "{name} · websites and systems" },
     },
-    proof: {
-      label: "Already true today",
+    sectors: {
+      title: "For the businesses around here.",
       items: [
-        { title: "VAT included", body: "The price you see is the price you pay." },
-        { title: "In euros", body: "No international card, no invoices in dollars." },
-        { title: "A person answers", body: "No bots, no ticket queue." },
-        { title: "Price locked", body: "Join the beta and your first year does not go up." },
-      ],
-    },
-    film: {
-      title: "AlumHost in 78 seconds.",
-      body: "What it is, how we isolate each server and what every plan includes, in one short video. Sound on.",
-      label: "Video: what AlumHost is",
-      fallback: "Your browser cannot play this video. You can download it:",
-      download: "download the video (MP4)",
-    },
-    perks: {
-      title: "How we work.",
-      items: [
-        {
-          title: "A person, not a ticket.",
-          body: "Your first setup happens with us on a video call or in person. After that, we keep answering ourselves.",
-        },
-        {
-          title: "Built for university.",
-          body: "Theses, coursework, systems labs and hackathons. Billed in euros, no international card needed.",
-        },
-        {
-          title: "Student pricing, no coupons.",
-          body: "No discounts to ask for and no small print: the price you see is the student price, for everyone.",
-        },
-        {
-          title: "Automated, not improvised",
-          body: "Creating, removing and isolating a server are concrete, repeatable commands, not manual steps that depend on someone's memory.",
-        },
+        { name: "Bars and cafés", body: "Your menu on the phone with a QR code on the table, opening hours always up to date and how to get there." },
+        { name: "Hair and beauty", body: "Your services and prices, photos of your work and a button to book." },
+        { name: "Academies", body: "Timetables, groups and enrolment on one clear page, and notices for families in one place." },
+        { name: "Shops", body: "What you sell, where you are and a direct WhatsApp so people can ask before they come." },
       ],
     },
     steps: {
-      title: "How you start.",
+      title: "How we work.",
       items: [
-        { verb: "Choose", body: "A static site or a VPS, depending on what you are shipping." },
-        { verb: "Reserve", body: "We are in private beta. Leave your details and we write back when a spot opens." },
-        { verb: "Launch", body: "We onboard you together and hand over your SSH access or your HTTPS site." },
+        { verb: "Visit", body: "We come to your business and look at how you work and what you need." },
+        { verb: "Propose", body: "We tell you in writing what your website includes and what it costs. If it fits, you pay half and we start." },
+        { verb: "Build", body: "We show it to you before it goes live and adjust it with you. On delivery, you pay the other half." },
+        { verb: "Look after", body: "With maintenance, the site stays up to date and we make the small changes." },
       ],
     },
+    prices: {
+      title: "Clear prices.",
+      sub: "You know what you pay before we start.",
+      web: {
+        name: "Your website",
+        price: "849 €",
+        note: "One payment: half when we start and half on delivery.",
+        features: ["Made for your business, not a template", "Designed to look good on phones", "We show it to you before it goes live"],
+      },
+      care: {
+        name: "Maintenance",
+        price: "30 €",
+        per: "/month",
+        note: "So you never have to worry about anything technical.",
+        features: ["Hosting and domain", "Backups", "Small changes every month, up to a limit", "Support on WhatsApp"],
+        extra: "If one month you need more changes than are included, we tell you the price first.",
+      },
+      later: {
+        name: "And later on",
+        body: "Automating tasks you now do by hand, organising your business information and connecting the programs you already use. If that sounds like something you need, tell us.",
+        cta: "Tell us",
+      },
+    },
     honest: {
-      title: "What we will not promise you.",
+      title: "What you will not get with us.",
       items: [
-        { title: "An SLA.", body: "This is a best-effort service, and we say so before you pay." },
-        { title: "The lowest price.", body: "Big clouds win on specs. We compete on help and being close by." },
-        { title: "Backups you did not order.", body: "Without the backup add-on, the data on your VPS is your responsibility." },
+        { title: "A call centre.", body: "You message us on WhatsApp and we answer, not a ticket system." },
+        { title: "A template you build yourself.", body: "With Wix and the like, you do the work. Here we do it and hand it over ready." },
+        { title: "Words you do not understand.", body: "We explain it with examples from your business. If it is not clear, that is on us." },
+        { title: "An agency that does not know your street.", body: "We meet at your place, in front of your counter, from day one." },
+      ],
+    },
+    team: {
+      title: "Who we are.",
+      names: ["Alonso", "Blas"],
+      and: "and",
+      body: "We are computer science students in Seville. We started {name} so local businesses have someone to call when something online gets stuck: someone close by who speaks plainly.",
+    },
+    faq: {
+      title: "Questions.",
+      items: [
         {
-          title: "Outbound email.",
-          body: "Port 25 is closed. So are 465 and 587, unless you ask us to open them for your project.",
+          q: "What is a small change?",
+          a: "Changing opening hours, a price, a photo or some text. They are included in maintenance up to a monthly limit. If you need more, we tell you the price first.",
+        },
+        {
+          q: "How do I pay?",
+          a: "The website in two halves: when we start and on delivery. Maintenance, every month. You pay by card from a link or a QR code, and maintenance can also be a direct debit.",
+        },
+        { q: "Do I need to know about computers?", a: "No. That is what we are here for. We explain just enough so you know what you have and how to ask for changes." },
+        {
+          q: "What if my business is not in Reina Mercedes?",
+          a: "We start with the neighbourhood because it is close to us. If you are somewhere else, write to us and we will see.",
         },
       ],
     },
     closing: {
-      title: "The beta is small on purpose.",
-      body: "Few spots, direct contact and beta conditions. Reserve yours and we will write back.",
+      title: "Shall we look at it at your place?",
+      body: "Tell us what business you run and we will arrange a time to see it with you.",
+      whatsapp: "Message us on WhatsApp",
     },
   },
 
@@ -202,6 +216,11 @@ const en: Dict = {
   },
 
   plans: {
+    picker: {
+      legend: "What are you shipping?",
+      options: { publish: "A static website", mini: "A small VPS", developer: "A VPS", pro: "A bigger VPS" },
+      details: "See the full plan",
+    },
     header: {
       title: "Clear plans, VAT included.",
       sub: "Beta prices, provisional until we measure real capacity. Pay yearly and the VPS plans come with 2 months free.",
@@ -289,10 +308,11 @@ const en: Dict = {
   contact: {
     header: {
       title: "Let's talk.",
-      sub: "To reserve a beta spot, ask about a plan or get help. A real person replies.",
+      sub: "Tell us what business you run and what you would like. We reply ourselves and, if you want, we meet at your place.",
     },
     channels: {
       emailLabel: "Email",
+      whatsappLabel: "WhatsApp",
       supportLabel: "Support",
       abuseLabel: "Report abuse",
       abuseNote: "We check it every day.",
@@ -308,15 +328,15 @@ const en: Dict = {
       reasons: {
         beta: "Reserve a beta spot",
         plans: "Question about plans",
-        business: "A website or server for my business",
-        custom: "I need something custom",
-        support: "Help with my service",
+        business: "I want a website for my business",
+        custom: "Automate or organise something in my business",
+        support: "I am a client and need a change",
         other: "Something else",
       },
       plan: "Plan you are interested in",
       planUnknown: "Not sure yet",
       message: "Message",
-      messageHelp: "Tell us what you want to build. At least 10 characters.",
+      messageHelp: "What business you run and what you would like. If you prefer a call, leave your phone number. At least 10 characters.",
       privacy: "We only use your details to reply to you.",
       privacyLink: "Privacy policy",
       submit: "Send",
@@ -639,7 +659,7 @@ const en: Dict = {
   },
 
   footer: {
-    tagline: "Boutique hosting for students and developers.",
+    tagline: "Websites and systems for businesses in Reina Mercedes, Seville.",
     status: "Service status",
     devlog: "Devlog",
     repo: "Open source",
