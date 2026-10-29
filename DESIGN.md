@@ -1,4 +1,4 @@
-# DESIGN.md: AlumHost
+# DESIGN.md: WingIT (antes AlumHost)
 
 ## Brief
 Web de producto de un hosting boutique (web estática + VPS) para estudiantes y desarrolladores. Un solo trabajo: que reserven
@@ -88,3 +88,15 @@ Parte de la negro y blanco (un solo tema oscuro) y le devuelve el color con ofic
 - Portada reformateada: hero en dos columnas (titular + CTA | selector de cristal, todo sobre el pliegue a 1440),
   "Lo que ya es verdad" (4 hechos ya decididos en `docs/memoria-decisiones.md`, `home.proof`) bajo el hero,
   "Cómo trabajamos" con titular fijo a la izquierda y cada regla arrancando en su color. Pie en noche profunda.
+
+## v4 "cal y añil" (WingIT, 29/10/2026, rama feat/wingit-consultoria)
+Consultoría de barrio: el público son bares, peluquerías, academias y comercios de Reina Mercedes. La web deja de
+hablar a desarrolladores y pasa a hablar a dueños de negocio. Se quita el agua (Caustics ya no se monta en Base).
+- Un solo tema claro: pared de cal `#F7F5F0`, tinta añil `#111A3A`, añil `#1C3A8C` (botones, enlaces, banda de pasos,
+  pie), albero `#E3A92F` (subrayado, verbos sobre añil, banda de cierre, marco de la placa), verde de azulejo
+  `#1D6656` para etiquetas, almagra `#A3271C` SOLO tachado y errores. El albero nunca va como texto sobre la pared.
+- Toque local, con medida: una sola pieza figurativa (la placa de calle de azulejo del hero, "Barrio de Reina
+  Mercedes"); la cinta de módulos hace de zócalo; los precios van como la pizarra de un bar (puntos guía).
+- Logo provisional: un azulejo (cuartos de círculo de albero y rombo de cal sobre añil), `Mark.astro` y favicon.
+- Portada: hero + placa · zócalo · para quién (filas por tipo de negocio) · cómo trabajamos (verbos en banda añil)
+  · precios (pizarra) · lo que no vas a tener (tachado) · quiénes somos + preguntas (`<details>`) · cierre albero.

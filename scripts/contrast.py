@@ -28,7 +28,7 @@ PAIRS = [
     ("btn-fg", "btn-bg", 4.5),
     ("white", "indigo", 4.5), ("sand", "indigo", 4.5),   # banda índigo
     ("ink", "sand", 4.5),                                  # banda arena
-    ("teal", "paper", 4.5), ("sand", "paper", 4.5),
+    ("teal", "paper", 4.5), ("indigo", "paper", 4.5),  # v4: el albero nunca va como texto sobre la pared
     ("text", "pool-base", 4.5), ("text", "pool-water", 4.5),  # hero sobre el agua
 ]
 ok = True

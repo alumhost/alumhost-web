@@ -1,6 +1,7 @@
 ---
 /**
- * Contacto sobre velo: titular y canales directos (izq.) + formulario (der.). Abuso con canal propio (plan §4.3).
+ * Contacto: titular y canales directos (izq.) + formulario (der.). WhatsApp solo si site.links.whatsapp existe.
+ * Abuso conserva su canal propio mientras siga en marcha el Publish del hosting antiguo (plan §4.3).
  */
 import Base from "../layouts/Base.astro";
 import ContactForm from "../components/ContactForm.astro";
@@ -13,12 +14,17 @@ const t = useDict(lang);
 const c = t.contact;
 ---
 <Base lang={lang} page="contact">
-  <div class="veil">
   <div class="container contact">
     <div class="intro">
       <h1 class="rise" style="--i:0">{c.header.title}</h1>
       <p class="lead rise" style="--i:1">{c.header.sub}</p>
       <dl class="channels rise" style="--i:2">
+        {site.links.whatsapp && (
+          <div>
+            <dt>{c.channels.whatsappLabel}</dt>
+            <dd><a href={site.links.whatsapp} rel="noopener">{c.channels.whatsappLabel}</a></dd>
+          </div>
+        )}
         <div>
           <dt>{c.channels.emailLabel}</dt>
           <dd><a class="mono" href={`mailto:${site.email.hello}`}>{site.email.hello}</a></dd>
@@ -37,9 +43,8 @@ const c = t.contact;
       </dl>
     </div>
     <div class="form-col rise" style="--i:2">
-      <ContactForm lang={lang} />
+      <ContactForm lang={lang} reasons={["business", "custom", "support", "other"]} noPlan />
     </div>
-  </div>
   </div>
 </Base>
 

@@ -1,14 +1,14 @@
 ---
 /**
  * Navegación: barra de cristal flotante sobre el agua (esquinas de 16 px, nunca cápsula), con el reflejo que sigue
- * al puntero. En móvil (<820px) los enlaces pasan a un panel desplegable. El CTA sale de primaryCta().
+ * al puntero. En móvil (<820px) los enlaces pasan a un panel desplegable. WingIT: los enlaces llevan a las
+ * secciones de la portada y el CTA pide una visita (formulario con motivo "business").
  * El cambio de idioma lleva a la misma página.
  */
 import Mark from "./Mark.astro";
 import Icon from "./Icon.astro";
 import { site } from "../config/site";
-import { primaryCta } from "../config/cta";
-import { path, useDict, type Lang, type RouteKey } from "../i18n";
+import { contactHref, path, useDict, type Lang, type RouteKey } from "../i18n";
 
 interface Props {
   lang: Lang;
@@ -18,11 +18,13 @@ const { lang, page } = Astro.props;
 const t = useDict(lang);
 const other: Lang = lang === "es" ? "en" : "es";
 const switchHref = path(page === "notFound" ? "home" : page, other);
-const cta = primaryCta(lang);
-const links: { key: RouteKey; label: string }[] = [
-  { key: "plans", label: t.nav.plans },
-  { key: "enterprise", label: t.nav.enterprise },
-  { key: "contact", label: t.nav.contact },
+const cta = { href: contactHref(lang, { reason: "business" }), label: t.nav.ctaVisit };
+const home = path("home", lang);
+const links: { href: string; label: string; current?: boolean }[] = [
+  { href: `${home}#servicios`, label: t.nav.services },
+  { href: `${home}#precios`, label: t.nav.prices },
+  { href: `${home}#nosotros`, label: t.nav.about },
+  { href: path("contact", lang), label: t.nav.contact, current: page === "contact" },
 ];
 ---
 <header class="nav-wrap">
@@ -36,7 +38,7 @@ const links: { key: RouteKey; label: string }[] = [
       <ul class="links">
         {links.map((l) => (
           <li>
-            <a href={path(l.key, lang)} aria-current={page === l.key ? "page" : undefined}>{l.label}</a>
+            <a href={l.href} aria-current={l.current ? "page" : undefined}>{l.label}</a>
           </li>
         ))}
         <li>

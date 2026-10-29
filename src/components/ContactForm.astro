@@ -11,6 +11,8 @@
  *   mensaje. Así sabemos el canal sin tocar el Worker ni añadir campos.
  * - Campo opcional "ID de referido": solo con motivo "beta" (siempre visible en /beta; en /contacto aparece al elegir
  *   ese motivo). No se valida contra una lista: llega en el asunto y el cuerpo del correo y se cuenta a mano.
+ * - WingIT (/contacto): `reasons` limita los motivos que se ofrecen y `noPlan` quita el selector de plan del hosting
+ *   (el Worker acepta plan vacío). Sin el motivo "beta" en la lista, el campo de referido no se pinta.
  * IA: si añades un campo, añádelo también a la validación de worker/index.ts (mismos límites).
  */
 import { plans } from "../config/plans";
@@ -22,14 +24,18 @@ interface Props {
   lang: Lang;
   /** Motivo fijo: oculta el selector de motivo y envía este valor. */
   reason?: Reason;
+  /** Motivos que se ofrecen en el selector, en este orden. Por defecto, todos. */
+  reasons?: Reason[];
+  /** Sin selector de plan (los planes son del hosting antiguo). */
+  noPlan?: boolean;
   /** Textos que cambian respecto a /contacto. title: null = sin título dentro del formulario. */
   copy?: { title?: string | null; message?: string; messageHelp?: string; submit?: string; success?: string };
 }
-const { lang, reason: fixedReason, copy = {} } = Astro.props;
+const { lang, reason: fixedReason, reasons: only, noPlan = false, copy = {} } = Astro.props;
 const t = useDict(lang);
 const f = { ...t.contact.form, ...Object.fromEntries(Object.entries(copy).filter(([, v]) => v !== undefined)) };
 const formTitle = copy.title === null ? null : (copy.title ?? t.contact.form.title);
-const reasons = Object.entries(f.reasons) as [keyof typeof f.reasons, string][];
+const reasons = (only ?? (Object.keys(f.reasons) as Reason[])).map((k) => [k, f.reasons[k]] as const);
 const messages = JSON.stringify({
   ...f.errors,
   server: fill(f.errors.server, { email: site.email.hello }),
@@ -55,7 +61,7 @@ const messages = JSON.stringify({
     </div>
   </div>
 
-  <div class:list={["row", { "row--single": fixedReason }]}>
+  <div class:list={["row", { "row--single": fixedReason || noPlan }]}>
     {fixedReason ? (
       <input type="hidden" name="reason" value={fixedReason} />
     ) : (
@@ -66,16 +72,18 @@ const messages = JSON.stringify({
         </select>
       </div>
     )}
-    <div class="field">
-      <label for="cf-plan">{f.plan}</label>
-      <select id="cf-plan" name="plan">
-        <option value="">{f.planUnknown}</option>
-        {plans.map((p) => <option value={p.id}>{t.plans.items[p.id].name}</option>)}
-      </select>
-    </div>
+    {!noPlan && (
+      <div class="field">
+        <label for="cf-plan">{f.plan}</label>
+        <select id="cf-plan" name="plan">
+          <option value="">{f.planUnknown}</option>
+          {plans.map((p) => <option value={p.id}>{t.plans.items[p.id].name}</option>)}
+        </select>
+      </div>
+    )}
   </div>
 
-  {(!fixedReason || fixedReason === "beta") && (
+  {(fixedReason ? fixedReason === "beta" : reasons.some(([k]) => k === "beta")) && (
     <div class="field" data-referral hidden={fixedReason !== "beta"}>
       <label for="cf-referral">{f.referral}</label>
       <input id="cf-referral" name="referral" type="text" maxlength="32" autocomplete="off" autocapitalize="none" spellcheck="false" aria-describedby="cf-referral-help" />

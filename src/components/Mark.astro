@@ -1,18 +1,16 @@
 ---
 /**
- * Logo de AlumHost: persona con una terminal (>_) en el cuerpo (decisión 30/09/2026, idea de Blas).
- * Transparente (sin baldosa): la figura usa currentColor, así hereda el color del texto de donde esté
- * (crema sobre la noche, tinta sobre la banda ámbar). La pantalla es terracota de marca y el prompt crema fijo.
- * Misma forma que docs/marca/alumhost-horizontal-oscuro.svg. El favicon (public/favicon.svg) conserva la
- * baldosa crema porque las pestañas del navegador pueden ser claras u oscuras.
+ * Logo de WingIT (provisional, 29/10/2026): un azulejo. Baldosa añil con dos cuartos de círculo de albero en
+ * esquinas opuestas y un rombo de cal en el centro, la misma pieza que la cinta de módulos (TileStrip).
+ * Colores fijos de marca (no currentColor): el azulejo se ve igual sobre la pared, el añil o el albero.
+ * Misma forma que public/favicon.svg.
  */
 interface Props { size?: number; class?: string }
 const { size = 28, class: className } = Astro.props;
 ---
-<svg width={size} height={size} viewBox="0 0 64 78" aria-hidden="true" focusable="false" class:list={["mark", className]}>
-  <circle cx="32" cy="12" r="11" fill="currentColor"/>
-  <rect x="4" y="29" width="56" height="46" rx="7" fill="currentColor"/>
-  <rect x="11" y="36" width="42" height="30" rx="3" fill="#B4533A"/>
-  <path d="M19 44 L27 51 L19 58" fill="none" stroke="#F4EBD9" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M31 58 H43" stroke="#F4EBD9" stroke-width="4" stroke-linecap="round"/>
+<svg width={size} height={size} viewBox="0 0 64 64" aria-hidden="true" focusable="false" class:list={["mark", className]}>
+  <rect width="64" height="64" fill="#1C3A8C"/>
+  <path d="M0 0h28a28 28 0 0 1-28 28zM64 64H36a28 28 0 0 1 28-28z" fill="#E3A92F"/>
+  <path d="M32 17 47 32 32 47 17 32z" fill="#F7F5F0"/>
+  <path d="M32 25 39 32 32 39 25 32z" fill="#1C3A8C"/>
 </svg>

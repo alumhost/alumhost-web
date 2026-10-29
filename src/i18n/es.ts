@@ -3,15 +3,16 @@
  * Reglas para editar (IA incluida):
  * - Nada de guiones largos. Frases cortas, voz activa, sin palabras de relleno ("potencia", "eleva", "sin fricción").
  * - No prometas nada que no esté en docs/memoria-decisiones.md (SLA, cifras de uptime, % de descuento...).
- * - Nada regional (ni Sevilla ni Andalucía): el público es internacional aunque el soporte sea en español.
+ * - WingIT es de barrio (Reina Mercedes, Sevilla): el toque local va en la portada. Las páginas del hosting antiguo
+ *   (planes, publicar, beta, enterprise, términos) siguen con su texto hasta que se decida qué hacer con ellas.
  * - {placeholders} se rellenan con fill() de src/i18n/index.ts. El nombre de marca sale de site.ts ({name}).
  */
 const es = {
   meta: {
     home: {
-      title: "{name} · VPS y webs para estudiantes, con soporte en español",
+      title: "{name} · Webs para negocios de Reina Mercedes, Sevilla",
       description:
-        "Hosting boutique para estudiantes y desarrolladores: webs estáticas y VPS con SSH, IVA incluido y onboarding 1:1 en español.",
+        "Webs y sistemas para bares, peluquerías, academias y comercios de Reina Mercedes. Trato en persona, soporte por WhatsApp y precios claros: web por 849 € y mantenimiento por 30 €/mes.",
     },
     plans: {
       title: "Planes y precios · {name}",
@@ -19,7 +20,7 @@ const es = {
     },
     contact: {
       title: "Contacto · {name}",
-      description: "Reserva tu plaza en la beta privada o pregúntanos lo que necesites. Te responde una persona.",
+      description: "Cuéntanos qué negocio tienes y quedamos para verlo. Te respondemos nosotros.",
     },
     privacy: {
       title: "Privacidad · {name}",
@@ -45,6 +46,10 @@ const es = {
     plans: "Planes",
     enterprise: "Enterprise",
     contact: "Contacto",
+    services: "Servicios",
+    prices: "Precios",
+    about: "Quiénes somos",
+    ctaVisit: "Pide una visita",
     cta: "Reservar plaza",
     menu: "Menú",
     close: "Cerrar",
@@ -65,84 +70,96 @@ const es = {
     from: "desde {price}/mes",
   },
 
+  // Portada de WingIT (consultoría de barrio). Precios: 849 € la web (sin afirmar IVA, pendiente) y 30 €/mes.
+  // IA: no inventes clientes, testimonios, plazos ni cifras. El tope de cambios aún no tiene número: no lo pongas.
   home: {
     hero: {
-      eyebrow: "Beta privada abierta",
-      titleA: "Tu servidor, montado",
-      titleEm: "contigo.",
-      sub: "VPS y webs estáticas para estudiantes y desarrolladores. La primera puesta en marcha la hacemos contigo, 1:1 y en español.",
-      ctaSecondary: "Ver planes",
-      picker: {
-        legend: "¿Qué quieres subir?",
-        options: {
-          publish: "Una web estática",
-          mini: "Un VPS pequeño",
-          developer: "Un VPS",
-          pro: "Un VPS grande",
-        },
-        details: "Ver el plan completo",
-      },
+      eyebrow: "Reina Mercedes, Sevilla",
+      titleA: "La web de tu negocio,",
+      titleEm: "hecha en el barrio.",
+      sub: "Webs y sistemas para bares, peluquerías, academias y comercios. Nos pasamos por tu local, te lo explicamos sin jerga y, si algo falla, nos escribes por WhatsApp.",
+      cta: "Pide una visita",
+      ctaSecondary: "Ver precios",
+      plaque: { top: "Barrio de", name: "Reina Mercedes", bottom: "{name} · webs y sistemas" },
     },
-    proof: {
-      label: "Lo que ya es verdad",
+    sectors: {
+      title: "Para los negocios de aquí.",
       items: [
-        { title: "IVA incluido", body: "El precio que ves es el que pagas." },
-        { title: "En euros", body: "Sin tarjeta internacional ni facturas en dólares." },
-        { title: "Te responde una persona", body: "En español, sin bots ni colas de tickets." },
-        { title: "Precio congelado", body: "Si entras en la beta, el primer año no sube." },
-      ],
-    },
-    film: {
-      title: "AlumHost en 78 segundos.",
-      body: "Qué es, cómo aislamos cada servidor y qué incluye cada plan, contado en un vídeo corto. Tiene sonido.",
-      label: "Vídeo: qué es AlumHost",
-      fallback: "Tu navegador no reproduce el vídeo. Puedes descargarlo:",
-      download: "descargar el vídeo (MP4)",
-    },
-    perks: {
-      title: "Cómo trabajamos.",
-      items: [
-        {
-          title: "Una persona, no un ticket.",
-          body: "La primera vez lo montamos contigo por videollamada o en persona. Después, te seguimos respondiendo nosotros.",
-        },
-        {
-          title: "Hecho para la uni.",
-          body: "TFG, TFM, prácticas de sistemas y hackathons. Sin tarjeta internacional ni facturas en dólares.",
-        },
-        {
-          title: "Precio de estudiante, sin cupones.",
-          body: "No hay descuentos que pedir ni letra pequeña: el precio que ves es el de estudiante, para todo el mundo.",
-        },
-        {
-          title: "Automatizado, no improvisado.",
-          body: "Crear, retirar y aislar un servidor son comandos concretos y repetibles, no pasos a mano que dependen de la memoria de alguien.",
-        },
+        { name: "Bares y cafeterías", body: "La carta en el móvil con un QR en la mesa, el horario siempre al día y cómo llegar." },
+        { name: "Peluquerías y estética", body: "Tus servicios y precios, fotos de tus trabajos y un botón para pedir cita." },
+        { name: "Academias", body: "Horarios, grupos y matrícula en una página clara, y los avisos a las familias en un solo sitio." },
+        { name: "Comercios", body: "Lo que vendes, dónde estás y un WhatsApp directo para que te pregunten antes de venir." },
       ],
     },
     steps: {
-      title: "Así empiezas.",
+      title: "Cómo trabajamos.",
       items: [
-        { verb: "Elige", body: "Web estática o VPS, según lo que vayas a subir." },
-        { verb: "Reserva", body: "Estamos en beta privada. Déjanos tus datos y te escribimos cuando haya plaza." },
-        { verb: "Arranca", body: "Hacemos el onboarding contigo y te damos tu acceso SSH o tu web con HTTPS." },
+        { verb: "Vamos", body: "Nos pasamos por tu negocio y vemos contigo cómo trabajas y qué te hace falta." },
+        { verb: "Proponemos", body: "Te decimos por escrito qué lleva tu web y cuánto cuesta. Si te encaja, pagas la mitad y empezamos." },
+        { verb: "Montamos", body: "Te la enseñamos antes de publicarla y la ajustamos contigo. Al entregarla, pagas la otra mitad." },
+        { verb: "Cuidamos", body: "Con el mantenimiento, la web sigue al día y los cambios pequeños los hacemos nosotros." },
       ],
     },
+    prices: {
+      title: "Precios claros.",
+      sub: "Sabes lo que pagas antes de empezar.",
+      web: {
+        name: "Tu web",
+        price: "849 €",
+        note: "Pago único: la mitad al empezar y la otra mitad al entregarla.",
+        features: ["Hecha para tu negocio, no una plantilla", "Pensada para verse bien en el móvil", "Te la enseñamos antes de publicarla"],
+      },
+      care: {
+        name: "Mantenimiento",
+        price: "30 €",
+        per: "/mes",
+        note: "Para que no tengas que preocuparte de nada técnico.",
+        features: ["Hosting y dominio", "Copias de seguridad", "Cambios pequeños cada mes, hasta un tope", "Soporte por WhatsApp"],
+        extra: "Si un mes pides más cambios de los que entran, te decimos antes cuánto cuesta.",
+      },
+      later: {
+        name: "Y más adelante",
+        body: "Automatizar tareas que hoy haces a mano, ordenar la información de tu negocio y conectar los programas que ya usas. Si te suena a algo que necesitas, cuéntanoslo.",
+        cta: "Cuéntanos",
+      },
+    },
     honest: {
-      title: "Lo que no te vamos a prometer.",
+      title: "Lo que no vas a tener con nosotros.",
       items: [
-        { title: "Un SLA.", body: "Es un servicio de mejor esfuerzo y te lo decimos antes de que pagues." },
-        { title: "Ser los más baratos.", body: "Las grandes nubes ganan en specs. Nosotros competimos en ayuda y cercanía." },
-        { title: "Backups que no has contratado.", body: "Sin el extra de backup, los datos de tu VPS son responsabilidad tuya." },
+        { title: "Una centralita.", body: "Nos escribes por WhatsApp y te contestamos nosotros, no un sistema de tickets." },
+        { title: "Una plantilla que montas tú.", body: "Con Wix y similares, el trabajo lo haces tú. Aquí lo hacemos nosotros y te lo dejamos listo." },
+        { title: "Palabras que no entiendes.", body: "Te lo explicamos con ejemplos de tu negocio. Si no se entiende, es culpa nuestra." },
+        { title: "Una agencia que no conoce tu calle.", body: "Nos vemos en tu local, delante de tu mostrador, desde el primer día." },
+      ],
+    },
+    team: {
+      title: "Quiénes somos.",
+      names: ["Alonso", "Blas"],
+      and: "y",
+      body: "Somos estudiantes de informática en Sevilla. Montamos {name} para que los negocios del barrio tengan a quien llamar cuando algo de internet se les atraganta: alguien cercano que habla claro.",
+    },
+    faq: {
+      title: "Preguntas.",
+      items: [
         {
-          title: "Correo saliente.",
-          body: "El puerto 25 está cerrado. El 465 y el 587 también, salvo que nos lo pidas para tu proyecto.",
+          q: "¿Qué es un cambio pequeño?",
+          a: "Cambiar un horario, un precio, una foto o un texto. Entran en el mantenimiento hasta un tope cada mes. Si pides más, te decimos antes cuánto cuesta.",
+        },
+        {
+          q: "¿Cómo se paga?",
+          a: "La web, en dos mitades: al empezar y al entregar. El mantenimiento, cada mes. Pagas con tarjeta desde un enlace o un QR, y el mantenimiento también puede ir domiciliado.",
+        },
+        { q: "¿Tengo que saber de informática?", a: "No. Para eso estamos. Te explicamos lo justo para que sepas qué tienes y cómo pedirnos cambios." },
+        {
+          q: "¿Y si mi negocio no está en Reina Mercedes?",
+          a: "Empezamos por el barrio porque nos pilla cerca. Si estás en otra zona, escríbenos y lo vemos.",
         },
       ],
     },
     closing: {
-      title: "La beta es pequeña a propósito.",
-      body: "Pocas plazas, trato directo y condiciones de beta. Reserva la tuya y te escribimos.",
+      title: "¿Lo vemos en tu local?",
+      body: "Cuéntanos qué negocio tienes y quedamos para verlo contigo.",
+      whatsapp: "Escríbenos por WhatsApp",
     },
   },
 
@@ -206,6 +223,12 @@ const es = {
   },
 
   plans: {
+    // Selector del hero antiguo (PlanPicker.astro). Ya no sale en la portada de WingIT.
+    picker: {
+      legend: "¿Qué quieres subir?",
+      options: { publish: "Una web estática", mini: "Un VPS pequeño", developer: "Un VPS", pro: "Un VPS grande" },
+      details: "Ver el plan completo",
+    },
     header: {
       title: "Planes claros, IVA incluido.",
       sub: "Precios de beta, provisionales hasta medir la capacidad real. Pagando al año, los VPS te salen con 2 meses gratis.",
@@ -293,10 +316,11 @@ const es = {
   contact: {
     header: {
       title: "Hablemos.",
-      sub: "Para reservar plaza en la beta, preguntar por un plan o pedir ayuda. Te responde una persona.",
+      sub: "Cuéntanos qué negocio tienes y qué te gustaría. Te contestamos nosotros y, si quieres, quedamos en tu local.",
     },
     channels: {
       emailLabel: "Correo",
+      whatsappLabel: "WhatsApp",
       supportLabel: "Soporte",
       abuseLabel: "Denunciar un abuso",
       abuseNote: "Lo revisamos todos los días.",
@@ -312,15 +336,15 @@ const es = {
       reasons: {
         beta: "Reservar plaza en la beta",
         plans: "Pregunta sobre los planes",
-        business: "Web o servidor para mi negocio",
-        custom: "Necesito algo a medida",
-        support: "Ayuda con mi servicio",
+        business: "Quiero una web para mi negocio",
+        custom: "Automatizar u ordenar algo de mi negocio",
+        support: "Ya soy cliente y necesito un cambio",
         other: "Otra cosa",
       },
       plan: "Plan que te interesa",
       planUnknown: "Aún no lo sé",
       message: "Mensaje",
-      messageHelp: "Cuéntanos qué quieres montar. Mínimo 10 caracteres.",
+      messageHelp: "Qué negocio tienes y qué te gustaría. Si prefieres que te llamemos, deja tu teléfono. Mínimo 10 caracteres.",
       privacy: "Usamos tus datos solo para responderte.",
       privacyLink: "Política de privacidad",
       submit: "Enviar",
@@ -647,7 +671,7 @@ const es = {
   },
 
   footer: {
-    tagline: "Hosting boutique para estudiantes y desarrolladores.",
+    tagline: "Webs y sistemas para los negocios de Reina Mercedes, Sevilla.",
     status: "Estado del servicio",
     devlog: "Devlog",
     repo: "Código abierto",

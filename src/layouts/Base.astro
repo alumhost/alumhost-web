@@ -1,6 +1,6 @@
 ---
 /**
- * Layout común: <head> (SEO, hreflang), agua de fondo, navegación, pie y el reflejo del cristal que sigue al puntero.
+ * Layout común: <head> (SEO, hreflang), navegación, pie y el reflejo del cristal que sigue al puntero.
  * Cada página pasa `lang` y `page`; los textos de <title>/<meta> salen de i18n (meta.*).
  */
 import "@fontsource-variable/archivo/wdth.css";
@@ -8,7 +8,6 @@ import "@fontsource/ibm-plex-sans/400.css";
 import "@fontsource/ibm-plex-sans/600.css";
 import "@fontsource-variable/jetbrains-mono/wght.css";
 import "../styles/global.css";
-import Caustics from "../components/Caustics.astro";
 import Nav from "../components/Nav.astro";
 import Footer from "../components/Footer.astro";
 import { fill, langs, path, useDict, type Lang, type RouteKey } from "../i18n";
@@ -37,7 +36,7 @@ const canonical = page === "notFound" ? null : new URL(path(page, lang), site).h
     <meta name="description" content={meta.description} />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="preload" href={archivoWoff2} as="font" type="font/woff2" crossorigin />
-    <meta name="theme-color" content="#0b1122" />
+    <meta name="theme-color" content="#f7f5f0" />
     {canonical && <link rel="canonical" href={canonical} />}
     {page !== "notFound" &&
       langs.map((l) => <link rel="alternate" hreflang={l} href={new URL(path(page, l), site).href} />)}
@@ -65,13 +64,13 @@ const canonical = page === "notFound" ? null : new URL(path(page, lang), site).h
           name: siteConfig.name,
           url: site.origin + "/",
           email: siteConfig.email.hello,
+          areaServed: "Reina Mercedes, Sevilla",
         })}
       />
     )}
   </head>
   <body>
     <a class="skip-link" href="#main">{t.nav.skip}</a>
-    <Caustics />
     <Nav lang={lang} page={page} />
     <main id="main" tabindex="-1">
       <slot />

@@ -11,7 +11,7 @@ import { path, useDict, type Lang } from "../i18n";
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const t = useDict(lang);
-const pk = t.home.hero.picker;
+const pk = t.plans.picker;
 const def = plans.find((p) => p.featured)?.id ?? plans[0].id;
 ---
 <fieldset class="picker glass">

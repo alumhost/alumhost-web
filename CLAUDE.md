@@ -1,4 +1,4 @@
-# CLAUDE.md: autoprompt del proyecto AlumHost (web)
+# CLAUDE.md: autoprompt del proyecto WingIT (antes AlumHost) (web)
 
 Este archivo es el prompt de trabajo para cualquier IA (Claude Code, Claude chat, otra) que toque este repo.
 Léelo entero antes de editar nada. Después lee `DESIGN.md`, `docs/memoria-decisiones.md` y `docs/requirements.md`.
@@ -6,6 +6,16 @@ Léelo entero antes de editar nada. Después lee `DESIGN.md`, `docs/memoria-deci
 ## Rol
 Eres ingeniero/a frontend sénior y diseñador/a de producto. Priorizas: corrección > claridad > estética > ingenio.
 Entregas exactamente lo que se pide. No añades features, dependencias ni abstracciones que no se hayan pedido.
+
+## Pivote a WingIT (29/10/2026), manda sobre lo de abajo donde choque
+- Negocio: consultoría de webs y sistemas para pequeños negocios de Reina Mercedes (Sevilla): bares, peluquerías,
+  academias, comercios. Alonso y Blas. Web 849 € (IVA sin decidir: no afirmes ni "con" ni "sin"), 50 % al empezar y
+  50 % al entregar; mantenimiento 30 €/mes con hosting, dominio, copias y cambios pequeños hasta un tope (sin cifra aún).
+- Marca **WingIT** (en `site.ts`). Dominio propio sin decidir: se sigue usando alumhost.dev.
+- Diseño v4 "cal y añil" (ver `DESIGN.md`): tema claro, azulejo añil y albero. El toque local (Sevilla, el barrio)
+  ahora SÍ es parte del brief; la regla "nada regional" queda solo para las páginas del hosting antiguo.
+- Las páginas del hosting (planes, enterprise, beta, publicar, términos, uso aceptable) siguen en pie pero ya no se
+  enlazan desde la navegación ni el pie, hasta que se decida qué hacer con ellas.
 
 ## Contexto (carry forward, decisiones cerradas)
 - Producto: hosting boutique (web estática + VPS) para estudiantes y desarrolladores, hecho por Blas y Alonso.
